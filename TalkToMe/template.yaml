@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:  
+  ProcessTextFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: TalkToMe::TalkToMe.TranscribeHandler::ProcessText
+      CodeUri: ./bin/Release/net8.0/publish
+      Runtime: dotnet8
+      MemorySize: 512
+      Timeout: 60
+      Architectures:
+        - x86_64
+      Policies:
+        - AWSLambda_FullAccess           # Full access to Lambda resources
+        - AmazonS3FullAccess             # Full access to S3 resources
+        - AmazonTranscribeFullAccess      # Full access to Amazon Transcribe
+        - AmazonPollyFullAccess           # Full access to Amazon Polly
+        - AmazonBedrockFullAccess
+      Events:
+        ProcessTextApi:
+          Type: HttpApi  # Creates a Lambda URL
+          Properties:
+            Path: /process-text
+            Method: post
+
+  ProcessAudioFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: TalkToMe::TalkToMe.TranscribeHandler::ProcessAudio
+      CodeUri: ./bin/Release/net8.0/publish
+      Runtime: dotnet8
+      MemorySize: 512
+      Timeout: 60
+      Architectures:
+        - x86_64
+      Policies:
+        - AWSLambda_FullAccess           # Full access to Lambda resources
+        - AmazonS3FullAccess             # Full access to S3 resources
+        - AmazonTranscribeFullAccess      # Full access to Amazon Transcribe
+        - AmazonPollyFullAccess           # Full access to Amazon Polly
+        - AmazonBedrockFullAccess
+      Events:
+        ProcessAudioApi:
+          Type: HttpApi  # Creates a Lambda URL
+          Properties:
+            Path: /process-audio
+            Method: post

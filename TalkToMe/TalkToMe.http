@@ -1,0 +1,6 @@
+@TalkToMe_HostAddress = http://localhost:5227
+
+GET {{TalkToMe_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
