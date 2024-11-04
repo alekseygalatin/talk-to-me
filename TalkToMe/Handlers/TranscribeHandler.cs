@@ -91,8 +91,8 @@ public class TranscribeHandler
             {
                 { "Content-Type", "application/json" },
                 { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
-                //{ "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
-                { "Access-Control-Allow-Origin", "http://localhost:3000" },
+                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                //{ "Access-Control-Allow-Origin", "http://localhost:3000" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             }
@@ -145,8 +145,8 @@ public class TranscribeHandler
             {
                 { "Content-Type", "application/json" },
                 { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
-                //{ "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
-                { "Access-Control-Allow-Origin", "http://localhost:3000" },
+                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                //{ "Access-Control-Allow-Origin", "http://localhost:3000" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             },
@@ -250,7 +250,7 @@ public class TranscribeHandler
     {
         var synthesizeSpeechRequest = new SynthesizeSpeechRequest
         {
-            OutputFormat = OutputFormat.Mp3,
+            OutputFormat = OutputFormat.Pcm,
             Text = text,
             VoiceId = "Joanna"
         };
