@@ -1,7 +1,26 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Resources:  
+Resources:
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyUserPool
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - openid
+      AllowedOAuthFlowsUserPoolClient: true
+      CallbackURLs:
+        - "https://d3u8od6g4wwl6c.cloudfront.net" # Your callback URL on S3
+      SupportedIdentityProviders:
+        - COGNITO
+  
   ProcessTextFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -17,13 +36,23 @@ Resources:
         - AmazonS3FullAccess             # Full access to S3 resources
         - AmazonTranscribeFullAccess      # Full access to Amazon Transcribe
         - AmazonPollyFullAccess           # Full access to Amazon Polly
-        - AmazonBedrockFullAccess
+        - AmazonBedrockFullAccess         # Full access to Amazon Bedrock
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - "cognito:GetUser"     # Allow getting user details
+                - "cognito:ListUsers"    # Optional: List users in the user pool
+                - "cognito:AdminGetUser"
+              Resource:
+                - "arn:aws:cognito-idp:us-east-1:038462779690:userpool/us-east-1_walDCpNcK"
       Events:
         ProcessTextApi:
           Type: HttpApi  # Creates a Lambda URL
           Properties:
             Path: /process-text
             Method: post
+
 
   ProcessAudioFunction:
     Type: AWS::Serverless::Function

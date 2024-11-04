@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon;
@@ -15,7 +18,10 @@ using Amazon.BedrockRuntime;
 using Amazon.BedrockRuntime.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentityProvider.Model;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using TalkToMe.Handlers;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -32,6 +38,7 @@ public class TranscribeHandler
     private readonly AmazonS3Client _s3Client;
     private readonly AmazonTranscribeServiceClient _transcribeClient;
     private readonly AmazonPollyClient _pollyClient;
+    private readonly AmazonCognitoIdentityProviderClient _cognitoClient; // Cognito client
     private readonly MemoryCache _cache;
     private static readonly AmazonBedrockAgentRuntimeClient _bedrockRuntime = new AmazonBedrockAgentRuntimeClient(RegionEndpoint.USEast1);
 
@@ -40,6 +47,7 @@ public class TranscribeHandler
         _s3Client = new AmazonS3Client(bucketRegion);
         _transcribeClient = new AmazonTranscribeServiceClient(bucketRegion);
         _pollyClient = new AmazonPollyClient(bucketRegion);
+        _cognitoClient = new AmazonCognitoIdentityProviderClient(bucketRegion); // Initialize Cognito client
         _cache = new MemoryCache(new MemoryCacheOptions());
     }
 
@@ -49,12 +57,25 @@ public class TranscribeHandler
         {
             return CreateCorsResponse();
         }
+        
+        string token = request.Headers.TryGetValue("authorization", out var authHeader) ? authHeader : null;
+
+        var tuple = await ValidateCognitoToken(token);
+        if (!tuple.Item1)
+        {
+            return new APIGatewayHttpApiV2ProxyResponse
+            {
+                StatusCode = 401,
+                Body = "Unauthorized"
+            };
+        }
+        
+        var sub = tuple.Item2.Claims.First(x => x.Type.Equals("sub")).Value;
 
         var dictionary = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Body);
-
         Console.WriteLine(dictionary?.GetValueOrDefault("text") ?? "");
         
-        string bedrockResponse = await SendTextToBedrock(dictionary?.GetValueOrDefault("text") ?? "");
+        string bedrockResponse = await SendTextToBedrock(dictionary?.GetValueOrDefault("text") ?? "", sub);
         Console.WriteLine("RESPONSE: " + bedrockResponse);
         byte[] responseBytes = await ConvertTextToSpeechSwedish(bedrockResponse);
 
@@ -71,8 +92,8 @@ public class TranscribeHandler
             {
                 { "Content-Type", "audio/wav" },
                 { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
-                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },  // Allow any origin
-                { "Access-Control-Allow-Headers", "Content-Type" },  // Allow Content-Type header
+                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             }
         };
@@ -84,12 +105,23 @@ public class TranscribeHandler
         {
             return CreateCorsResponse();
         }
-        
+
+        string token = request.Headers.TryGetValue("Authorization", out var authHeader) ? authHeader : null;
+
+        var tuple = await ValidateCognitoToken(token);
+        if (!tuple.Item1)
+        {
+            return new APIGatewayHttpApiV2ProxyResponse
+            {
+                StatusCode = 401,
+                Body = "Unauthorized"
+            };
+        }
+
+        var sub = tuple.Item2.Claims.First(x => x.Type.Equals("sub")).Value;
+
         Console.WriteLine(JsonSerializer.Serialize(request));
-        Console.WriteLine(request.Body);
         var dictionary = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Body);
-        // using var inputStream = new MemoryStream(Convert.FromBase64String(dictionary?.GetValueOrDefault("audio") ?? ""));
-        // using var reader = new StreamReader(inputStream);
         string base64Audio = dictionary?.GetValueOrDefault("audio") ?? "";
     
         byte[] audioBytes = Convert.FromBase64String(base64Audio);
@@ -98,7 +130,7 @@ public class TranscribeHandler
     
         await UploadFileToS3(audioStream, mp3InputFileKey);
         string transcriptText = await TranscribeMp3ToText(mp3InputFileKey);
-        string bedrockResponse = await SendTextToBedrock(transcriptText);
+        string bedrockResponse = await SendTextToBedrock(transcriptText, sub);
         byte[] responseBytes = await ConvertTextToSpeech(bedrockResponse);
     
         return CreateResponse(responseBytes);
@@ -113,15 +145,14 @@ public class TranscribeHandler
             {
                 { "Content-Type", "audio/wav" },
                 { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
-                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },  // Allow any origin
-                { "Access-Control-Allow-Headers", "Content-Type" },  // Allow Content-Type header
+                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             },
             Body = Convert.ToBase64String(audioBytes),
             IsBase64Encoded = true
         };
     }
-
 
     private async Task UploadFileToS3(MemoryStream audioStream, string fileKey)
     {
@@ -130,14 +161,14 @@ public class TranscribeHandler
         await fileTransferUtility.UploadAsync(audioStream, s3BucketName, fileKey);
     }
 
-    private async Task<string> SendTextToBedrock(string chat)
+    private async Task<string> SendTextToBedrock(string chat, string sessionId)
     {
         var response = await _bedrockRuntime.InvokeAgentAsync(new InvokeAgentRequest
         {
             AgentAliasId = "OA0NAMBO9F",
             AgentId = "WNWLTJJLDA",
             InputText = chat,
-            SessionId = "123456789"
+            SessionId = sessionId
         });
 
         if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
@@ -242,5 +273,80 @@ public class TranscribeHandler
         await synthesizeSpeechResponse.AudioStream.CopyToAsync(memoryStream);
 
         return memoryStream.ToArray(); // Return the audio byte array
+    }
+
+    private async Task<(bool, JwtSecurityToken)> ValidateCognitoToken(string token)
+    {
+        // Replace with your User Pool ID, Region, and App Client ID
+        string userPoolId = "us-east-1_walDCpNcK"; // Your User Pool ID
+        string region = "us-east-1"; // Change to your region
+        string clientId = "7o8tqlt2ucihqsbtthfopc9d4p"; // Your App Client ID without a secret
+
+        if (string.IsNullOrEmpty(token))
+        {
+            Console.WriteLine("Token is null or empty.");
+            return (false, null); // Early return for invalid token input
+        }
+
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var keys = await GetCognitoPublicKeysAsync(userPoolId, region);
+            
+            // Specify token validation parameters
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeys = keys,
+                ValidateIssuer = true,
+                ValidIssuer = $"https://cognito-idp.{region}.amazonaws.com/{userPoolId}",
+                ValidateAudience = true,
+                ValidAudience = clientId,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero // Do not allow any clock skew
+            };
+
+            // Validate the token
+            handler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
+            
+            // If we reach this point, the token is valid
+            return (true, validatedToken as JwtSecurityToken);
+        }
+        catch (SecurityTokenExpiredException)
+        {
+            Console.WriteLine("Token is expired.");
+        }
+        catch (SecurityTokenInvalidSignatureException)
+        {
+            Console.WriteLine("Token signature is invalid.");
+        }
+        catch (SecurityTokenInvalidAudienceException)
+        {
+            Console.WriteLine("Token audience is invalid.");
+        }
+        catch (SecurityTokenInvalidIssuerException)
+        {
+            Console.WriteLine("Token issuer is invalid.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Token validation failed: {ex.Message}");
+        }
+
+        return (false, null); // Token is invalid or other error
+    }
+
+    private async Task<IEnumerable<JsonWebKey>> GetCognitoPublicKeysAsync(string userPoolId, string region)
+    {
+        // Fetch the Cognito public keys from the AWS Cognito JWK endpoint
+        var jwksUri = $"https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json";
+
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetStringAsync(jwksUri);
+        
+        // Deserialize directly into the JsonWebKeySet
+        var keys = JsonSerializer.Deserialize<JsonWebKeySet>(response);
+
+        return keys.Keys;
     }
 }
