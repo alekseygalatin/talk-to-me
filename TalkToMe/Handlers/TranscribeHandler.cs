@@ -76,10 +76,9 @@ public class TranscribeHandler
         Console.WriteLine(dictionary?.GetValueOrDefault("text") ?? "");
         
         string bedrockResponse = await SendTextToBedrock(dictionary?.GetValueOrDefault("text") ?? "", sub);
-        Console.WriteLine("RESPONSE: " + bedrockResponse);
         byte[] responseBytes = await ConvertTextToSpeechSwedish(bedrockResponse);
 
-        var response = CreateResponse(responseBytes);
+        var response = CreateResponse(responseBytes, bedrockResponse);
         return response;
     }
     
@@ -90,9 +89,10 @@ public class TranscribeHandler
             StatusCode = 200,
             Headers = new Dictionary<string, string>
             {
-                { "Content-Type", "audio/wav" },
+                { "Content-Type", "application/json" },
                 { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
-                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                //{ "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                { "Access-Control-Allow-Origin", "http://localhost:3000" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             }
@@ -133,24 +133,28 @@ public class TranscribeHandler
         string bedrockResponse = await SendTextToBedrock(transcriptText, sub);
         byte[] responseBytes = await ConvertTextToSpeech(bedrockResponse);
     
-        return CreateResponse(responseBytes);
+        return CreateResponse(responseBytes, bedrockResponse);
     }
     
-    public static APIGatewayHttpApiV2ProxyResponse CreateResponse(byte[] audioBytes)
+    public static APIGatewayHttpApiV2ProxyResponse CreateResponse(byte[] audioBytes, string text)
     {
         return new APIGatewayHttpApiV2ProxyResponse
         {
             StatusCode = 200,
             Headers = new Dictionary<string, string>
             {
-                { "Content-Type", "audio/wav" },
+                { "Content-Type", "application/json" },
                 { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
-                { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                //{ "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
+                { "Access-Control-Allow-Origin", "http://localhost:3000" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             },
-            Body = Convert.ToBase64String(audioBytes),
-            IsBase64Encoded = true
+            Body = JsonSerializer.Serialize(new
+            {
+                Audio = Convert.ToBase64String(audioBytes),
+                Text = text
+            })
         };
     }
 
