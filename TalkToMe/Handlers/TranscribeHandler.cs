@@ -90,9 +90,9 @@ public class TranscribeHandler
             Headers = new Dictionary<string, string>
             {
                 { "Content-Type", "application/json" },
-                { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
+                { "Content-Disposition", "attachment; filename=\"audio.wav\"" }, 
                 { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
-                //{ "Access-Control-Allow-Origin", "http://localhost:3000" },
+                //{ "Access-Control-Allow-Origin", "http://localhost:5173" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             }
@@ -146,7 +146,7 @@ public class TranscribeHandler
                 { "Content-Type", "application/json" },
                 { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
                 { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
-                //{ "Access-Control-Allow-Origin", "http://localhost:3000" },
+                // { "Access-Control-Allow-Origin", "http://localhost:5173" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             },
@@ -169,7 +169,7 @@ public class TranscribeHandler
     {
         var response = await _bedrockRuntime.InvokeAgentAsync(new InvokeAgentRequest
         {
-            AgentAliasId = "OA0NAMBO9F",
+            AgentAliasId = "WHY0CYNTVI",
             AgentId = "WNWLTJJLDA",
             InputText = chat,
             SessionId = sessionId
@@ -184,14 +184,15 @@ public class TranscribeHandler
             }
 
             var responseText = Encoding.UTF8.GetString(output.ToArray());
-            try
-            {
-                var result = JsonConvert.DeserializeObject<AgenQuestionResponseModel>(responseText);
-                responseText = result.Parameters.Question;
-            }
-            catch
-            {
-            }
+            Console.WriteLine("RES: " + responseText);
+            // try
+            // {
+            //     var result = JsonConvert.DeserializeObject<AgenQuestionResponseModel>(responseText);
+            //     responseText = result.Parameters.Topic ?? result.Parameters.Question;
+            // }
+            // catch
+            // {
+            // }
             
             return responseText;
         }

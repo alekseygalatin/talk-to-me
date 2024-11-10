@@ -9,4 +9,5 @@ public class AgenQuestionResponseModel
 public class Parameters
 {
     public string Question { get; set; }
+    public string? Topic { get; set; }
 }
