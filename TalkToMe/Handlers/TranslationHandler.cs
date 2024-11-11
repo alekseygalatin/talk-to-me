@@ -58,9 +58,8 @@ public class TranslationHandler
             Headers = new Dictionary<string, string>
             {
                 { "Content-Type", "application/json" },
-                { "Content-Disposition", "attachment; filename=\"audio.wav\"" }, 
                 { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
-                //{ "Access-Control-Allow-Origin", "http://localhost:5173" },
+                // { "Access-Control-Allow-Origin", "http://localhost:5173" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             }
@@ -75,9 +74,8 @@ public class TranslationHandler
             Headers = new Dictionary<string, string>
             {
                 { "Content-Type", "application/json" },
-                { "Content-Disposition", "attachment; filename=\"audio.wav\"" },
                 { "Access-Control-Allow-Origin", "https://d3u8od6g4wwl6c.cloudfront.net" },
-                //{ "Access-Control-Allow-Origin", "http://localhost:5173" },
+                // { "Access-Control-Allow-Origin", "http://localhost:5173" },
                 { "Access-Control-Allow-Headers", "Content-Type,Authorization" },
                 { "Access-Control-Allow-Methods", "POST" }
             },
@@ -93,7 +91,7 @@ public class TranslationHandler
     {
         var response = await _bedrockRuntime.InvokeAgentAsync(new InvokeAgentRequest
         {
-            AgentAliasId = "GNAH0QPDO9",
+            AgentAliasId = "T6D1PSJSZR",
             AgentId = "VPE9UHNC8T",
             InputText = chat,
             SessionId = sessionId
