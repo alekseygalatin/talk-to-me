@@ -1,4 +1,6 @@
+namespace TalkToMe.Core.Interfaces;
+
 public interface IBedrockClientFactory
 {
-    IAmazonBedrockRuntime CreateClient();
-} 
+    AmazonBedrockRuntimeClient CreateClient();
+}

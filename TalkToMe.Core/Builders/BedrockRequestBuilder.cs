@@ -1,6 +1,10 @@
+using TalkToMe.Core.Models;
+
+namespace TalkToMe.Core.Builders;
+
 public class BedrockRequestBuilder
 {
-    private readonly BedrockRequest _request = new();
+    private readonly CoreBedrockRequest _request = new();
 
     public BedrockRequestBuilder WithPrompt(string prompt)
     {
@@ -14,5 +18,11 @@ public class BedrockRequestBuilder
         return this;
     }
 
-    public BedrockRequest Build() => _request;
-} 
+    public BedrockRequestBuilder WithSystemInstruction(string instruction)
+    {
+        _request.SystemInstruction = instruction;
+        return this;
+    }
+
+    public CoreBedrockRequest Build() => _request;
+}

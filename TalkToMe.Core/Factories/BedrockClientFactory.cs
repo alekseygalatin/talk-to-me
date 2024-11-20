@@ -2,6 +2,8 @@ using Amazon.BedrockRuntime;
 using Amazon.Runtime;
 using System;
 using Microsoft.Extensions.Options;
+using TalkToMe.Core.Configuration;
+using TalkToMe.Core.Interfaces;
 
 namespace TalkToMe.Core.Factories
 {
@@ -14,7 +16,7 @@ namespace TalkToMe.Core.Factories
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public IAmazonBedrockRuntime CreateClient()
+        public AmazonBedrockRuntimeClient CreateClient()
         {
             return new AmazonBedrockRuntimeClient(
                 new AmazonBedrockRuntimeConfig

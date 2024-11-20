@@ -1,4 +1,8 @@
+using TalkToMe.Core.Models;
+
+namespace TalkToMe.Core.Interfaces;
+
 public interface IBedrockService
 {
-    Task<BedrockResponse> InvokeModelAsync(BedrockRequest request);
-} 
+    Task<CoreBedrockResponse> InvokeModelAsync(CoreBedrockRequest request);
+}
