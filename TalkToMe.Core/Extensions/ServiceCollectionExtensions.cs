@@ -1,0 +1,18 @@
+using Microsoft.Extensions.DependencyInjection;
+using TalkToMe.Core.Factories;
+using TalkToMe.Core.Services;
+
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddBedrockServices(
+        this IServiceCollection services,
+        BedrockSettings settings)
+    {
+        services.AddSingleton(settings);
+        
+        services.AddSingleton<IBedrockClientFactory, BedrockClientFactory>();
+        services.AddScoped<IBedrockService, LamaBedrockService>();
+        
+        return services;
+    }
+}
