@@ -33,37 +33,64 @@ public class LamaBedrockService : IBedrockService, IDisposable
         try
         {
             var promptText = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{request.SystemInstruction}<|eot_id|><|start_header_id|>user<|end_header_id|>{request.Prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
-            var converse = new ConverseRequest
+            
+            var requestBody = JsonSerializer.Serialize(new
             {
-                ModelId = request.ModelId, // Replace with your mo
-                Messages = new List<Message>
-                {
-                    // User provides the system instruction and input in the first message
-                    new Message
-                    {
-                        Role = "user",
-                        Content = new List<ContentBlock>
-                        {
-                            new ContentBlock
-                            {
-                                Text = promptText
-                            }
-                        }
-                    }
-                },
-                AdditionalModelRequestFields = new Document
-                {
-                    {"max_gen_len", new Document(512)},
-                    {"temperature", new Document(0.7)},
-                    {"top_p", new Document(0.9)}
-                }
+                prompt = promptText,
+                max_gen_len = 512,
+                temperature = 0.7,
+                top_p = 0.9
+            });
+
+            var requestBytes = Encoding.UTF8.GetBytes(requestBody);
+                
+            var invokeRequest = new InvokeModelRequest
+            {
+                ModelId = modelId,
+                Body = new MemoryStream(requestBytes),
+                ContentType = "application/json",
+                Accept = "application/json"
             };
 
-            var response = await _client.ConverseAsync(converse);
+            var response = await _client.InvokeModelAsync(invokeRequest);
+                
+            using var reader = new StreamReader(response.Body);
+            var responseBody = await reader.ReadToEndAsync();
+            var parsedResponse = JsonSerializer.Deserialize<JsonDocument>(responseBody);
+            var generationText = parsedResponse.RootElement
+                .GetProperty("generation").GetString() ?? string.Empty;
+            
+            // var converse = new ConverseRequest
+            // {
+            //     ModelId = request.ModelId, // Replace with your mo
+            //     Messages = new List<Message>
+            //     {
+            //         // User provides the system instruction and input in the first message
+            //         new Message
+            //         {
+            //             Role = "user",
+            //             Content = new List<ContentBlock>
+            //             {
+            //                 new ContentBlock
+            //                 {
+            //                     Text = promptText
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     AdditionalModelRequestFields = new Document
+            //     {
+            //         {"max_gen_len", new Document(512)},
+            //         {"temperature", new Document(0.7)},
+            //         {"top_p", new Document(0.9)}
+            //     }
+            // };
+            //
+            // var response = await _client.ConverseAsync(converse);
 
             return new CoreBedrockResponse
             {
-                Response = response.Output.Message.Content[0].Text ?? string.Empty,
+                Response = generationText,
                 Metadata = new Dictionary<string, object>
                 {
                     { "ModelId", modelId },
