@@ -32,8 +32,7 @@ public class LamaBedrockService : IBedrockService, IDisposable
 
         try
         {
-            var promptText = $"<<SYS>>{request.SystemInstruction}<<SYS>>{request.Prompt}";
-
+            var promptText = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{request.SystemInstruction}<|eot_id|><|start_header_id|>user<|end_header_id|>{request.Prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
             var converse = new ConverseRequest
             {
                 ModelId = request.ModelId, // Replace with your mo
