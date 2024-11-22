@@ -38,11 +38,15 @@ public class LamaBedrockService : IBedrockService, IDisposable
             var promptBuilder = new StringBuilder();
             promptBuilder.AppendLine("<|begin_of_text|>");
             promptBuilder.AppendLine($"<|start_header_id|>system<|end_header_id|>{request.SystemInstruction}.");
-            promptBuilder.AppendLine("The following section contains the conversation history for your reference. Do not include or repeat this history in your response. Only respond to the user's latest input after the conversation history:");
-            _conversationManager.GetFormattedPrompt((role, content) =>
-            {
-                promptBuilder.AppendLine($"{role}: {content}");
-            });
+            
+            if (request.SupportHistory) {
+                promptBuilder.AppendLine("The following section contains the conversation history for your reference. Do not include or repeat this history in your response. Only respond to the user's latest input after the conversation history:");
+                _conversationManager.GetFormattedPrompt((role, content) =>
+                {
+                    promptBuilder.AppendLine($"{role}: {content}");
+                });
+            }
+            
             promptBuilder.AppendLine("<|eot_id|>");
             
             promptBuilder.AppendLine($"<|start_header_id|>user<|end_header_id|>{request.Prompt}.");
@@ -69,7 +73,8 @@ public class LamaBedrockService : IBedrockService, IDisposable
 
             var response = await _client.InvokeModelAsync(invokeRequest);
             
-            _conversationManager.AddMessage("user", request.Prompt);
+            if (request.SupportHistory)
+                _conversationManager.AddMessage("user", request.Prompt);
             
             using var reader = new StreamReader(response.Body);
             var responseBody = await reader.ReadToEndAsync();
@@ -77,34 +82,8 @@ public class LamaBedrockService : IBedrockService, IDisposable
             var generationText = parsedResponse.RootElement
                 .GetProperty("generation").GetString() ?? string.Empty;
             
-            _conversationManager.AddMessage("model", generationText);
-            // var converse = new ConverseRequest
-            // {
-            //     ModelId = request.ModelId, // Replace with your mo
-            //     Messages = new List<Message>
-            //     {
-            //         // User provides the system instruction and input in the first message
-            //         new Message
-            //         {
-            //             Role = "user",
-            //             Content = new List<ContentBlock>
-            //             {
-            //                 new ContentBlock
-            //                 {
-            //                     Text = promptText
-            //                 }
-            //             }
-            //         }
-            //     },
-            //     AdditionalModelRequestFields = new Document
-            //     {
-            //         {"max_gen_len", new Document(512)},
-            //         {"temperature", new Document(0.7)},
-            //         {"top_p", new Document(0.9)}
-            //     }
-            // };
-            //
-            // var response = await _client.ConverseAsync(converse);
+            if (request.SupportHistory)
+                _conversationManager.AddMessage("model", generationText);
 
             return new CoreBedrockResponse
             {

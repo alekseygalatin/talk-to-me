@@ -6,6 +6,11 @@ using Amazon.BedrockAgentRuntime.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Microsoft.IdentityModel.Tokens;
+using TalkToMe.Core.Builders;
+using TalkToMe.Core.Configuration;
+using TalkToMe.Core.Factories;
+using TalkToMe.Core.Interfaces;
+using TalkToMe.Core.Services;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using PayloadPart = Amazon.BedrockAgentRuntime.Model.PayloadPart;
 
@@ -15,8 +20,16 @@ public class TranslationHandler
 {
     private static readonly AmazonBedrockAgentRuntimeClient _bedrockRuntime = new AmazonBedrockAgentRuntimeClient(RegionEndpoint.USEast1);
 
+    private static IBedrockService _bedrockService;
     public TranslationHandler()
     {
+        var settings = new BedrockSettings
+        {
+            Region = "us-east-1",
+            DefaultModelId = "us.meta.llama3-1-8b-instruct-v1:0"
+        };
+
+        _bedrockService = new LamaBedrockService(new BedrockClientFactory(settings), settings, new ConversationManager());
     }
 
     public async Task<APIGatewayHttpApiV2ProxyResponse> ProcessText(APIGatewayHttpApiV2ProxyRequest request)
@@ -89,37 +102,13 @@ public class TranslationHandler
 
     private async Task<string> SendTextToBedrock(string chat, string sessionId)
     {
-        var response = await _bedrockRuntime.InvokeAgentAsync(new InvokeAgentRequest
-        {
-            AgentAliasId = "T6D1PSJSZR",
-            AgentId = "VPE9UHNC8T",
-            InputText = chat,
-            SessionId = sessionId
-        });
+        var request = new BedrockRequestBuilder()
+            .WithModel("us.meta.llama3-1-8b-instruct-v1:0")
+            .WithSystemInstruction("You are a Swedish-to-English language translation agent. When given a Swedish word or phrase.\nProvide an accurate English translation, a brief example sentence showing natural usage in Swedish, and any relevant notes on nuances like article usage in Swedish.\n\nYour respons always must contain only JSON in the format: {\"translation\":  \"english translation\",  \"example_usage\": \"example swedish sentence\",  \"translation_notes\": \"notes on use\"}")
+            .WithPrompt(chat)
+            .Build();
 
-        if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-        {
-            MemoryStream output = new MemoryStream();
-            foreach (PayloadPart item in response.Completion)
-            {
-                item.Bytes.CopyTo(output);
-            }
-
-            var responseText = Encoding.UTF8.GetString(output.ToArray());
-            Console.WriteLine("RES: " + responseText);
-            // try
-            // {
-            //     var result = JsonConvert.DeserializeObject<AgenQuestionResponseModel>(responseText);
-            //     responseText = result.Parameters.Topic ?? result.Parameters.Question;
-            // }
-            // catch
-            // {
-            // }
-            
-            return responseText;
-        }
-
-        throw new Exception("Failed to get response from Bedrock.");
+        return (await _bedrockService.InvokeModelAsync(request)).Response;
     }
 
     private async Task<(bool, JwtSecurityToken)> ValidateCognitoToken(string token)

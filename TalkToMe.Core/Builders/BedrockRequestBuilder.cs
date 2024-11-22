@@ -23,6 +23,13 @@ public class BedrockRequestBuilder
         _request.SystemInstruction = instruction;
         return this;
     }
+    
+    public BedrockRequestBuilder WithHistory()
+    {
+        _request.SupportHistory = true;
+        return this;
+    }
+
 
     public CoreBedrockRequest Build() => _request;
 }
