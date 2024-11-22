@@ -35,20 +35,19 @@ public class LamaBedrockService : IBedrockService, IDisposable
 
         try
         {
-            //var promptText = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{request.SystemInstruction}<|eot_id|><|start_header_id|>user<|end_header_id|>{request.Prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
-            
             var promptBuilder = new StringBuilder();
             promptBuilder.AppendLine("<|begin_of_text|>");
-            promptBuilder.AppendLine($"<|start_header_id|>system<|end_header_id|>{request.SystemInstruction}<|eot_id|>");
-            promptBuilder.AppendLine("<|start_history|>");
+            promptBuilder.AppendLine($"<|start_header_id|>system<|end_header_id|>{request.SystemInstruction}.");
+            promptBuilder.AppendLine("The following section contains the conversation history for your reference. Do not include or repeat this history in your response. Only respond to the user's latest input after the conversation history:");
             _conversationManager.GetFormattedPrompt((role, content) =>
             {
-                var header = role == "User" ? "user" : "assistant";
-                promptBuilder.AppendLine($"<|start_header_id|>{header}<|end_header_id|>{content}<|eot_id|>");
+                promptBuilder.AppendLine($"{role}: {content}");
             });
-            promptBuilder.AppendLine("<|end_history|>");
+            promptBuilder.AppendLine("<|eot_id|>");
             
-            promptBuilder.AppendLine($"<|start_header_id|>user<|end_header_id|>{request.Prompt}<|eot_id|>");
+            promptBuilder.AppendLine($"<|start_header_id|>user<|end_header_id|>{request.Prompt}.");
+            promptBuilder.AppendLine("Your response must not include your role name. Provide only the content.<|eot_id|>");
+
             
             var requestBody = JsonSerializer.Serialize(new
             {
