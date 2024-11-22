@@ -11,14 +11,17 @@ public class LamaBedrockService : IBedrockService, IDisposable
 {
     private readonly AmazonBedrockRuntimeClient _client;
     private readonly BedrockSettings _settings;
+    private readonly IConversationManager _conversationManager;
     private bool _disposed;
 
     public LamaBedrockService(
         IBedrockClientFactory clientFactory, 
-        BedrockSettings settings)
+        BedrockSettings settings,
+        IConversationManager conversationManager)
     {
         if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _conversationManager = conversationManager;
         _client = clientFactory.CreateClient();
     }
 
@@ -32,11 +35,24 @@ public class LamaBedrockService : IBedrockService, IDisposable
 
         try
         {
-            var promptText = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{request.SystemInstruction}<|eot_id|><|start_header_id|>user<|end_header_id|>{request.Prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
+            //var promptText = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{request.SystemInstruction}<|eot_id|><|start_header_id|>user<|end_header_id|>{request.Prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
+            
+            var promptBuilder = new StringBuilder();
+            promptBuilder.AppendLine("<|begin_of_text|>");
+            promptBuilder.AppendLine($"<|start_header_id|>system<|end_header_id|>{request.SystemInstruction}<|eot_id|>");
+            promptBuilder.AppendLine("<|start_history|>");
+            _conversationManager.GetFormattedPrompt((role, content) =>
+            {
+                var header = role == "User" ? "user" : "assistant";
+                promptBuilder.AppendLine($"<|start_header_id|>{header}<|end_header_id|>{content}<|eot_id|>");
+            });
+            promptBuilder.AppendLine("<|end_history|>");
+            
+            promptBuilder.AppendLine($"<|start_header_id|>user<|end_header_id|>{request.Prompt}<|eot_id|>");
             
             var requestBody = JsonSerializer.Serialize(new
             {
-                prompt = promptText,
+                prompt = promptBuilder.ToString(),
                 max_gen_len = 512,
                 temperature = 0.7,
                 top_p = 0.9
@@ -53,13 +69,16 @@ public class LamaBedrockService : IBedrockService, IDisposable
             };
 
             var response = await _client.InvokeModelAsync(invokeRequest);
-                
+            
+            _conversationManager.AddMessage("user", request.Prompt);
+            
             using var reader = new StreamReader(response.Body);
             var responseBody = await reader.ReadToEndAsync();
             var parsedResponse = JsonSerializer.Deserialize<JsonDocument>(responseBody);
             var generationText = parsedResponse.RootElement
                 .GetProperty("generation").GetString() ?? string.Empty;
             
+            _conversationManager.AddMessage("model", generationText);
             // var converse = new ConverseRequest
             // {
             //     ModelId = request.ModelId, // Replace with your mo
