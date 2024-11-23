@@ -6,15 +6,15 @@ using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
 
 namespace TalkToMe.Core.Services;
-
-public class LamaBedrockService : IBedrockService, IDisposable
+//https://www.llama.com/docs/model-cards-and-prompt-formats/llama3_1/
+public class LamaAiModelService : IAiModelService, IDisposable
 {
     private readonly AmazonBedrockRuntimeClient _client;
     private readonly BedrockSettings _settings;
     private readonly IConversationManager _conversationManager;
     private bool _disposed;
 
-    public LamaBedrockService(
+    public LamaAiModelService(
         IBedrockClientFactory clientFactory, 
         BedrockSettings settings,
         IConversationManager conversationManager)

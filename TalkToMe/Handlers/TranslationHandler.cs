@@ -20,7 +20,7 @@ public class TranslationHandler
 {
     private static readonly AmazonBedrockAgentRuntimeClient _bedrockRuntime = new AmazonBedrockAgentRuntimeClient(RegionEndpoint.USEast1);
 
-    private static IBedrockService _bedrockService;
+    private static IAiModelService _aiModelService;
     public TranslationHandler()
     {
         var settings = new BedrockSettings
@@ -29,7 +29,7 @@ public class TranslationHandler
             DefaultModelId = "us.meta.llama3-1-8b-instruct-v1:0"
         };
 
-        _bedrockService = new LamaBedrockService(new BedrockClientFactory(settings), settings, new ConversationManager());
+        _aiModelService = new LamaAiModelService(new BedrockClientFactory(settings), settings, new ConversationManager());
     }
 
     public async Task<APIGatewayHttpApiV2ProxyResponse> ProcessText(APIGatewayHttpApiV2ProxyRequest request)
@@ -108,7 +108,7 @@ public class TranslationHandler
             .WithPrompt(chat)
             .Build();
 
-        return (await _bedrockService.InvokeModelAsync(request)).Response;
+        return (await _aiModelService.InvokeModelAsync(request)).Response;
     }
 
     private async Task<(bool, JwtSecurityToken)> ValidateCognitoToken(string token)

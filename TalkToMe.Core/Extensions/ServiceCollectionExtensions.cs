@@ -14,7 +14,8 @@ public static class ServiceCollectionExtensions
         
         services.AddSingleton<IBedrockClientFactory, BedrockClientFactory>();
         services.AddScoped<IConversationManager, ConversationManager>();
-        services.AddScoped<IBedrockService, LamaBedrockService>();
+        services.AddScoped<IAiService, AiService>();
+        services.AddScoped<IAiModelService, LamaAiModelService>();
         
         return services;
     }
