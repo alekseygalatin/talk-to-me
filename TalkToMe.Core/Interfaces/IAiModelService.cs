@@ -4,5 +4,5 @@ namespace TalkToMe.Core.Interfaces;
 
 public interface IAiModelService
 {
-    Task<CoreBedrockResponse> InvokeModelAsync(CoreBedrockRequest request);
+    Task<CoreResponse> InvokeModelAsync(CoreRequest request);
 }

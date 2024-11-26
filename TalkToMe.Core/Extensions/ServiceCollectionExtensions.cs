@@ -14,9 +14,21 @@ public static class ServiceCollectionExtensions
         
         services.AddSingleton<IBedrockClientFactory, BedrockClientFactory>();
         services.AddScoped<IConversationManager, ConversationManager>();
-        services.AddScoped<IAiService, AiService>();
+        services.AddScoped<IAiService, BedrockService>();
         services.AddScoped<IAiModelService, LamaAiModelService>();
         
+        return services;
+    }
+
+    public static IServiceCollection AddOpenAiServices(
+        this IServiceCollection services,
+        OpenAiSettings settings)
+    {
+        services.AddScoped<IAiService, OpenAiService>(opts => 
+        {
+            return new OpenAiService(settings);
+        });
+
         return services;
     }
 }
