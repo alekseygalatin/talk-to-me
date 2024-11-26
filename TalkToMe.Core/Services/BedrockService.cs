@@ -4,11 +4,11 @@ using TalkToMe.Core.Models;
 
 namespace TalkToMe.Core.Services;
 
-public class AiService: IAiService
+public class BedrockService : IAiService
 {
     private readonly Dictionary<string, IAiModelService> _modelServices = new();
 
-    public AiService(
+    public BedrockService(
         IBedrockClientFactory clientFactory, 
         BedrockSettings settings,
         IConversationManager conversationManager)
@@ -22,7 +22,7 @@ public class AiService: IAiService
         };
     }
 
-    public async Task<CoreBedrockResponse> InvokeModelAsync(CoreBedrockRequest request)
+    public async Task<CoreResponse> SendMessageAsync(CoreRequest request)
     {
         var aiModelService = _modelServices.GetValueOrDefault(request.ModelId)!;
         return await aiModelService.InvokeModelAsync(request);

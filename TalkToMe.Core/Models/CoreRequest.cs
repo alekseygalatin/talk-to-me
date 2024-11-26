@@ -1,6 +1,6 @@
 namespace TalkToMe.Core.Models;
 
-public class CoreBedrockRequest
+public class CoreRequest
 {
     public string Prompt { get; set; }
     public string ModelId { get; set; }

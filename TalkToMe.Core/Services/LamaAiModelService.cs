@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
-using Amazon.Runtime.Documents;
 using TalkToMe.Core.Configuration;
 using TalkToMe.Core.Exceptions;
 using TalkToMe.Core.Interfaces;
@@ -25,7 +23,7 @@ public class LamaAiModelService : IAiModelService, IDisposable
         _client = clientFactory.CreateClient();
     }
 
-    public async Task<CoreBedrockResponse> InvokeModelAsync(CoreBedrockRequest request)
+    public async Task<CoreResponse> InvokeModelAsync(CoreRequest request)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
             
@@ -85,7 +83,7 @@ public class LamaAiModelService : IAiModelService, IDisposable
             if (request.SupportHistory)
                 _conversationManager.AddMessage("model", generationText);
 
-            return new CoreBedrockResponse
+            return new CoreResponse
             {
                 Response = generationText,
                 Metadata = new Dictionary<string, object>
