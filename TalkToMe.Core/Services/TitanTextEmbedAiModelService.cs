@@ -1,28 +1,23 @@
-using System.Runtime.InteropServices.JavaScript;
-using System.Text.Json.Serialization;
-using Amazon.Runtime.Documents;
 using TalkToMe.Core.Configuration;
 using TalkToMe.Core.Exceptions;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
 
 namespace TalkToMe.Core.Services;
-//https://www.llama.com/docs/model-cards-and-prompt-formats/llama3_1/
-public class LamaAiModelService : IAiModelService, IDisposable
+
+public class TitanTextEmbedAiModelService : IAiModelService, IDisposable
 {
     private readonly AmazonBedrockRuntimeClient _client;
     private readonly BedrockSettings _settings;
     private readonly IConversationManager _conversationManager;
     private bool _disposed;
 
-    public LamaAiModelService(
+    public TitanTextEmbedAiModelService(
         IBedrockClientFactory clientFactory, 
-        BedrockSettings settings,
-        IConversationManager conversationManager)
+        BedrockSettings settings)
     {
         if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _conversationManager = conversationManager;
         _client = clientFactory.CreateClient();
     }
 
@@ -36,30 +31,9 @@ public class LamaAiModelService : IAiModelService, IDisposable
 
         try
         {
-            var promptBuilder = new StringBuilder();
-            promptBuilder.AppendLine("<|begin_of_text|>");
-            promptBuilder.AppendLine($"<|start_header_id|>system<|end_header_id|>{request.SystemInstruction}.");
-            
-            if (request.SupportHistory) {
-                promptBuilder.AppendLine("The following section contains the conversation history for your reference. Do not include or repeat this history in your response. Only respond to the user's latest input after the conversation history:");
-                await _conversationManager.GetFormattedPrompt(request.Prompt, (role, content) =>
-                {
-                    promptBuilder.AppendLine($"{role}: {content}");
-                });
-            }
-            
-            promptBuilder.AppendLine("<|eot_id|>");
-            
-            promptBuilder.AppendLine($"<|start_header_id|>user<|end_header_id|>{request.Prompt}.");
-            promptBuilder.AppendLine("Your response must not include your role name. Provide only the content.<|eot_id|>");
-
-            
             var requestBody = JsonSerializer.Serialize(new
             {
-                prompt = promptBuilder.ToString(),
-                max_gen_len = 512,
-                temperature = 0.7,
-                top_p = 0.9
+                inputText = request.Prompt
             });
 
             var requestBytes = Encoding.UTF8.GetBytes(requestBody);
@@ -73,27 +47,12 @@ public class LamaAiModelService : IAiModelService, IDisposable
             };
 
             var response = await _client.InvokeModelAsync(invokeRequest);
-
+            
             using var reader = new StreamReader(response.Body);
             var responseBody = await reader.ReadToEndAsync();
             var parsedResponse = JsonSerializer.Deserialize<JsonDocument>(responseBody);
             var generationText = parsedResponse.RootElement
-                .GetProperty("generation").GetString() ?? string.Empty;
-            
-            if (request.SupportHistory)
-                await _conversationManager.AddMessage($"{request.Prompt}. {generationText}", new List<Dialog>
-                {
-                    new Dialog
-                    {
-                        Role = "user",
-                        Message = request.Prompt
-                    },
-                    new Dialog
-                    {
-                        Role = "model",
-                        Message = generationText
-                    }
-                });
+                .GetProperty("embedding").ToString() ?? string.Empty;
 
             return new CoreBedrockResponse
             {

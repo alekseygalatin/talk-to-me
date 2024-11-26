@@ -18,6 +18,10 @@ public class AiService: IAiService
             {
                 "us.meta.llama3-1-8b-instruct-v1:0",
                 new LamaAiModelService(clientFactory, settings, conversationManager)
+            },
+            {
+                "amazon.titan-embed-text-v1",
+                new TitanTextEmbedAiModelService(clientFactory, settings)
             }
         };
     }
