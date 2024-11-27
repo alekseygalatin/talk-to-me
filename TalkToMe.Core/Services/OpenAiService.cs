@@ -1,75 +1,34 @@
-﻿using Newtonsoft.Json;
-using RestSharp;
-using TalkToMe.Core.Configuration;
+﻿using TalkToMe.Core.Configuration;
+using TalkToMe.Core.Constants;
 using TalkToMe.Core.Interfaces;
-using TalkToMe.Core.Models;
-using TalkToMe.Core.Models.OpenAiModels;
 
 namespace TalkToMe.Core.Services
 {
-    public class OpenAiService : IAiService, IDisposable
+    public class OpenAiService : IAIProvider
     {
-        private readonly OpenAiSettings _settings;
-        private readonly RestClient _client;
-        private bool _disposed;
+        private readonly Dictionary<string, IAiModelService> _modelServices = new();
 
         public OpenAiService(OpenAiSettings settings)
         {
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            if (string.IsNullOrEmpty(_settings.BaseUrl)) throw new ArgumentException("Base URL must be provided.", nameof(settings.BaseUrl));
-            if (string.IsNullOrEmpty(_settings.ApiKey)) throw new ArgumentException("API key must be provided.", nameof(settings.ApiKey));
-
-            _client = new RestClient(_settings.BaseUrl);
-        }
-
-        public async Task<CoreResponse> SendMessageAsync(CoreRequest request)
-        {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-
-            var restRequest = new RestRequest("chat/completions", Method.Post);
-            restRequest.AddHeader("Authorization", $"Bearer {_settings.ApiKey}");
-
-            restRequest.AddJsonBody(new
+            _modelServices = new Dictionary<string, IAiModelService>
             {
-                model = request.ModelId,
-                messages = new[] 
                 {
-                    new { role = "system", content = request.SystemInstruction },
-                    new { role = "user", content = request.Prompt } 
+                    OpenAIModelNames.GPT4oMini, new ChatGPT4oMiniModelService(settings, OpenAIModelNames.GPT4oMini)
+                },
+                {
+                    OpenAIModelNames.GPT4o, new ChatGPT4oModelService(settings, OpenAIModelNames.GPT4o)
                 }
-            });
-
-            var response = await _client.ExecuteAsync(restRequest);
-            if (response.IsSuccessful)
-            {
-                dynamic result = JsonConvert.DeserializeObject<OpenAiResponse>(response.Content);
-                return new CoreResponse
-                {
-                    Response = result.Choices[0].Message.Content
-                };
-            }
-            else
-            {
-                throw new Exception($"Error: {response.StatusCode}, {response.Content}");
-            }
+            };
         }
 
-        public void Dispose()
+        public IAiModelService GetModel(string modelId)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+            var aiModel = _modelServices.GetValueOrDefault(modelId);
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed) return;
+            if (aiModel is null)
+                throw new NotSupportedException($"Model with id {modelId} is not suported");
 
-            if (disposing)
-            {
-                _client?.Dispose();
-            }
-
-            _disposed = true;
+            return aiModel;
         }
     }
 }

@@ -11,26 +11,33 @@ public class LamaAiModelService : IAiModelService, IDisposable
     private readonly BedrockSettings _settings;
     private readonly IConversationManager _conversationManager;
     private bool _disposed;
+    private readonly string _modelId;
 
     public LamaAiModelService(
         IBedrockClientFactory clientFactory, 
         BedrockSettings settings,
-        IConversationManager conversationManager)
+        IConversationManager conversationManager, 
+        string modelId)
     {
         if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        if (string.IsNullOrEmpty(modelId))
+            throw new ArgumentNullException("modelId");
+
         _conversationManager = conversationManager;
         _client = clientFactory.CreateClient();
+        _modelId = modelId; 
     }
 
-    public async Task<CoreResponse> InvokeModelAsync(CoreRequest request)
+    public string ModelId
+    {
+        get { return _modelId; }
+    }
+
+    public async Task<CoreResponse> SendMessageAsync(CoreRequest request)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
             
-        var modelId = string.IsNullOrEmpty(request.ModelId) 
-            ? _settings.DefaultModelId 
-            : request.ModelId;
-
         try
         {
             var promptBuilder = new StringBuilder();
@@ -63,7 +70,7 @@ public class LamaAiModelService : IAiModelService, IDisposable
                 
             var invokeRequest = new InvokeModelRequest
             {
-                ModelId = modelId,
+                ModelId = _modelId,
                 Body = new MemoryStream(requestBytes),
                 ContentType = "application/json",
                 Accept = "application/json"
@@ -88,7 +95,7 @@ public class LamaAiModelService : IAiModelService, IDisposable
                 Response = generationText,
                 Metadata = new Dictionary<string, object>
                 {
-                    { "ModelId", modelId },
+                    { "ModelId", _modelId },
                     { "RequestId", response.ResponseMetadata.RequestId }
                 }
             };

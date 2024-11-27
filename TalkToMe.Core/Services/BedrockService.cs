@@ -1,10 +1,10 @@
 using TalkToMe.Core.Configuration;
+using TalkToMe.Core.Constants;
 using TalkToMe.Core.Interfaces;
-using TalkToMe.Core.Models;
 
 namespace TalkToMe.Core.Services;
 
-public class BedrockService : IAiService
+public class BedrockService : IAIProvider
 {
     private readonly Dictionary<string, IAiModelService> _modelServices = new();
 
@@ -16,15 +16,20 @@ public class BedrockService : IAiService
         _modelServices = new Dictionary<string, IAiModelService>
         {
             {
-                "us.meta.llama3-1-8b-instruct-v1:0",
-                new LamaAiModelService(clientFactory, settings, conversationManager)
+                BedrockAIModelNames.Lama3_1_8b_v1, 
+                new LamaAiModelService(clientFactory, settings, conversationManager, BedrockAIModelNames.Lama3_1_8b_v1)
             }
         };
     }
 
-    public async Task<CoreResponse> SendMessageAsync(CoreRequest request)
+    public IAiModelService GetModel(string modelId)
     {
-        var aiModelService = _modelServices.GetValueOrDefault(request.ModelId)!;
-        return await aiModelService.InvokeModelAsync(request);
+        var aiModel = _modelServices.GetValueOrDefault(modelId);
+
+        if (aiModel is null)
+            throw new NotSupportedException($"Model with id {modelId} is not suported");
+
+        return aiModel;
     }
+   
 }
