@@ -14,9 +14,9 @@ public static class ServiceCollectionExtensions
         
         services.AddSingleton<IBedrockClientFactory, BedrockClientFactory>();
         services.AddScoped<IConversationManager, ConversationManager>();
-        services.AddScoped<IAiService, BedrockService>();
         services.AddScoped<IAiModelService, LamaAiModelService>();
-        
+        services.AddTransient<BedrockService>();
+
         return services;
     }
 
@@ -24,7 +24,8 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         OpenAiSettings settings)
     {
-        services.AddScoped<IAiService, OpenAiService>(opts => 
+        services.AddScoped<IAiModelService, ChatGPT4oMiniModelService>();
+        services.AddTransient<OpenAiService>(opts => 
         {
             return new OpenAiService(settings);
         });

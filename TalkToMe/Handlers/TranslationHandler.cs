@@ -8,6 +8,7 @@ using Amazon.Lambda.Core;
 using Microsoft.IdentityModel.Tokens;
 using TalkToMe.Core.Builders;
 using TalkToMe.Core.Configuration;
+using TalkToMe.Core.Constants;
 using TalkToMe.Core.Factories;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Services;
@@ -29,7 +30,8 @@ public class TranslationHandler
             DefaultModelId = "us.meta.llama3-1-8b-instruct-v1:0"
         };
 
-        _aiModelService = new LamaAiModelService(new BedrockClientFactory(settings), settings, new ConversationManager());
+        _aiModelService = new LamaAiModelService(new BedrockClientFactory(settings), settings, new ConversationManager(),
+            BedrockAIModelNames.Lama3_1_8b_v1);
     }
 
     public async Task<APIGatewayHttpApiV2ProxyResponse> ProcessText(APIGatewayHttpApiV2ProxyRequest request)
@@ -108,7 +110,7 @@ public class TranslationHandler
             .WithPrompt(chat)
             .Build();
 
-        return (await _aiModelService.InvokeModelAsync(request)).Response;
+        return (await _aiModelService.SendMessageAsync(request)).Response;
     }
 
     private async Task<(bool, JwtSecurityToken)> ValidateCognitoToken(string token)

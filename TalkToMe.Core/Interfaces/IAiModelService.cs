@@ -4,5 +4,6 @@ namespace TalkToMe.Core.Interfaces;
 
 public interface IAiModelService
 {
-    Task<CoreResponse> InvokeModelAsync(CoreRequest request);
+    string ModelId { get; }
+    Task<CoreResponse> SendMessageAsync(CoreRequest request);
 }
