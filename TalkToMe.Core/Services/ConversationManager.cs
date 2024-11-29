@@ -1,4 +1,5 @@
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using TalkToMe.Core.Configuration;
 using TalkToMe.Core.Factories;
@@ -9,10 +10,20 @@ namespace TalkToMe.Core.Services;
 
 public class Document
 {
+    [BsonId]
     public ObjectId Id { get; set; }
+    
+    [BsonElement("guideId")]
     public string GuideId { get; set; }  // Unique identifier for the guide
+    
+    [BsonElement("Embedding")]
     public List<float> Embedding { get; set; }
+    
+    [BsonElement("dialog")]
     public List<Dialog> Dialog { get; set; }
+    
+    [BsonElement("expiryDate")]
+    public DateTime ExpiryDate { get; set; }
 }
 
 public class Dialog
@@ -45,11 +56,10 @@ public class ConversationManager : IConversationManager
         _titan = new TitanTextEmbedAiModelService(factory, "amazon.titan-embed-text-v1");
     }
     
-    public async Task AddMemory(string promt, List<Dialog> dialogs)
+    public async Task AddMemory(string promt, List<Dialog> dialogs, string sessionId)
     {
         var response = await _titan.SendMessageAsync(new CoreRequest
         {
-            ModelId = "amazon.titan-embed-text-v1",
             Prompt = promt
         });
 
@@ -57,19 +67,19 @@ public class ConversationManager : IConversationManager
         
         var document = new Document
         {
-            GuideId = "guide123",
+            GuideId = sessionId,
             Embedding = vector,
-            Dialog = dialogs
+            Dialog = dialogs,
+            ExpiryDate = DateTime.UtcNow.AddDays(1)
         };
 
         await _mongoCollection.InsertOneAsync(document);
     }
 
-    public async Task<IEnumerable<Dialog>> GetMemories(string promt)
+    public async Task<IEnumerable<Dialog>> GetMemories(string promt, string sessionId)
     {
         var response = await _titan.SendMessageAsync(new CoreRequest
         {
-            ModelId = "amazon.titan-embed-text-v1",
             Prompt = promt
         });
 
@@ -91,7 +101,7 @@ public class ConversationManager : IConversationManager
 
         var results = await _mongoCollection.Aggregate<Document>(new[] { searchPipeline,     new BsonDocument
         {
-            { "$match", new BsonDocument { { "GuideId", "guide123" } } }
+            { "$match", new BsonDocument { { "guideId", sessionId } } }
         }}).ToListAsync();
         
         return results.SelectMany(x => x.Dialog);

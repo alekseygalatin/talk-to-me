@@ -12,12 +12,6 @@ public class CoreRequestBuilder
         return this;
     }
 
-    public CoreRequestBuilder WithModel(string modelId)
-    {
-        _request.ModelId = modelId;
-        return this;
-    }
-
     public CoreRequestBuilder WithSystemInstruction(string instruction)
     {
         _request.SystemInstruction = instruction;
@@ -27,6 +21,12 @@ public class CoreRequestBuilder
     public CoreRequestBuilder WithHistory()
     {
         _request.SupportHistory = true;
+        return this;
+    }
+    
+    public CoreRequestBuilder WithSession(string sessionId)
+    {
+        _request.SessionId = sessionId;
         return this;
     }
 

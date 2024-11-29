@@ -43,7 +43,7 @@ public class LamaAiModelService : IAiModelService, IDisposable
             
             if (request.SupportHistory) {
                 promptBuilder.AppendLine("The following section contains the conversation history for your reference. Do not include or repeat this history in your response. Only respond to the user's latest input after the conversation history:");
-                var memories = await _conversationManager.GetMemories(request.Prompt);
+                var memories = await _conversationManager.GetMemories(request.Prompt, request.SessionId);
                 foreach (var memory in memories)
                 {
                     promptBuilder.AppendLine($"{memory.Role}: {memory.Message}");
@@ -96,7 +96,7 @@ public class LamaAiModelService : IAiModelService, IDisposable
                         Role = "model",
                         Message = responseBody
                     }
-                });
+                }, request.SessionId);
             }
 
             return new CoreResponse

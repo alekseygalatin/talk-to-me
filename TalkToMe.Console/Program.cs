@@ -73,24 +73,28 @@ class Program
         .WithSystemInstruction(swedishInstruction)
         .WithPrompt("Hej")
         .WithHistory()
+        .WithSession("1234")
         .Build();
 
         var request2 = new CoreRequestBuilder()
         .WithSystemInstruction(swedishInstruction)
         .WithPrompt("jag heter Gordon")
         .WithHistory()
+        .WithSession("1234")
         .Build();
         
         var request3 = new CoreRequestBuilder()
         .WithSystemInstruction(swedishInstruction)
         .WithPrompt("Min bror Oleg")
         .WithHistory()
+        .WithSession("1234")
         .Build();
         
         var request4 = new CoreRequestBuilder()
         .WithSystemInstruction(swedishInstruction)
         .WithPrompt("Vad heter mig?")
         .WithHistory()
+        .WithSession("1234")
         .Build();
 
         var response1 = await aiService.SendMessageAsync(request1);
@@ -114,24 +118,28 @@ class Program
         .WithSystemInstruction(englishInstruction)
         .WithPrompt("Hello")
         .WithHistory()
+        .WithSession("12345")
         .Build();
 
         var request2 = new CoreRequestBuilder()
         .WithSystemInstruction(englishInstruction)
         .WithPrompt("My name is Gordon")
         .WithHistory()
+        .WithSession("12345")
         .Build();
 
         var request3 = new CoreRequestBuilder()
         .WithSystemInstruction(englishInstruction)
         .WithPrompt("My brother is Oleg")
         .WithHistory()
+        .WithSession("12345")
         .Build();
 
         var request4 = new CoreRequestBuilder()
         .WithSystemInstruction(englishInstruction)
         .WithPrompt("What is my name?")
         .WithHistory()
+        .WithSession("12345")
         .Build();
 
         var response1 = await aiService.SendMessageAsync(request1);

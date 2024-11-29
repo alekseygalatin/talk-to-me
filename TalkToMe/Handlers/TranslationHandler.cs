@@ -105,7 +105,6 @@ public class TranslationHandler
     private async Task<string> SendTextToBedrock(string chat, string sessionId)
     {
         var request = new CoreRequestBuilder()
-            .WithModel("us.meta.llama3-1-8b-instruct-v1:0")
             .WithSystemInstruction("You are a Swedish-to-English language translation agent. When given a Swedish word or phrase.\nProvide an accurate English translation, a brief example sentence showing natural usage in Swedish, and any relevant notes on nuances like article usage in Swedish.\n\nYour respons always must contain only JSON in the format: {\"translation\":  \"english translation\",  \"example_usage\": \"example swedish sentence\",  \"translation_notes\": \"notes on use\"}")
             .WithPrompt(chat)
             .Build();
