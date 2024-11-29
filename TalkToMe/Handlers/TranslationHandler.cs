@@ -30,7 +30,7 @@ public class TranslationHandler
             DefaultModelId = "us.meta.llama3-1-8b-instruct-v1:0"
         };
 
-        _aiModelService = new LamaAiModelService(new BedrockClientFactory(settings), settings, new ConversationManager(),
+        _aiModelService = new LamaAiModelService(new BedrockClientFactory(settings), new ConversationManager(),
             BedrockAIModelNames.Lama3_1_8b_v1);
     }
 

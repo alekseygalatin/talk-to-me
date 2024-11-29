@@ -62,7 +62,7 @@ class Program
         await SendEnglishPromts(chatGpt4oMiniService);*/
 
         await SendSwedishPromts(lamaService);
-        await SendSwedishPromts(chatGpt4oMiniService);
+        //await SendSwedishPromts(chatGpt4oMiniService);
     }
 
     private static async Task SendSwedishPromts(IAiModelService aiService) 
