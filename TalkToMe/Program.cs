@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.OpenApi.Models;
+using TalkToMe.Configuration;
 using TalkToMe.Core.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +17,41 @@ builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(setup =>
+{
+    // Include 'SecurityScheme' to use JWT Authentication
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
+    };
+    setup.AddSecurityDefinition("Bearer", jwtSecurityScheme);
+    setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            ArraySegment<string>.Empty
+        }
+    });
+});
+
+builder.Services.Configure<AuthenticationSchemeOptions>(o =>
+{
+    
+}).AddAuthentication(o => { o.DefaultScheme = "CognitoToken"; })
+.AddScheme<AuthenticationSchemeOptions, CognitoTokenAuthHandler>("CognitoToken", _ => {});
+
 builder.Services.AddBedrockServices(new BedrockSettings
 {
     Region = "us-east-1",
@@ -24,16 +61,14 @@ builder.Services.AddBedrockServices(new BedrockSettings
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors();
 
 app.UseHttpsRedirection();
 
+app.UseAuthorization();
 app.UseAuthorization();
 
 app.MapControllers();

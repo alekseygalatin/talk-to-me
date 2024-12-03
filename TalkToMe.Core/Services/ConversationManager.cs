@@ -16,7 +16,7 @@ public class Document
     [BsonElement("guideId")]
     public string GuideId { get; set; }  // Unique identifier for the guide
     
-    [BsonElement("Embedding")]
+    [BsonElement("embedding")]
     public List<float> Embedding { get; set; }
     
     [BsonElement("dialog")]
@@ -91,7 +91,7 @@ public class ConversationManager : IConversationManager
                 "$vectorSearch", new BsonDocument
                 {
                     { "index", "vector_index" }, // Replace with your actual index name
-                    { "path", "Embedding" }, // Field where embeddings are stored
+                    { "path", "embedding" }, // Field where embeddings are stored
                     { "queryVector", new BsonArray(vector) }, // The embedding vector for search
                     { "numCandidates", 5 }, // Number of candidates for the search
                     { "limit", 5 } // Limit the number of returned results

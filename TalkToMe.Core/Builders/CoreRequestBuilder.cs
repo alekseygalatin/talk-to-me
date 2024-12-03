@@ -17,19 +17,6 @@ public class CoreRequestBuilder
         _request.SystemInstruction = instruction;
         return this;
     }
-    
-    public CoreRequestBuilder WithHistory()
-    {
-        _request.SupportHistory = true;
-        return this;
-    }
-    
-    public CoreRequestBuilder WithSession(string sessionId)
-    {
-        _request.SessionId = sessionId;
-        return this;
-    }
-
 
     public CoreRequest Build() => _request;
 }

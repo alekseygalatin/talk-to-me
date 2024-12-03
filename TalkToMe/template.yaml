@@ -21,10 +21,10 @@ Resources:
       SupportedIdentityProviders:
         - COGNITO
   
-  ProcessTextFunction:
+  ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: TalkToMe::TalkToMe.TranscribeHandler::ProcessText
+      Handler: TalkToMe
       CodeUri: ./bin/Release/net8.0/publish
       Runtime: dotnet8
       MemorySize: 512
@@ -48,63 +48,7 @@ Resources:
                 - "arn:aws:cognito-idp:us-east-1:038462779690:userpool/us-east-1_walDCpNcK"
       Events:
         ProcessTextApi:
-          Type: HttpApi  # Creates a Lambda URL
+          Type: 'Api'
           Properties:
-            Path: /process-text
-            Method: post
-            
-  TranslateTextFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: TalkToMe::TalkToMe.TranslationHandler::ProcessText
-      CodeUri: ./bin/Release/net8.0/publish
-      Runtime: dotnet8
-      MemorySize: 512
-      Timeout: 60
-      Architectures:
-        - x86_64
-      Policies:
-        - AWSLambda_FullAccess           # Full access to Lambda resources
-        - AmazonS3FullAccess             # Full access to S3 resources
-        - AmazonTranscribeFullAccess      # Full access to Amazon Transcribe
-        - AmazonPollyFullAccess           # Full access to Amazon Polly
-        - AmazonBedrockFullAccess         # Full access to Amazon Bedrock
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - "cognito:GetUser"     # Allow getting user details
-                - "cognito:ListUsers"    # Optional: List users in the user pool
-                - "cognito:AdminGetUser"
-              Resource:
-                - "arn:aws:cognito-idp:us-east-1:038462779690:userpool/us-east-1_walDCpNcK"
-      Events:
-        ProcessTextApi:
-          Type: HttpApi  # Creates a Lambda URL
-          Properties:
-            Path: /translate-text
-            Method: post
-
-
-  ProcessAudioFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: TalkToMe::TalkToMe.TranscribeHandler::ProcessAudio
-      CodeUri: ./bin/Release/net8.0/publish
-      Runtime: dotnet8
-      MemorySize: 512
-      Timeout: 60
-      Architectures:
-        - x86_64
-      Policies:
-        - AWSLambda_FullAccess           # Full access to Lambda resources
-        - AmazonS3FullAccess             # Full access to S3 resources
-        - AmazonTranscribeFullAccess      # Full access to Amazon Transcribe
-        - AmazonPollyFullAccess           # Full access to Amazon Polly
-        - AmazonBedrockFullAccess
-      Events:
-        ProcessAudioApi:
-          Type: HttpApi  # Creates a Lambda URL
-          Properties:
-            Path: /process-audio
-            Method: post
+            Path: '/{proxy+}'
+            Method: 'ANY'

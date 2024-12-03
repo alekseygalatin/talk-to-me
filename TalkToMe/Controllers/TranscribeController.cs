@@ -1,37 +1,77 @@
+using System.Text.Json;
+using Amazon;
 using Amazon.Lambda.APIGatewayEvents;
+using Amazon.Polly;
+using Amazon.Polly.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using TalkToMe.Core.Agents;
+using TalkToMe.Core.Interfaces;
 
-namespace TalkToMe.Controllers
+namespace TalkToMe.Controllers;
+
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class TranscribeController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class TranscribeController : ControllerBase
+    private SwedishConversationAgent _swedishConversationAgent;
+    private SwedishTranslationAgent _swedishTranslationAgent;
+        
+    private readonly AmazonPollyClient _pollyClient;
+    private readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast1;
+        
+    public TranscribeController(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager)
     {
-        [HttpPost("process-text")]
-        public async Task<APIGatewayHttpApiV2ProxyResponse> ProcessText([FromBody] string text, [FromQuery] string sessionId)
+        _swedishConversationAgent = new SwedishConversationAgent(aiProviderFactory, conversationManager);
+        _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
+            
+        _pollyClient = new AmazonPollyClient(bucketRegion);
+    }
+        
+    [HttpPost("process-text")]
+    public async Task<APIGatewayHttpApiV2ProxyResponse> ProcessText([FromBody] string text)
+    {
+        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("aud")).Value;
+        var response = await _swedishConversationAgent.Invoke(text, sub);
+        var audio = await ConvertTextToSpeechSwedish(response.Response);
+        return this.CreateResponse(audio, response.Response);
+    }
+        
+    [HttpPost("translate-word")]
+    public async Task<APIGatewayHttpApiV2ProxyResponse> TranslateWord([FromBody] string text)
+    {
+        var response = await _swedishTranslationAgent.Invoke(text);
+        return this.CreateResponse(null, response.Response);
+    }
+        
+    private async Task<byte[]> ConvertTextToSpeechSwedish(string text)
+    {
+        var synthesizeSpeechRequest = new SynthesizeSpeechRequest
         {
-            var transcribeHandler = new TranscribeHandler();
-            var result = await transcribeHandler.ProcessText(new APIGatewayHttpApiV2ProxyRequest
-            {
-                RequestContext = new APIGatewayHttpApiV2ProxyRequest.ProxyRequestContext
-                {
-                    Http = new APIGatewayHttpApiV2ProxyRequest.HttpDescription
-                    {
-                        Method = "POST"
-                    }
-                },
-                Headers = new Dictionary<string, string>()
-                {
-                    {"authorization", "eyJraWQiOiJDU2x2ZmdBem9OZk9rMXV6OVFkQmxYbVJYNkhkVVgrVnBrT1g4UWZFcTlnPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiVUplYU03SzN2cnlWQnM4cWJWckItZyIsInN1YiI6ImE0YzgwNDY4LWIwNTEtNzA2OS1lZjFmLWUwNjRjY2FlMjhhZiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xX3dhbERDcE5jSyIsImNvZ25pdG86dXNlcm5hbWUiOiJhbGV4Iiwib3JpZ2luX2p0aSI6ImEzZWExYWI2LTNjNmUtNGFkNi04MDg2LTNiZDkzMzA3MmQzNSIsImF1ZCI6IjdvOHRxbHQydWNpaHFzYnR0aGZvcGM5ZDRwIiwiZXZlbnRfaWQiOiI5OTQ2MzljMy1jZDViLTRkMWYtOTU1Ni0wMjY1ZGYxZGVjYTAiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTczMTQwNzkxNywiZXhwIjoxNzMxNDExNTE3LCJpYXQiOjE3MzE0MDc5MTcsImp0aSI6IjhjZTZiNGRmLTY4NGItNDA5Zi1hYWJlLTg4MmNjZTYzOGU1YyJ9.asktbVotsU1A3jbGu4xQ483kssxhst1_LSNFRcZl17wm6rTpo81zOjp-SVwwfndayHi1oXYT5c-u46ImgtUVUcDHbHX_3kj4Jzk9dfGTRSCCqxOVB_S0jrUcCPZhybtlhPRQ9n2A3WHZwXb0ffjU2_qThzU3LoukPM8gbCzoq6XfhfmoFIRpfYsqKLN6bdcVrygX_wfE9VSf8wVKdiVw3yIgaE0ISuiDrsyxjWaDrHzxLlVpDS-z_qnf11E2aKqG9YhP-4myIyQV1q8cXsCDxuHxxzoqO5jFRd-xW9pPou-mYbjFEnvcoLkXRJT6cUHH5tAypI3Ht6Q1lnu_yL8OYA"}
-                },
-                Body = JsonConvert.SerializeObject(new
-                {
-                    text = text
-                })
-            });
+            OutputFormat = OutputFormat.Mp3,
+            Text = text,
+            VoiceId = "Elin", // Neural Swedish voice
+            Engine = Engine.Neural // Use the neural engine
+        };
 
-            return result;
-        }
+        using var synthesizeSpeechResponse = await _pollyClient.SynthesizeSpeechAsync(synthesizeSpeechRequest);
+        using var memoryStream = new MemoryStream();
+        await synthesizeSpeechResponse.AudioStream.CopyToAsync(memoryStream);
+
+        return memoryStream.ToArray(); // Return the audio byte array
+    }
+        
+    private APIGatewayHttpApiV2ProxyResponse CreateResponse(byte[]? audioBytes, string text)
+    {
+        return new APIGatewayHttpApiV2ProxyResponse
+        {
+            StatusCode = 200,
+            Body = JsonSerializer.Serialize(new
+            {
+                Audio = audioBytes != null ? Convert.ToBase64String(audioBytes): "",
+                Text = text
+            })
+        };
     }
 }

@@ -8,14 +8,13 @@ public class BedrockService : IAIProvider
     private readonly Dictionary<string, IAiModelService> _modelServices = new();
 
     public BedrockService(
-        IBedrockClientFactory clientFactory,
-        IConversationManager conversationManager)
+        IBedrockClientFactory clientFactory)
     {
         _modelServices = new Dictionary<string, IAiModelService>
         {
             {
                 BedrockAIModelNames.Lama3_1_8b_v1, 
-                new LamaAiModelService(clientFactory, conversationManager, BedrockAIModelNames.Lama3_1_8b_v1)
+                new LamaAiModelService(clientFactory, BedrockAIModelNames.Lama3_1_8b_v1)
             }
         };
     }
