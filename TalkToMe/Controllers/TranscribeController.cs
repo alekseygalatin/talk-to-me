@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.Agents;
 using TalkToMe.Core.Interfaces;
+using TalkToMe.Models;
 
 namespace TalkToMe.Controllers;
 
@@ -17,6 +18,8 @@ public class TranscribeController : ControllerBase
 {
     private SwedishConversationAgent _swedishConversationAgent;
     private SwedishTranslationAgent _swedishTranslationAgent;
+    private SwedishStoryTailorAgent _storyTailorAgent;
+    private SwedishRetailerAgent _swedishRetailerAgent;
         
     private readonly AmazonPollyClient _pollyClient;
     private readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast1;
@@ -25,6 +28,8 @@ public class TranscribeController : ControllerBase
     {
         _swedishConversationAgent = new SwedishConversationAgent(aiProviderFactory, conversationManager);
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
+        _storyTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory);
+        _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory);
             
         _pollyClient = new AmazonPollyClient(bucketRegion);
     }
@@ -43,6 +48,22 @@ public class TranscribeController : ControllerBase
     {
         var response = await _swedishTranslationAgent.Invoke(text);
         return this.CreateResponse(null, response.Response);
+    }
+    
+    [HttpPost("get-story")]
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetStory()
+    {
+        var response = await _storyTailorAgent.Invoke();
+        var audio = await ConvertTextToSpeechSwedish(response.Response);
+        return this.CreateResponse(audio, response.Response);
+    }
+    
+    [HttpPost("get-story-feedback")]
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetStoryFeedback([FromBody] RetailRequest data)
+    {
+        var response = await _swedishRetailerAgent.Invoke(data.OriginText, data.RetailText);
+        var audio = await ConvertTextToSpeechSwedish(response.Response);
+        return this.CreateResponse(audio, response.Response);
     }
         
     private async Task<byte[]> ConvertTextToSpeechSwedish(string text)
