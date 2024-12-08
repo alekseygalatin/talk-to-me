@@ -37,8 +37,12 @@ public class LamaAiModelService : IAiModelService, IDisposable
             promptBuilder.AppendLine("<|begin_of_text|>");
             promptBuilder.AppendLine($"<|start_header_id|>system<|end_header_id|>{request.SystemInstruction}.");
             promptBuilder.AppendLine("<|eot_id|>");
-            
-            promptBuilder.AppendLine($"<|start_header_id|>user<|end_header_id|>{request.Prompt}.");
+
+            if (!string.IsNullOrWhiteSpace(request.Prompt))
+            {
+                promptBuilder.AppendLine($"<|start_header_id|>user<|end_header_id|>{request.Prompt}.");
+            }
+
             promptBuilder.AppendLine("Your response must not include your role name. Provide only the content.<|eot_id|>");
             
             var requestBody = JsonSerializer.Serialize(new
