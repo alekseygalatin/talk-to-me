@@ -10,6 +10,8 @@ namespace TalkToMe.Core.Configuration
         {
             CreateMap<UserPreference, UserPreferenceResponseDto>();
             CreateMap<UserPreferenceRequestDto, UserPreference>();
+            CreateMap<LanguageRequestDto, Language>();
+            CreateMap<Language, LanguageResponseDto>();
         }
     }
 }

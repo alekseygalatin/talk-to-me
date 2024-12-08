@@ -3,7 +3,7 @@ using TalkToMe.Core.DTO.Response;
 
 namespace TalkToMe.Core.Interfaces
 {
-    public interface IUserPreferencesService
+    public interface IUserPreferenceService
     {
         Task<UserPreferenceResponseDto> GetByIdAsync(string userId);
         Task CreateAsync(string userId, UserPreferenceRequestDto dto);

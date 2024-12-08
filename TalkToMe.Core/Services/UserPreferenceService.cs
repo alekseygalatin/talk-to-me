@@ -7,12 +7,12 @@ using TalkToMe.Infrastructure.IRepository;
 
 namespace TalkToMe.Core.Services
 {
-    public class UserPreferencesService : IUserPreferencesService
+    public class UserPreferenceService : IUserPreferenceService
     {
         private readonly IBaseRepository<UserPreference> _repository;
         private readonly IMapper _mapper;
 
-        public UserPreferencesService(IBaseRepository<UserPreference> repository, IMapper mapper)
+        public UserPreferenceService(IBaseRepository<UserPreference> repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;

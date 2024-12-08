@@ -3,19 +3,19 @@ using TalkToMe.Domain.Constants;
 
 namespace TalkToMe.Domain.Entities
 {
-    [DynamoDBTable(TableNames.UserPreferences)]
-    public class UserPreference
+    [DynamoDBTable(TableNames.Languages)]
+    public class Language
     {
         [DynamoDBHashKey]
-        public string UserId { get; set; } = default!;
+        public string Code { get; set; } = default!;
 
         [DynamoDBProperty]
         public string Name { get; set; } = default!;
 
         [DynamoDBProperty]
-        public string Sex { get; set; } = default!;
+        public string EnglishName { get; set; } = default!;
 
         [DynamoDBProperty]
-        public string NativeLanguage { get; set; } = default!;
+        public bool Active { get; set; }
     }
 }

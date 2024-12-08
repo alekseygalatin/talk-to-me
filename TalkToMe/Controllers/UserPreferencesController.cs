@@ -10,9 +10,9 @@ namespace TalkToMe.Controllers
     [Route("api/[controller]")]
     public class UserPreferencesController : ControllerBase
     {
-        private readonly IUserPreferencesService _service;
+        private readonly IUserPreferenceService _service;
 
-        public UserPreferencesController(IUserPreferencesService service)
+        public UserPreferencesController(IUserPreferenceService service)
         {
             _service = service;
         }

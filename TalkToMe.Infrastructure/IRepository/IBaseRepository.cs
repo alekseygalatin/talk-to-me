@@ -3,9 +3,10 @@ namespace TalkToMe.Infrastructure.IRepository
 {
     public interface IBaseRepository<T> where T : class
     {
-        Task<T> GetByIdAsync(string userId);
-        Task CreateAsync(T preferences);
-        Task UpdateAsync(T preferences);
-        Task DeleteAsync(string userId);
+        Task<List<T>> GetAllAsync();
+        Task<T> GetByIdAsync(string key);
+        Task CreateAsync(T entity);
+        Task UpdateAsync(T entity);
+        Task DeleteAsync(string key);
     }
 }
