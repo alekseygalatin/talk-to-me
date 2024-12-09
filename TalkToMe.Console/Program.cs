@@ -62,7 +62,7 @@ class Program
 
     private static async Task SendSwedishPromts(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager) 
     {
-        var swedishConversationAgent = new SwedishConversationAgent(aiProviderFactory, conversationManager);
+        var swedishConversationAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
         var request = await swedishConversationAgent.Invoke("Hej", "1234");
         var request2 = await swedishConversationAgent.Invoke("jag heter Gordon", "1234");
         var request3 = await swedishConversationAgent.Invoke("Min bror Oleg", "1234");
