@@ -1,7 +1,14 @@
+using Amazon.DynamoDBv2;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.OpenApi.Models;
 using TalkToMe.Configuration;
 using TalkToMe.Core.Configuration;
+using TalkToMe.Core.Interfaces;
+using TalkToMe.Core.Services;
+using TalkToMe.Infrastructure.Helpers;
+using TalkToMe.Infrastructure.IRepository;
+using TalkToMe.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +65,20 @@ builder.Services.AddBedrockServices(new BedrockSettings
     DefaultModelId = "us.meta.llama3-1-8b-instruct-v1:0"
 });
 
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new MappingProfile());
+});
+
+IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+builder.Services.AddAWSService<IAmazonDynamoDB>();
+builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+builder.Services.AddScoped<ILanguageRepository, LanguageRepository>();
+builder.Services.AddScoped<IUserPreferenceService, UserPreferenceService>();
+builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddSingleton<DynamoDbTableManager>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -72,5 +93,12 @@ app.UseAuthorization();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var tableManager = scope.ServiceProvider.GetRequiredService<DynamoDbTableManager>();
+    // Ensure table exists and seed data
+    await tableManager.CreateTablesIfNotExist();
+}
 
 app.Run();
