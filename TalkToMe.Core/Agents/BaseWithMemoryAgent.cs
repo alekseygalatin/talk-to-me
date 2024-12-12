@@ -7,7 +7,7 @@ namespace TalkToMe.Core.Agents;
 
 public abstract class BaseWithMemoryAgent
 {
-    private IAiModelService _model;
+    protected IAiModelService _model;
     private IConversationManager _conversationManager;
     
     protected abstract string SystemPromt { get; }

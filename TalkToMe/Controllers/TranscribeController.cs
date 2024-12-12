@@ -20,6 +20,7 @@ public class TranscribeController : ControllerBase
     private SwedishTranslationAgent _swedishTranslationAgent;
     private SwedishStoryTailorAgent _storyTailorAgent;
     private SwedishRetailerAgent _swedishRetailerAgent;
+    private SwedishConversationHelperAgent _conversationHelperAgent;
         
     private readonly AmazonPollyClient _pollyClient;
     private readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast1;
@@ -30,6 +31,7 @@ public class TranscribeController : ControllerBase
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
         _storyTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory);
         _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory);
+        _conversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
             
         _pollyClient = new AmazonPollyClient(bucketRegion);
     }
@@ -64,6 +66,14 @@ public class TranscribeController : ControllerBase
         var response = await _swedishRetailerAgent.Invoke(data.OriginText, data.RetailText);
         var audio = await ConvertTextToSpeechSwedish(response.Response);
         return this.CreateResponse(audio, response.Response);
+    }
+    
+    [HttpPost("get-question-help")]
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetQuestionHelp([FromBody] string text)
+    {
+        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("aud")).Value;
+        var response = await _conversationHelperAgent.Invoke(text, sub);
+        return this.CreateResponse(null, response.Response);
     }
         
     private async Task<byte[]> ConvertTextToSpeechSwedish(string text)
