@@ -5,7 +5,7 @@ using TalkToMe.Core.Interfaces;
 
 namespace TalkToMe.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserPreferencesController : ControllerBase
@@ -52,6 +52,20 @@ namespace TalkToMe.Controllers
         {
             await _service.DeleteAsync(userId);
             return NoContent();
+        }
+
+        [HttpPut("set-current-language-to-learn/{userId}/{langaugeCode}")]
+        public async Task<IActionResult> SetCurrentLanguageToLearn(string userId, string langaugeCode)
+        {
+            try
+            {
+                await _service.SetCurrentLanguageToLearn(userId, langaugeCode);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 

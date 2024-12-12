@@ -1,6 +1,8 @@
 ﻿using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2;
 using TalkToMe.Domain.Constants;
+using TalkToMe.Domain.Entities;
+using Amazon.DynamoDBv2.DataModel;
 
 namespace TalkToMe.Infrastructure.Helpers
 {
@@ -39,22 +41,7 @@ namespace TalkToMe.Infrastructure.Helpers
                     {
                         AttributeName = "UserId",
                         AttributeType = "S"
-                    }/*,
-                    new AttributeDefinition
-                    {
-                        AttributeName = "Name",
-                        AttributeType = "S"
-                    },
-                    new AttributeDefinition
-                    {
-                        AttributeName = "Sex",
-                        AttributeType = "S"
-                    },
-                    new AttributeDefinition
-                    {
-                        AttributeName = "NativeLanguage",
-                        AttributeType = "S"
-                    }*/
+                    }
                 },
                 KeySchema = new List<KeySchemaElement>
                 {
@@ -87,22 +74,7 @@ namespace TalkToMe.Infrastructure.Helpers
                     {
                         AttributeName = "Code",
                         AttributeType = "S"
-                    }/*,
-                    new AttributeDefinition
-                    {
-                        AttributeName = "Name",
-                        AttributeType = "S"
-                    },
-                    new AttributeDefinition
-                    {
-                        AttributeName = "EnglishName",
-                        AttributeType = "S"
-                    },
-                    new AttributeDefinition
-                    {
-                        AttributeName = "Active",
-                        AttributeType = "BOOL"
-                    }*/
+                    }
                 },
                 KeySchema = new List<KeySchemaElement>
                 {
@@ -125,47 +97,69 @@ namespace TalkToMe.Infrastructure.Helpers
 
         private async Task SeedLanguageDataAsync()
         {
-            var english = new PutItemRequest
+            Console.WriteLine("Seed languages started");
+            await WaitForTableToBeActiveAsync(TableNames.Languages);
+
+            var languages = new List<PutItemRequest>
             {
-                TableName = TableNames.Languages,
-                Item = new Dictionary<string, AttributeValue>
+                new PutItemRequest
                 {
-                    { "Code", new AttributeValue { S = "en-us" } },
-                    { "Name", new AttributeValue { S = "English" } },
-                    { "EnglishName", new AttributeValue { S = "English" } },
-                    { "Active", new AttributeValue { BOOL = true } }
+                    TableName = TableNames.Languages,
+                    Item = new Dictionary<string, AttributeValue>
+                    {
+                        { "Code", new AttributeValue { S = "en-US" } },
+                        { "Name", new AttributeValue { S = "English" } },
+                        { "EnglishName", new AttributeValue { S = "English" } },
+                        { "Active", new AttributeValue { BOOL = true } }
+                    }
+                },
+                new PutItemRequest
+                {
+                    TableName = TableNames.Languages,
+                    Item = new Dictionary<string, AttributeValue>
+                    {
+                        { "Code", new AttributeValue { S = "sv-SE" } },
+                        { "Name", new AttributeValue { S = "Svenska" } },
+                        { "EnglishName", new AttributeValue { S = "Swedish" } },
+                        { "Active", new AttributeValue { BOOL = true } }
+                    }
+                },
+                new PutItemRequest
+                {
+                    TableName = TableNames.Languages,
+                    Item = new Dictionary<string, AttributeValue>
+                    {
+                        { "Code", new AttributeValue { S = "ru" } },
+                        { "Name", new AttributeValue { S = "Русский" } },
+                        { "EnglishName", new AttributeValue { S = "Russian" } },
+                        { "Active", new AttributeValue { BOOL = true } }
+                    }
                 }
             };
 
-            await _dynamoDb.PutItemAsync(english);
-
-            var swedish = new PutItemRequest
+            foreach (var request in languages)
             {
-                TableName = TableNames.Languages,
-                Item = new Dictionary<string, AttributeValue>
-                {
-                    { "Code", new AttributeValue { S = "sv-se" } },
-                    { "Name", new AttributeValue { S = "Svenska" } },
-                    { "EnglishName", new AttributeValue { S = "Swedish" } },
-                    { "Active", new AttributeValue { BOOL = true } }
-                }
-            };
-            await _dynamoDb.PutItemAsync(swedish);
-
-            var russian = new PutItemRequest
-            {
-                TableName = TableNames.Languages,
-                Item = new Dictionary<string, AttributeValue>
-                {
-                    { "Code", new AttributeValue { S = "ru" } },
-                    { "Name", new AttributeValue { S = "Русский " } },
-                    { "EnglishName", new AttributeValue { S = "Russian" } },
-                    { "Active", new AttributeValue { BOOL = true } }
-                }
-            };
-            await _dynamoDb.PutItemAsync(russian);
+                await _dynamoDb.PutItemAsync(request);
+            }
 
             Console.WriteLine("Seed languages data inserted.");
+        }
+
+        private async Task WaitForTableToBeActiveAsync(string tableName)
+        {
+            Console.WriteLine($"Waiting for table {tableName} to become active...");
+            string tableStatus;
+            do
+            {
+                var response = await _dynamoDb.DescribeTableAsync(new DescribeTableRequest { TableName = tableName });
+                tableStatus = response.Table.TableStatus;
+                if (tableStatus != "ACTIVE")
+                {
+                    await Task.Delay(5000); // Wait 5 seconds before checking again
+                }
+            } while (tableStatus != "ACTIVE");
+
+            Console.WriteLine($"Table {tableName} is now active.");
         }
     }
 }

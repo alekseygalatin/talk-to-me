@@ -5,7 +5,7 @@ using TalkToMe.Core.Interfaces;
 
 namespace TalkToMe.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class LanguagesController : ControllerBase

@@ -17,5 +17,8 @@ namespace TalkToMe.Domain.Entities
 
         [DynamoDBProperty]
         public string NativeLanguage { get; set; } = default!;
+
+        [DynamoDBProperty]
+        public string CurrentLanguageToLearn { get; set; } = default!;
     }
 }

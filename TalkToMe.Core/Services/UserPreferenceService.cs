@@ -73,6 +73,16 @@ namespace TalkToMe.Core.Services
 
             await _repository.DeleteAsync(userId);
         }
+
+        public async Task SetCurrentLanguageToLearn(string userId, string languageCode)
+        {
+            var userPreferences = await _repository.GetByIdAsync(userId);
+            if (userPreferences == null)
+                throw new Exception("User preferences not found");
+
+            userPreferences.CurrentLanguageToLearn = languageCode;
+            await _repository.UpdateAsync(userPreferences);
+        }
     }
 
 }

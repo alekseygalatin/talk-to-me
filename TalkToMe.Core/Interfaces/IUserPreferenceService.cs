@@ -9,5 +9,6 @@ namespace TalkToMe.Core.Interfaces
         Task CreateAsync(string userId, UserPreferenceRequestDto dto);
         Task UpdateAsync(string userId, UserPreferenceRequestDto dto);
         Task DeleteAsync(string userId);
+        Task SetCurrentLanguageToLearn(string userId, string languageCode);
     }
 }

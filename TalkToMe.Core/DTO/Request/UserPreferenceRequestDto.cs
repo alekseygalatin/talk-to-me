@@ -12,5 +12,7 @@ namespace TalkToMe.Core.DTO.Request
 
         [Required]
         public string NativeLanguage { get; set; } = default!;
+
+        public string? CurrentLanguageToLearn { get; set; } = default!;
     }
 }

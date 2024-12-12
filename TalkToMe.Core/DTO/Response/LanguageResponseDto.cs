@@ -9,5 +9,7 @@ namespace TalkToMe.Core.DTO.Response
 
         [Required]
         public string Name { get; set; } = default!;
+
+        public string EnglishName { get; set; } = default!;
     }
 }
