@@ -56,7 +56,7 @@ public class CognitoTokenAuthHandler : AuthenticationHandler<AuthenticationSchem
             IssuerSigningKeys = keys,
             ValidateIssuer = true,
             ValidIssuer = $"https://cognito-idp.{region}.amazonaws.com/{userPoolId}",
-            ValidateAudience = true,
+            ValidateAudience = false,
             ValidAudience = clientId,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero // Do not allow any clock skew

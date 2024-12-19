@@ -12,7 +12,7 @@ using TalkToMe.Models;
 
 namespace TalkToMe.Controllers;
 
-[AllowAnonymous]
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AgentsController : ControllerBase
@@ -42,7 +42,7 @@ public class AgentsController : ControllerBase
     [HttpPost("{agent}/text/invoke")]
     public async Task<APIGatewayHttpApiV2ProxyResponse> Invoke([FromRoute] string agent, [FromBody] string text)
     {
-        var sub = "123";//this.HttpContext.User.Claims.First(x => x.Type.Equals("sub")).Value;
+        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
         if (agent == "conversationAgent")
         {
             var response = await _swedishConversationAgent.Invoke(text, sub);
