@@ -11,6 +11,7 @@ public abstract class BaseWithMemoryAgent
     private IConversationManager _conversationManager;
     
     protected abstract string SystemPromt { get; }
+    protected abstract string AgentId { get; }
 
     protected BaseWithMemoryAgent(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager, AIProvider aiProvider, string model)
     {
@@ -35,23 +36,28 @@ public abstract class BaseWithMemoryAgent
                 Role = "model",
                 Message = response.Response
             }
-        }, sessionId);
+        }, GetKey(sessionId));
 
         return response;
     }
 
-    protected async Task<string> BuildSystemPromt(string message, string sessionId)
+    protected virtual async Task<string> BuildSystemPromt(string message, string sessionId)
     {
         var promptBuilder = new StringBuilder();
         
-        promptBuilder.AppendLine(SystemPromt);
-        promptBuilder.AppendLine("The following section contains the conversation history for your reference. Do not include or repeat this history in your response. Only respond to the user's latest input after the conversation history:");
-        var memories = await _conversationManager.GetMemories(message, sessionId);
+        promptBuilder.Append(SystemPromt);
+        promptBuilder.Append("The following section contains the conversation history for your reference. Do not include or repeat this history in your response. Only respond to the user's latest input after the conversation history: ");
+        var memories = await _conversationManager.GetMemories(message, GetKey(sessionId));
         foreach (var memory in memories)
         {
-            promptBuilder.AppendLine($"{memory.Role}: {memory.Message}");
+            promptBuilder.Append($"{memory.Role}: {memory.Message}");
         }
 
         return promptBuilder.ToString();
+    }
+
+    private string GetKey(string sessionId)
+    {
+        return $"{sessionId}{AgentId}";
     }
 }

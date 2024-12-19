@@ -23,6 +23,10 @@ public class BedrockService : IAIProvider
             {
                 BedrockAIModelNames.AWS_Nova_Pro,
                 new NovaProModelService(clientFactory, BedrockAIModelNames.AWS_Nova_Pro)
+            },
+            {
+                BedrockAIModelNames.Claude_3_5_Haiku,
+                new ClaudeHaikuModelService(clientFactory, BedrockAIModelNames.Claude_3_5_Haiku)
             }
         };
     }

@@ -27,6 +27,11 @@ namespace TalkToMe.Infrastructure.Repository
         {
             return await _context.LoadAsync<T>(key);
         }
+        
+        public async Task<List<T>> GetManyByIdAsync(string key)
+        {
+            return await _context.QueryAsync<T>(key).GetRemainingAsync();
+        }
 
         public async Task CreateAsync(T entity)
         {
