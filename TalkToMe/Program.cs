@@ -6,6 +6,7 @@ using TalkToMe.Configuration;
 using TalkToMe.Core.Configuration;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Services;
+using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.Helpers;
 using TalkToMe.Infrastructure.IRepository;
 using TalkToMe.Infrastructure.Repository;
@@ -75,8 +76,10 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddAWSService<IAmazonDynamoDB>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<ILanguageRepository, LanguageRepository>();
+builder.Services.AddScoped<IBaseRepository<WordEntity>, WordRepository>();
 builder.Services.AddScoped<IUserPreferenceService, UserPreferenceService>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<IWordService, WordService>();
 builder.Services.AddSingleton<DynamoDbTableManager>();
 
 var app = builder.Build();

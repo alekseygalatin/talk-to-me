@@ -21,6 +21,22 @@ Resources:
       SupportedIdentityProviders:
         - COGNITO
   
+  WordTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: WordTable
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: word
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: word
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST # Use on-demand pricing
+      
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -37,6 +53,7 @@ Resources:
         - AmazonTranscribeFullAccess      # Full access to Amazon Transcribe
         - AmazonPollyFullAccess           # Full access to Amazon Polly
         - AmazonBedrockFullAccess         # Full access to Amazon Bedrock
+        - AmazonDynamoDBFullAccess
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
