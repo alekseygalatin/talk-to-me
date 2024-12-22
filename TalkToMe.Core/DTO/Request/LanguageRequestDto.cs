@@ -14,5 +14,7 @@ namespace TalkToMe.Core.DTO.Request
         public string EnglishName { get; set; } = default!;
 
         public bool Active { get; set; }
+
+        public List<string> Pronouns { get; set; } = new List<string>();
     }
 }

@@ -8,10 +8,10 @@ namespace TalkToMe.Core.DTO.Request
         public string Name { get; set; } = default!;
 
         [Required]
-        public string Sex { get; set; } = default!;
+        public string NativeLanguage { get; set; } = default!;
 
         [Required]
-        public string NativeLanguage { get; set; } = default!;
+        public string PreferedPronoun { get; set; } = default!;
 
         public string? CurrentLanguageToLearn { get; set; } = default!;
     }
