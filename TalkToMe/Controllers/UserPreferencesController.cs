@@ -21,8 +21,6 @@ namespace TalkToMe.Controllers
         public async Task<IActionResult> GetById(string userId)
         {
             var preferences = await _service.GetByIdAsync(userId);
-            if (preferences == null) return NotFound();
-
             return Ok(preferences);
         }
 

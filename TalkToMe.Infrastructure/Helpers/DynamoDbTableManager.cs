@@ -1,8 +1,6 @@
 ﻿using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2;
 using TalkToMe.Domain.Constants;
-using TalkToMe.Domain.Entities;
-using Amazon.DynamoDBv2.DataModel;
 
 namespace TalkToMe.Infrastructure.Helpers
 {
@@ -95,54 +93,72 @@ namespace TalkToMe.Infrastructure.Helpers
             Console.WriteLine($"Table {TableNames.Languages} created.");
         }
 
-        private async Task SeedLanguageDataAsync()
+        public async Task SeedLanguageDataAsync()
         {
-            Console.WriteLine("Seed languages started");
             await WaitForTableToBeActiveAsync(TableNames.Languages);
 
-            var languages = new List<PutItemRequest>
+            if (!await TableContainsRecordsAsync(TableNames.Languages)) 
             {
-                new PutItemRequest
+                Console.WriteLine("Seed languages started");
+
+                var languages = new List<PutItemRequest>
                 {
-                    TableName = TableNames.Languages,
-                    Item = new Dictionary<string, AttributeValue>
+                    new PutItemRequest
                     {
-                        { "Code", new AttributeValue { S = "en-US" } },
-                        { "Name", new AttributeValue { S = "English" } },
-                        { "EnglishName", new AttributeValue { S = "English" } },
-                        { "Active", new AttributeValue { BOOL = true } }
+                        TableName = TableNames.Languages,
+                        Item = new Dictionary<string, AttributeValue>
+                        {
+                            { "Code", new AttributeValue { S = "en-US" } },
+                            { "Name", new AttributeValue { S = "English" } },
+                            { "EnglishName", new AttributeValue { S = "English" } },
+                            { "Active", new AttributeValue { BOOL = true } },
+                            { "Pronouns",  new AttributeValue { SS = new List<string>{ "He/Him", "She/Her", "They/Them" } } }
+                        }
+                    },
+                    new PutItemRequest
+                    {
+                        TableName = TableNames.Languages,
+                        Item = new Dictionary<string, AttributeValue>
+                        {
+                            { "Code", new AttributeValue { S = "sv-SE" } },
+                            { "Name", new AttributeValue { S = "Svenska" } },
+                            { "EnglishName", new AttributeValue { S = "Swedish" } },
+                            { "Active", new AttributeValue { BOOL = true } },
+                            { "Pronouns",  new AttributeValue { SS = new List<string>{ "Han", "Hon", "Hen" } } }
+                        }
+                    },
+                    new PutItemRequest
+                    {
+                        TableName = TableNames.Languages,
+                        Item = new Dictionary<string, AttributeValue>
+                        {
+                            { "Code", new AttributeValue { S = "ru" } },
+                            { "Name", new AttributeValue { S = "Русский" } },
+                            { "EnglishName", new AttributeValue { S = "Russian" } },
+                            { "Active", new AttributeValue { BOOL = true } },
+                            { "Pronouns",  new AttributeValue { SS = new List<string>{ "Он", "Она", "Оно" } } }
+                        }
+                    },
+                    new PutItemRequest
+                    {
+                        TableName = TableNames.Languages,
+                        Item = new Dictionary<string, AttributeValue>
+                        {
+                            { "Code", new AttributeValue { S = "ky" } },
+                            { "Name", new AttributeValue { S = "Кыргыз тили" } },
+                            { "EnglishName", new AttributeValue { S = "Kyrgyz" } },
+                            { "Active", new AttributeValue { BOOL = true } },
+                            { "Pronouns",  new AttributeValue { SS = new List<string>{ "Ал" } } }
+                        }
                     }
-                },
-                new PutItemRequest
+                };
+
+                foreach (var request in languages)
                 {
-                    TableName = TableNames.Languages,
-                    Item = new Dictionary<string, AttributeValue>
-                    {
-                        { "Code", new AttributeValue { S = "sv-SE" } },
-                        { "Name", new AttributeValue { S = "Svenska" } },
-                        { "EnglishName", new AttributeValue { S = "Swedish" } },
-                        { "Active", new AttributeValue { BOOL = true } }
-                    }
-                },
-                new PutItemRequest
-                {
-                    TableName = TableNames.Languages,
-                    Item = new Dictionary<string, AttributeValue>
-                    {
-                        { "Code", new AttributeValue { S = "ru" } },
-                        { "Name", new AttributeValue { S = "Русский" } },
-                        { "EnglishName", new AttributeValue { S = "Russian" } },
-                        { "Active", new AttributeValue { BOOL = true } }
-                    }
+                    await _dynamoDb.PutItemAsync(request);
                 }
-            };
-
-            foreach (var request in languages)
-            {
-                await _dynamoDb.PutItemAsync(request);
+                Console.WriteLine("Seed languages data inserted.");
             }
-
-            Console.WriteLine("Seed languages data inserted.");
         }
 
         private async Task WaitForTableToBeActiveAsync(string tableName)
@@ -160,6 +176,20 @@ namespace TalkToMe.Infrastructure.Helpers
             } while (tableStatus != "ACTIVE");
 
             Console.WriteLine($"Table {tableName} is now active.");
+        }
+
+        public async Task<bool> TableContainsRecordsAsync(string tableName)
+        {
+            var request = new ScanRequest
+            {
+                TableName = tableName,
+                Limit = 1 // Fetch only one item to check for records
+            };
+
+            var response = await _dynamoDb.ScanAsync(request);
+
+            // If response has any items, the table contains records
+            return response.Count > 0;
         }
     }
 }

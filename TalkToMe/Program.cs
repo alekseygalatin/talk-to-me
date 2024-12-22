@@ -85,6 +85,20 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+/*app.Use(async (context, next) =>
+{
+    if (context.Request.Method == HttpMethods.Options)
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        context.Response.StatusCode = StatusCodes.Status204NoContent;
+        return;
+    }
+
+    await next();
+});*/
+
 app.UseCors();
 
 app.UseHttpsRedirection();
@@ -97,8 +111,8 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var tableManager = scope.ServiceProvider.GetRequiredService<DynamoDbTableManager>();
-    // Ensure table exists and seed data
-    await tableManager.CreateTablesIfNotExist();
+    // Seed langauges if not exist
+    await tableManager.SeedLanguageDataAsync();
 }
 
 app.Run();
