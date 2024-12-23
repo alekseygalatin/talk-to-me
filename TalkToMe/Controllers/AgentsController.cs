@@ -62,14 +62,12 @@ public class AgentsController : ControllerBase
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
                 var response = await _swedishConversationAgent.Invoke(text, sub);
-                var audio = await ConvertTextToSpeechSwedish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
             else
             {
                 var response = await _englishConversationAgent.Invoke(text, sub);
-                var audio = await ConvertTextToSpeechEnglish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
         }
         else if (agent == "wordTeacherAgent")
@@ -77,14 +75,12 @@ public class AgentsController : ControllerBase
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
                 var response = await _swedishWordTeacherAgent.Invoke(text, sub);
-                var audio = await ConvertTextToSpeechSwedish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
             else
             {
                 var response = await _englishWordTeacherAgent.Invoke(text, sub);
-                var audio = await ConvertTextToSpeechEnglish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
         }
         else if (agent == "translationAgent")
@@ -92,12 +88,12 @@ public class AgentsController : ControllerBase
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
                 var response = await _swedishTranslationAgent.Invoke(text);
-                return this.CreateResponse(null, response.Response);
+                return this.CreateResponse(response.Response);
             }
             else
             {
                 var response = await _englishTranslationAgent.Invoke(text);
-                return this.CreateResponse(null, response.Response);
+                return this.CreateResponse(response.Response);
             }
         }
         else if (agent == "conversationHelperAgent")
@@ -105,12 +101,12 @@ public class AgentsController : ControllerBase
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
                 var response = await _swedishConversationHelperAgent.Invoke(text, sub);
-                return this.CreateResponse(null, response.Response);
+                return this.CreateResponse(response.Response);
             }
             else
             {
                 var response = await _englishConversationHelperAgent.Invoke(text, sub);
-                return this.CreateResponse(null, response.Response);
+                return this.CreateResponse(response.Response);
             }
         }
         
@@ -125,14 +121,12 @@ public class AgentsController : ControllerBase
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
                 var response = await _swedishStoryTailorAgent.Invoke();
-                var audio = await ConvertTextToSpeechSwedish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
             else
             {
                 var response = await _englishStoryTailorAgent.Invoke();
-                var audio = await ConvertTextToSpeechEnglish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
         }
 
@@ -147,62 +141,25 @@ public class AgentsController : ControllerBase
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
                 var response = await _swedishRetailerAgent.Invoke(data.Promt, data.Text);
-                var audio = await ConvertTextToSpeechSwedish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
             else
             {
                 var response = await _englishRetailerAgent.Invoke(data.Promt, data.Text);
-                var audio = await ConvertTextToSpeechEnglish(response.Response);
-                return this.CreateResponse(audio, response.Response);
+                return this.CreateResponse(response.Response);
             }
         }
         
         throw new NotFoundException($"Agent: {agent} has not been found");
     }
         
-    private async Task<byte[]> ConvertTextToSpeechSwedish(string text)
-    {
-        var synthesizeSpeechRequest = new SynthesizeSpeechRequest
-        {
-            OutputFormat = OutputFormat.Mp3,
-            Text = text,
-            VoiceId = "Elin", // Neural Swedish voice
-            Engine = Engine.Neural // Use the neural engine
-        };
-
-        using var synthesizeSpeechResponse = await _pollyClient.SynthesizeSpeechAsync(synthesizeSpeechRequest);
-        using var memoryStream = new MemoryStream();
-        await synthesizeSpeechResponse.AudioStream.CopyToAsync(memoryStream);
-
-        return memoryStream.ToArray(); // Return the audio byte array
-    }
-    
-    private async Task<byte[]> ConvertTextToSpeechEnglish(string text)
-    {
-        var synthesizeSpeechRequest = new SynthesizeSpeechRequest
-        {
-            OutputFormat = OutputFormat.Mp3,
-            Text = text,
-            VoiceId = "Ruth", // Neural English voice
-            Engine = Engine.Neural // Use the neural engine
-        };
-
-        using var synthesizeSpeechResponse = await _pollyClient.SynthesizeSpeechAsync(synthesizeSpeechRequest);
-        using var memoryStream = new MemoryStream();
-        await synthesizeSpeechResponse.AudioStream.CopyToAsync(memoryStream);
-
-        return memoryStream.ToArray(); // Return the audio byte array
-    }
-        
-    private APIGatewayHttpApiV2ProxyResponse CreateResponse(byte[]? audioBytes, string text)
+    private APIGatewayHttpApiV2ProxyResponse CreateResponse(string text)
     {
         return new APIGatewayHttpApiV2ProxyResponse
         {
             StatusCode = 200,
             Body = JsonSerializer.Serialize(new
             {
-                Audio = audioBytes != null ? Convert.ToBase64String(audioBytes): "",
                 Text = text
             })
         };

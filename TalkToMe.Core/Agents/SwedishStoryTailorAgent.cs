@@ -9,7 +9,7 @@ namespace TalkToMe.Core.Agents;
 public class SwedishStoryTailorAgent : BaseAgent
 {
     public SwedishStoryTailorAgent(IAIProviderFactory aiProviderFactory) :
-        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_1_70b_v1)
+        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Claude_3_5_Haiku)
     {
     }
     
@@ -21,6 +21,7 @@ public class SwedishStoryTailorAgent : BaseAgent
         
         var request = new CoreRequestBuilder()
         .WithSystemInstruction(promt)
+        .WithPrompt("skriv")
         .Build();
 
         return await base.Invoke(request);
