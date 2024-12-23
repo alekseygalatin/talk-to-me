@@ -17,5 +17,8 @@ namespace TalkToMe.Domain.Entities
 
         [DynamoDBProperty]
         public bool Active { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> Pronouns { get; set; } = new List<string>();
     }
 }

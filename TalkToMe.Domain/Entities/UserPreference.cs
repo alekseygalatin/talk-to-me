@@ -13,10 +13,10 @@ namespace TalkToMe.Domain.Entities
         public string Name { get; set; } = default!;
 
         [DynamoDBProperty]
-        public string Sex { get; set; } = default!;
+        public string NativeLanguage { get; set; } = default!;
 
         [DynamoDBProperty]
-        public string NativeLanguage { get; set; } = default!;
+        public string PreferedPronoun { get; set; } = default!;
 
         [DynamoDBProperty]
         public string CurrentLanguageToLearn { get; set; } = default!;

@@ -56,7 +56,7 @@ namespace TalkToMe.Core.Services
                 throw new KeyNotFoundException("User preferences not found.");
 
             preferences.Name = dto.Name;
-            preferences.Sex = dto.Sex;
+            preferences.PreferedPronoun = dto.PreferedPronoun;
             preferences.NativeLanguage = dto.NativeLanguage;
 
             await _repository.UpdateAsync(preferences);

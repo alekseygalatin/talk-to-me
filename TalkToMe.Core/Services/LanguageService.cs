@@ -57,6 +57,7 @@ namespace TalkToMe.Core.Services
             language.Name = dto.Name;
             language.EnglishName = dto.EnglishName;
             language.Active = dto.Active;
+            language.Pronouns = dto.Pronouns;
 
             await _repository.UpdateAsync(language);
         }
