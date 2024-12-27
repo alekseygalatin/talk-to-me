@@ -21,6 +21,10 @@ public class BedrockService : IAIProvider
                 new LamaAiModelService(clientFactory, BedrockAIModelNames.Lama3_1_70b_v1)
             },
             {
+                BedrockAIModelNames.Lama3_3_70b_v1, 
+                new LamaAiModelService(clientFactory, BedrockAIModelNames.Lama3_3_70b_v1)
+            },
+            {
                 BedrockAIModelNames.AWS_Nova_Pro,
                 new NovaProModelService(clientFactory, BedrockAIModelNames.AWS_Nova_Pro)
             },

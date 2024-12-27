@@ -9,7 +9,7 @@ namespace TalkToMe.Core.Agents;
 public class EnglishTranslationAgent : BaseAgent
 {
     public EnglishTranslationAgent(IAIProviderFactory aiProviderFactory) :
-        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_1_8b_v1)
+        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
     {
     }
     
