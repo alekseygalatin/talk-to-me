@@ -61,11 +61,17 @@ public class AgentsController : ControllerBase
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
+                if (string.IsNullOrEmpty(text))
+                    text = "Hej";
+                
                 var response = await _swedishConversationAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
             else
             {
+                if (string.IsNullOrEmpty(text))
+                    text = "Hi";
+                
                 var response = await _englishConversationAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
@@ -74,11 +80,17 @@ public class AgentsController : ControllerBase
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
+                if (string.IsNullOrEmpty(text))
+                    text = "Hej";
+                
                 var response = await _swedishWordTeacherAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
             else
             {
+                if (string.IsNullOrEmpty(text))
+                    text = "Hi";
+                
                 var response = await _englishWordTeacherAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
