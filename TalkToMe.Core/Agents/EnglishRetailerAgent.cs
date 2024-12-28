@@ -9,7 +9,7 @@ namespace TalkToMe.Core.Agents;
 public class EnglishRetailerAgent : BaseAgent
 {
     public EnglishRetailerAgent(IAIProviderFactory aiProviderFactory) :
-        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_1_8b_v1)
+        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
     {
     }
 
@@ -20,10 +20,10 @@ public class EnglishRetailerAgent : BaseAgent
     {
         var promt = new StringBuilder(SystemPromt);
         promt.Append($"This is original text: {originalText}. ");
-        promt.Append($"This is my retailing: {retailing}.");
         
         var request = new CoreRequestBuilder()
         .WithSystemInstruction(promt.ToString())
+        .WithPrompt($"This is my retailing: {retailing}.")
         .Build();
 
         return await base.Invoke(request);
