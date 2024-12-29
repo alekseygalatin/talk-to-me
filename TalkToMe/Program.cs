@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddCors(x => x.AddDefaultPolicy(y => 
+builder.Services.AddCors(x => x.AddDefaultPolicy(y =>
     y.AllowAnyMethod()
      .AllowAnyOrigin()
      .AllowAnyHeader()));
@@ -25,35 +25,33 @@ builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(setup =>
-{
-    // Include 'SecurityScheme' to use JWT Authentication
-    var jwtSecurityScheme = new OpenApiSecurityScheme
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen(options =>
     {
-        BearerFormat = "JWT",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
-    };
-    setup.AddSecurityDefinition("Bearer", jwtSecurityScheme);
-    setup.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
+        const string identifier = "ApiKey";
+        options.AddSecurityDefinition(identifier, new()
             {
-                Reference = new OpenApiReference
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Description = "Put **_ONLY_** your token on textbox below!",
+            });
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            ArraySegment<string>.Empty
-        }
+                    Reference = new ()
+                    {
+                        Id = identifier,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
     });
-});
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();

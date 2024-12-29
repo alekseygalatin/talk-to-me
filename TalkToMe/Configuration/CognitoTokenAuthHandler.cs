@@ -12,23 +12,20 @@ namespace TalkToMe.Configuration;
 public class CognitoTokenAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     private static readonly TimeSpan RefreshCognitoPublicInterval = TimeSpan.FromMinutes(5);
-    private static readonly Lazy<bool> IsDevelopment = new(() =>
-    {
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        return !string.IsNullOrEmpty(environment) && environment.Equals("Development", StringComparison.OrdinalIgnoreCase);
-    });
 
     private readonly IMemoryCache _memoryCache;
     private readonly IHttpClientFactory _httpClientFactory;
 
     [Obsolete]
-    public CognitoTokenAuthHandler(IMemoryCache memoryCache, IHttpClientFactory httpClientFactory, IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+    public CognitoTokenAuthHandler(IMemoryCache memoryCache, IHttpClientFactory httpClientFactory, IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) 
+        : base(options, logger, encoder, clock)
     {
         _memoryCache = memoryCache;
         _httpClientFactory = httpClientFactory;
     }
 
-    public CognitoTokenAuthHandler(IMemoryCache memoryCache, IHttpClientFactory httpClientFactory, IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder) : base(options, logger, encoder)
+    public CognitoTokenAuthHandler(IMemoryCache memoryCache, IHttpClientFactory httpClientFactory, IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder) 
+        : base(options, logger, encoder)
     {
         _memoryCache = memoryCache;
         _httpClientFactory = httpClientFactory;
@@ -36,73 +33,74 @@ public class CognitoTokenAuthHandler : AuthenticationHandler<AuthenticationSchem
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var token = Request.Headers.TryGetValue("authorization", out var authHeader) ? authHeader.ToString() : null;
-
-        if (string.IsNullOrEmpty(token))
+        if (!Request.Headers.TryGetValue("authorization", out var authHeader) || string.IsNullOrEmpty(authHeader))
         {
             return await Task.FromResult(AuthenticateResult.Fail("Token is empty!"));
         }
         
-        var principal = await ValidateCognitoToken(token);
+        var principal = await ValidateCognitoToken(authHeader!);
+        if (principal is null)
+        {
+            return await Task.FromResult(AuthenticateResult.Fail("Invalid token validation parameters."));
+        }
 
         var tiket = new AuthenticationTicket(principal, Scheme.Name);
         return await Task.FromResult(AuthenticateResult.Success(tiket));
     }
     
-    private async Task<ClaimsPrincipal> ValidateCognitoToken(string token)
+    private async Task<ClaimsPrincipal?> ValidateCognitoToken(string token)
     {
         // Replace with your User Pool ID, Region, and App Client ID
         const string userPoolId = "us-east-1_walDCpNcK"; // Your User Pool ID
         const string region = "us-east-1"; // Change to your region
         const string clientId = "7o8tqlt2ucihqsbtthfopc9d4p"; // Your App Client ID without a secret
 
-        if (string.IsNullOrEmpty(token))
+        var tokenValidationParameters = await GetTokenValidationParameters(userPoolId, region, clientId);
+        if (tokenValidationParameters is null)
         {
-            Console.WriteLine("Token is null or empty.");
-            return null; // Early return for invalid token input
-        }
-
-        if (IsDevelopment.Value)
-        {
-            token = token.Replace("Bearer", "").Trim();
+            return null;
         }
 
         var handler = new JwtSecurityTokenHandler();
-        var keys = await GetCognitoPublicKeysAsync(userPoolId, region);
 
-        // Specify token validation parameters
-        var tokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKeys = keys,
-            ValidateIssuer = true,
-            ValidIssuer = $"https://cognito-idp.{region}.amazonaws.com/{userPoolId}",
-            ValidateAudience = false,
-            ValidAudience = clientId,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero // Do not allow any clock skew
-        };
-
-        // Validate the token
         return handler.ValidateToken(token, tokenValidationParameters, out _);
     }
 
-    private async Task<IEnumerable<JsonWebKey>> GetCognitoPublicKeysAsync(string userPoolId, string region)
+    private async Task<TokenValidationParameters?> GetTokenValidationParameters(string userPoolId, string region, string clientId)
     {
-        // Fetch the Cognito public keys from the AWS Cognito JWK endpoint
-        var jwksUri = $"https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json";
-
-        var keys = await _memoryCache.GetOrCreateAsync(jwksUri, async entry =>
+        var cacheKey = (userPoolId, region, clientId);
+        var tokenValidationParameters = await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = RefreshCognitoPublicInterval;
+
+            // Fetch the Cognito public keys from the AWS Cognito JWK endpoint
+            var jwksUri = $"https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json";
 
             using var httpClient = _httpClientFactory.CreateClient();
             var response = await httpClient.GetStringAsync(jwksUri);
             var keySet = JsonSerializer.Deserialize<JsonWebKeySet>(response);
-            
-            return keySet.Keys;
+
+            if (keySet is null)
+            {
+                return null;
+            }
+
+            var keys = keySet.Keys;
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeys = keys,
+                ValidateIssuer = true,
+                ValidIssuer = $"https://cognito-idp.{region}.amazonaws.com/{userPoolId}",
+                ValidateAudience = false,
+                ValidAudience = clientId,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero // Do not allow any clock skew
+            };
+
+            return tokenValidationParameters;
         });
 
-        return keys;
+        return tokenValidationParameters;
     }
 }
