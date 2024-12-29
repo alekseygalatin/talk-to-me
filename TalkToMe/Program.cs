@@ -17,12 +17,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(x => x.AddDefaultPolicy(y => 
     y.AllowAnyMethod()
-    .AllowAnyOrigin()
-    .AllowAnyHeader()));
+     .AllowAnyOrigin()
+     .AllowAnyHeader()));
 
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup =>
@@ -54,11 +55,13 @@ builder.Services.AddSwaggerGen(setup =>
     });
 });
 
-builder.Services.Configure<AuthenticationSchemeOptions>(o =>
-{
-    
-}).AddAuthentication(o => { o.DefaultScheme = "CognitoToken"; })
-.AddScheme<AuthenticationSchemeOptions, CognitoTokenAuthHandler>("CognitoToken", _ => {});
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient();
+
+builder.Services
+    .Configure<AuthenticationSchemeOptions>(_ => { })
+    .AddAuthentication(o => { o.DefaultScheme = "CognitoToken"; })
+    .AddScheme<AuthenticationSchemeOptions, CognitoTokenAuthHandler>("CognitoToken", _ => { });
 
 builder.Services.AddBedrockServices(new BedrockSettings
 {
@@ -71,7 +74,7 @@ var mapperConfig = new MapperConfiguration(mc =>
     mc.AddProfile(new MappingProfile());
 });
 
-IMapper mapper = mapperConfig.CreateMapper();
+var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAWSService<IAmazonDynamoDB>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
