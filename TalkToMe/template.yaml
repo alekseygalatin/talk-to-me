@@ -24,22 +24,12 @@ Resources:
   WordTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: WordTable
+      TableName: DictionaryTable
       AttributeDefinitions:
         - AttributeName: UserId
           AttributeType: S
         - AttributeName: Word
           AttributeType: S
-        - AttributeName: Transcription
-          AttributeType: S
-        - AttributeName: BaseFormWord
-          AttributeType: S
-        - AttributeName: Translations
-          AttributeType: SS
-        - AttributeName: Example
-          AttributeType: S
-        - AttributeName: IncludeIntoChat
-          AttributeType: BOOL
       KeySchema:
         - AttributeName: UserId
           KeyType: HASH
