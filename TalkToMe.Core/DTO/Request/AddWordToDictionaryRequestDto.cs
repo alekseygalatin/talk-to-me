@@ -5,14 +5,17 @@ namespace TalkToMe.Core.DTO.Request;
 public class AddWordToDictionaryRequestDto
 {
     [Required]
-    public string Word { get; set; }
-    
+    public string Word { get; set; } = default!;
+
     [Required]
-    public string Translation { get; set; }
-    
+    public string Transcription { get; set; } = default!;
+
     [Required]
-    public string Example { get; set; }
-    
+    public string BaseFormWord { get; set; } = default!;
+
     [Required]
-    public bool IncludeIntoChat { get; set; }
+    public List<string> Translations { get; set; } = new List<string>();
+
+    [Required]
+    public string Example { get; set; } = default!;
 }

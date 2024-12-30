@@ -6,18 +6,24 @@ namespace TalkToMe.Domain.Entities;
 [DynamoDBTable(TableNames.WordTable)]
 public class WordEntity
 {
-    [DynamoDBHashKey("userId")]
+    [DynamoDBHashKey]
     public string UserId { get; set; } = default!;
 
-    [DynamoDBRangeKey("word")]
+    [DynamoDBRangeKey]
     public string Word { get; set; } = default!;
-    
-    [DynamoDBProperty("translation")]
-    public string Translation { get; set; }
-    
-    [DynamoDBProperty("example")]
-    public string Example { get; set; }
-    
-    [DynamoDBProperty("includeIntoChat")]
+
+    [DynamoDBProperty]
+    public string Transcription { get; set; } = default!;
+
+    [DynamoDBProperty]
+    public string BaseFormWord { get; set; } = default!;
+
+    [DynamoDBProperty]
+    public List<string> Translations { get; set; } = new List<string>();
+
+    [DynamoDBProperty]
+    public string Example { get; set; } = default!;
+
+    [DynamoDBProperty]
     public bool IncludeIntoChat { get; set; }
 }

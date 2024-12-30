@@ -1,7 +1,6 @@
 using TalkToMe.Core.Enums;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
-using TalkToMe.Core.Services;
 
 namespace TalkToMe.Core.Agents;
 
