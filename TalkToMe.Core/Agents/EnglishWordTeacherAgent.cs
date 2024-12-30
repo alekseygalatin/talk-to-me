@@ -17,7 +17,7 @@ public class EnglishWordTeacherAgent : BaseWithMemoryAgent
     }
     
     protected override string SystemPromt => "";
-    protected override string AgentId => "1";
+    protected override string AgentId => "3";
 
     public async Task<CoreResponse> Invoke(string message, string sessionId)
     {
