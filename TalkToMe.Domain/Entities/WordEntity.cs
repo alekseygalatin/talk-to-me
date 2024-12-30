@@ -3,7 +3,7 @@ using TalkToMe.Domain.Constants;
 
 namespace TalkToMe.Domain.Entities;
 
-[DynamoDBTable(TableNames.WordTable)]
+[DynamoDBTable(TableNames.DictionaryTable)]
 public class WordEntity
 {
     [DynamoDBHashKey]
