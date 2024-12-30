@@ -23,7 +23,7 @@ namespace TalkToMe.Core.Agents
             sb.Append($"\"example\":\"provide an {languageFrom} sentence that uses the base form of the word\",");
             sb.Append($"\"translationNotes\":\"include any relevant notes about nuances or specifics of the translation, if needed. (write in {languageTo})\"");
             sb.Append("} ");
-            sb.Append("Always ensure the response is accurate, comprehensive, and formatted as a valid JSON object. Do not omit any field.");
+            sb.Append("Always ensure the response is accurate, comprehensive, and formatted as a valid JSON object without unnecessary symbols outside. Do not omit any field.");
 
             return sb.ToString();
         }
