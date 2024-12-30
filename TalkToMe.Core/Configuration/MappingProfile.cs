@@ -12,6 +12,8 @@ namespace TalkToMe.Core.Configuration
             CreateMap<UserPreferenceRequestDto, UserPreference>();
             CreateMap<LanguageRequestDto, Language>();
             CreateMap<Language, LanguageResponseDto>();
+            CreateMap<AddWordToDictionaryRequestDto, WordEntity>();
+            CreateMap<WordEntity, WordResponseDto>();
         }
     }
 }

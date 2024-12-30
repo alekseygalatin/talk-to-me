@@ -26,14 +26,24 @@ Resources:
     Properties:
       TableName: WordTable
       AttributeDefinitions:
-        - AttributeName: userId
+        - AttributeName: UserId
           AttributeType: S
-        - AttributeName: word
+        - AttributeName: Word
           AttributeType: S
+        - AttributeName: Transcription
+          AttributeType: S
+        - AttributeName: BaseFormWord
+          AttributeType: S
+        - AttributeName: Translations
+          AttributeType: SS
+        - AttributeName: Example
+          AttributeType: S
+        - AttributeName: IncludeIntoChat
+          AttributeType: BOOL
       KeySchema:
-        - AttributeName: userId
+        - AttributeName: UserId
           KeyType: HASH
-        - AttributeName: word
+        - AttributeName: Word
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST # Use on-demand pricing
       
