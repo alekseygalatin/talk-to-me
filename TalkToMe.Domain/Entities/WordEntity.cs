@@ -10,6 +10,9 @@ public class WordEntity
     public string UserId { get; set; } = default!;
 
     [DynamoDBRangeKey]
+    public string Langauge { get; set; } = default!;
+
+    [DynamoDBRangeKey]
     public string Word { get; set; } = default!;
 
     [DynamoDBProperty]

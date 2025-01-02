@@ -33,7 +33,7 @@ public class EnglishWordTeacherAgent : BaseWithMemoryAgent
 
     protected override async Task<string> BuildSystemPromt(string message, string sessionId)
     {
-        var words = await _wordService.GetWords(sessionId);
+        var words = await _wordService.GetWords(sessionId, "en-US");
         var list = words.Select(x => x.Word);
         var str = new StringBuilder("I am learning English and would like you to help me as a language-learning partner to practice the following words: ");
         str.Append(string.Join(", ", list));
