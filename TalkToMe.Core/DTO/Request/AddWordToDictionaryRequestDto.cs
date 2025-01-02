@@ -5,6 +5,9 @@ namespace TalkToMe.Core.DTO.Request;
 public class AddWordToDictionaryRequestDto
 {
     [Required]
+    public string Language { get; set; } = default!;
+
+    [Required]
     public string Word { get; set; } = default!;
 
     [Required]

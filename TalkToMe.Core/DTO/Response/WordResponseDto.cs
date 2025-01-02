@@ -1,9 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace TalkToMe.Core.DTO.Response;
 
 public class WordResponseDto
 {
+    public string Language { get; set; } = default!;
     public string Word { get; set; } = default!;
     public string Transcription { get; set; } = default!;
     public string BaseFormWord { get; set; } = default!;

@@ -9,19 +9,19 @@ namespace TalkToMe.Core.Services;
 
 public class WordService : IWordService
 {
-    private readonly IBaseRepository<WordEntity> _repository;
+    private readonly IWordRepository _repository;
     private readonly IMapper _mapper;
 
-    public WordService(IBaseRepository<WordEntity> repository,
+    public WordService(IWordRepository repository,
         IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;
     }
 
-    public async Task<List<WordResponseDto>> GetWords(string userId)
+    public async Task<List<WordResponseDto>> GetWords(string userId, string langauge)
     {
-        var wordsList = await _repository.GetManyByIdAsync(userId);
+        var wordsList = await _repository.GetManyByIdAsync(userId, langauge);
         return _mapper.Map<List<WordResponseDto>>(wordsList);
     }
 
