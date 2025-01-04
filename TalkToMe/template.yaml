@@ -21,10 +21,10 @@ Resources:
       SupportedIdentityProviders:
         - COGNITO
   
-  WordTable:
+  WordsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: DictionaryTable
+      TableName: WordsTable
       AttributeDefinitions:
         - AttributeName: UserId
           AttributeType: S
@@ -37,9 +37,16 @@ Resources:
           KeyType: HASH
         - AttributeName: Language
           KeyType: RANGE
-        - AttributeName: Word
-          KeyType: RANGE
-      BillingMode: PAY_PER_REQUEST # Use on-demand pricing
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: WordIndex
+          KeySchema:
+            - AttributeName: UserId
+              KeyType: HASH
+            - AttributeName: Word
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       
   ApiFunction:
     Type: AWS::Serverless::Function
