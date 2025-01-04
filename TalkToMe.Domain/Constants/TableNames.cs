@@ -4,6 +4,6 @@
     {
         public const string UserPreferences = "UserPreferences";
         public const string Languages = "Languages";
-        public const string DictionaryTable = "DictionaryTable";
+        public const string WordsTable = "WordsTable";
     }
 }
