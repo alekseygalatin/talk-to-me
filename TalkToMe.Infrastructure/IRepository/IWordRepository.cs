@@ -4,6 +4,7 @@ namespace TalkToMe.Infrastructure.IRepository
 {
     public interface IWordRepository : IBaseRepository<WordEntity>
     {
-        Task<List<WordEntity>> GetManyByIdAsync(string partitionKey, string sortKeyValue);
+        Task<List<WordEntity>> GetWordsByLanguageAsync(string userId, string language);
+        Task<WordEntity?> GetWordAsync(string userId, string language, string word);
     }
 }

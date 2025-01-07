@@ -19,14 +19,23 @@ public class WordRepository : BaseRepository<WordEntity>, IWordRepository
         _context = new DynamoDBContext(dynamoDb, config);
     }
 
-    public async Task<List<WordEntity>> GetManyByIdAsync(string partitionKey, string sortKeyValue)
+    public async Task<List<WordEntity>> GetWordsByLanguageAsync(string userId, string language)
     {
         var query = _context.QueryAsync<WordEntity>(
-            partitionKey,
-            QueryOperator.Equal,
-            new List<object> { sortKeyValue }
-        );
+            userId,
+            QueryOperator.BeginsWith,
+            new[] { $"{language}#" });
 
         return await query.GetRemainingAsync();
+    }
+
+    public async Task<WordEntity?> GetWordAsync(string userId, string language, string word)
+    {
+        var query = _context.QueryAsync<WordEntity>(
+            userId,
+            QueryOperator.Equal,
+            new[] { $"{language}#{word}" });
+
+        return (await query.GetRemainingAsync()).FirstOrDefault();
     }
 }
