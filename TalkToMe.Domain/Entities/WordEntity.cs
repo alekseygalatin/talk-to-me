@@ -1,4 +1,6 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using TalkToMe.Domain.Constants;
 
 namespace TalkToMe.Domain.Entities;
@@ -10,19 +12,38 @@ public class WordEntity
     public string UserId { get; set; } = default!;
 
     [DynamoDBRangeKey]
-    public string Langauge { get; set; } = default!;
+    public string LanguageWord { get; set; } = default!;
 
-    [DynamoDBRangeKey]
-    public string Word { get; set; } = default!;
+    [DynamoDBIgnore]
+    public string Language
+    {
+        get => LanguageWord.Split('#')[0]; 
+    }
+
+    [DynamoDBIgnore]
+    public string Word
+    {
+        get => LanguageWord.Split('#')[1];
+    }
 
     [DynamoDBProperty]
     public string Transcription { get; set; } = default!;
 
     [DynamoDBProperty]
-    public string BaseFormWord { get; set; } = default!;
+    public string TranslationsJson { get; set; } = default!;
 
-    [DynamoDBProperty]
-    public List<string> Translations { get; set; } = new List<string>();
+    [DynamoDBIgnore]
+    public List<string> Translations
+    {
+        get => TranslationsJson != null
+            ? JsonSerializer.Deserialize<List<string>>(TranslationsJson)
+            : new List<string>();
+        set => TranslationsJson = JsonSerializer.Serialize(value,
+            new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
+    }
 
     [DynamoDBProperty]
     public string Example { get; set; } = default!;

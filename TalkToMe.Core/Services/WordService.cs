@@ -21,7 +21,7 @@ public class WordService : IWordService
 
     public async Task<List<WordResponseDto>> GetWords(string userId, string langauge)
     {
-        var wordsList = await _repository.GetManyByIdAsync(userId, langauge);
+        var wordsList = await _repository.GetWordsByLanguageAsync(userId, langauge);
         return _mapper.Map<List<WordResponseDto>>(wordsList);
     }
 

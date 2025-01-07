@@ -28,25 +28,16 @@ Resources:
       AttributeDefinitions:
         - AttributeName: UserId
           AttributeType: S
-        - AttributeName: Language
-          AttributeType: S
-        - AttributeName: Word
+        - AttributeName: LanguageWord
           AttributeType: S
       KeySchema:
         - AttributeName: UserId
           KeyType: HASH
-        - AttributeName: Language
+        - AttributeName: LanguageWord
           KeyType: RANGE
-      BillingMode: PAY_PER_REQUEST
-      GlobalSecondaryIndexes:
-        - IndexName: WordIndex
-          KeySchema:
-            - AttributeName: UserId
-              KeyType: HASH
-            - AttributeName: Word
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
       
   ApiFunction:
     Type: AWS::Serverless::Function
