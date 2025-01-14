@@ -24,12 +24,16 @@ public class Document
     
     [BsonElement("expiryDate")]
     public DateTime ExpiryDate { get; set; }
+    
+    [BsonElement("timeStamp")]
+    public DateTime TimeStamp { get; set; }
 }
 
 public class Dialog
 {
     public string Role { get; set; }
     public string Message { get; set; }
+    public string TimeStamp { get; set; }
 }
 
 public class ConversationManager : IConversationManager
@@ -70,7 +74,8 @@ public class ConversationManager : IConversationManager
             GuideId = sessionId,
             Embedding = vector,
             Dialog = dialogs,
-            ExpiryDate = DateTime.UtcNow.AddDays(1)
+            ExpiryDate = DateTime.UtcNow.AddDays(1),
+            TimeStamp = DateTime.UtcNow
         };
 
         await _mongoCollection.InsertOneAsync(document);

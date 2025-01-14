@@ -20,8 +20,10 @@ public class CognitoTokenAuthHandler : AuthenticationHandler<AuthenticationSchem
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        string token = Request.Headers.TryGetValue("authorization", out var authHeader) ? authHeader.ToString() : null;
+        string? token = Request.Headers.TryGetValue("authorization", out var authHeader) ? authHeader.ToString() : null;
 
+        token = token?.Split(" ").LastOrDefault();
+        
         if (string.IsNullOrEmpty(token))
         {
             return await Task.FromResult(AuthenticateResult.Fail("Token is empty!"));

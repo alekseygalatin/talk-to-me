@@ -22,15 +22,19 @@ public abstract class BaseWithMemoryAgent
     
     protected async Task<CoreResponse> Invoke(CoreRequest request, string sessionId)
     {
-        var response = await _model.SendMessageAsync(request);
-        
-        await _conversationManager.AddMemory($"{request.Prompt}. {response.Response}", new List<Dialog>
+        var task1 =  _conversationManager.AddMemory($"{request.Prompt}", new List<Dialog>
         {
             new Dialog
             {
                 Role = "user",
                 Message = request.Prompt
-            },
+            }
+        }, GetKey(sessionId));
+        
+        var response = await _model.SendMessageAsync(request);
+        
+        var task2 = _conversationManager.AddMemory($"{response.Response}", new List<Dialog>
+        {
             new Dialog
             {
                 Role = "model",
@@ -38,6 +42,8 @@ public abstract class BaseWithMemoryAgent
             }
         }, GetKey(sessionId));
 
+        await Task.WhenAll(task1, task2);
+        
         return response;
     }
 
