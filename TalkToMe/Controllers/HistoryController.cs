@@ -46,8 +46,32 @@ public class HistoryController : ControllerBase
                 });
                 return Ok(result);
             }
+        } 
+        else if (agent == "wordTeacherAgent")
+        {
+            if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
+            {
+                var history = await _historyService.GetHistory(sub + "6");
+                var result = history.Select(x => new HistoryMessageDto
+                {
+                    Message = x.Dialog.First().Message,
+                    IsUser = x.Dialog.First().Role != "model",
+                    DateTime = x.TimeStamp.ToString()
+                });
+                return Ok(result);
+            }
+            else
+            {
+                var history = await _historyService.GetHistory(sub + "3");
+                var result = history.Select(x => new HistoryMessageDto
+                {
+                    Message = x.Dialog.First().Message,
+                    IsUser = x.Dialog.First().Role != "model",
+                    DateTime = x.TimeStamp.ToString()
+                });
+                return Ok(result);
+            }
         }
-        
         throw new NotFoundException($"Agent: {agent} has not been found");
     }
 }
