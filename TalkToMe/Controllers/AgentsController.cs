@@ -2,7 +2,6 @@ using System.Text.Json;
 using Amazon;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Polly;
-using Amazon.Polly.Model;
 using Amazon.TranscribeService.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,8 +29,7 @@ public class AgentsController : ControllerBase
     private EnglishRetailerAgent _englishRetailerAgent;
     private EnglishConversationHelperAgent _englishConversationHelperAgent;
     private EnglishWordTeacherAgent _englishWordTeacherAgent;
-        
-    private readonly AmazonPollyClient _pollyClient;
+    
     private readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast1;
         
     public AgentsController(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager, IWordService wordService)
@@ -39,18 +37,16 @@ public class AgentsController : ControllerBase
         _swedishConversationAgent = new SwedishConversationAgent(aiProviderFactory, conversationManager);
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
         _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory);
-        _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory);
+        _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory, conversationManager);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
         _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
             
         _englishConversationAgent = new EnglishConversationAgent(aiProviderFactory, conversationManager);
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory);
         _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory);
-        _englishRetailerAgent = new EnglishRetailerAgent(aiProviderFactory);
+        _englishRetailerAgent = new EnglishRetailerAgent(aiProviderFactory, conversationManager);
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, conversationManager);
         _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
-        
-        _pollyClient = new AmazonPollyClient(bucketRegion);
     }
         
     [HttpPost("{locale}/{agent}/text/invoke")]
@@ -128,6 +124,7 @@ public class AgentsController : ControllerBase
     [HttpPost("{locale}/{agent}/invoke")]
     public async Task<APIGatewayHttpApiV2ProxyResponse> Invoke([FromRoute] string locale, [FromRoute] string agent)
     {
+        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
         if (agent == "storyTailorAgent")
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
@@ -148,16 +145,17 @@ public class AgentsController : ControllerBase
     [HttpPost("{locale}/{agent}/promt/text/invoke")]
     public async Task<APIGatewayHttpApiV2ProxyResponse> Invoke([FromRoute] string locale, [FromRoute] string agent, [FromBody] WithPromtRequest data)
     {
+        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
         if (agent == "retailerAgent")
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
-                var response = await _swedishRetailerAgent.Invoke(data.Promt, data.Text);
+                var response = await _swedishRetailerAgent.Invoke(data.Promt, data.Text, sub);
                 return this.CreateResponse(response.Response);
             }
             else
             {
-                var response = await _englishRetailerAgent.Invoke(data.Promt, data.Text);
+                var response = await _englishRetailerAgent.Invoke(data.Promt, data.Text, sub);
                 return this.CreateResponse(response.Response);
             }
         }

@@ -15,50 +15,51 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddCors(x => x.AddDefaultPolicy(y => 
+builder.Services.AddCors(x => x.AddDefaultPolicy(y =>
     y.AllowAnyMethod()
-    .AllowAnyOrigin()
-    .AllowAnyHeader()));
+     .AllowAnyOrigin()
+     .AllowAnyHeader()));
 
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(setup =>
-{
-    // Include 'SecurityScheme' to use JWT Authentication
-    var jwtSecurityScheme = new OpenApiSecurityScheme
-    {
-        BearerFormat = "JWT",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
-    };
-    setup.AddSecurityDefinition("Bearer", jwtSecurityScheme);
-    setup.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            ArraySegment<string>.Empty
-        }
-    });
-});
 
-builder.Services.Configure<AuthenticationSchemeOptions>(o =>
-{
-    
-}).AddAuthentication(o => { o.DefaultScheme = "CognitoToken"; })
-.AddScheme<AuthenticationSchemeOptions, CognitoTokenAuthHandler>("CognitoToken", _ => {});
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen(options =>
+    {
+        const string identifier = "ApiKey";
+        options.AddSecurityDefinition(identifier, new()
+            {
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Description = "Put **_ONLY_** your token on textbox below!",
+            });
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new ()
+                    {
+                        Id = identifier,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
+    });
+
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient();
+
+builder.Services
+    .Configure<AuthenticationSchemeOptions>(_ => { })
+    .AddAuthentication(o => { o.DefaultScheme = "CognitoToken"; })
+    .AddScheme<AuthenticationSchemeOptions, CognitoTokenAuthHandler>("CognitoToken", _ => { });
 
 builder.Services.AddBedrockServices(new BedrockSettings
 {
@@ -71,7 +72,7 @@ var mapperConfig = new MapperConfiguration(mc =>
     mc.AddProfile(new MappingProfile());
 });
 
-IMapper mapper = mapperConfig.CreateMapper();
+var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAWSService<IAmazonDynamoDB>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
