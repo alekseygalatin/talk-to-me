@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TalkToMe.Core.DTO.Request;
 
-public class AddWordToDictionaryRequestDto
+public class WordRequestDto
 {
     public string LanguageWord { get { return $"{Language}#{Word}"; } } 
 

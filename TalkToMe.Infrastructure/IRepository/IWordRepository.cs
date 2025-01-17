@@ -6,5 +6,7 @@ namespace TalkToMe.Infrastructure.IRepository
     {
         Task<List<WordEntity>> GetWordsByLanguageAsync(string userId, string language);
         Task<WordEntity?> GetWordAsync(string userId, string language, string word);
+        Task DeleteAsync(WordEntity word);
+        Task UpdateIncludeIntoChatAsync(string userId, string languageWord, bool includeIntoChat);
     }
 }
