@@ -6,6 +6,7 @@ on:
       environment:
         description: 'Deployment environment (e.g. dev or prod)'
         required: true
+        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
