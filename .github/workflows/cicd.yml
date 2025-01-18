@@ -25,20 +25,22 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      # 2. Set up .NET (if your project is .NET 6, for example)
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
       # 4. Configure AWS Credentials from GitHub secrets
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4.0.3
+        env: 
+          STAGE: ${{ inputs.environment }}
         with:
           role-to-assume: ${{ secrets.ROLE }}
           role-session-name: OIDCSession
           audience: 'sts.amazonaws.com'
           aws-region: 'us-east-1'
+          
+      # 2. Set up .NET (if your project is .NET 6, for example)
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
 
       # 5. (Optional) Restore and build your .NET project
       - name: Restore and build .NET project
