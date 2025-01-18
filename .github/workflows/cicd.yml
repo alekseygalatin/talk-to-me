@@ -31,7 +31,7 @@ jobs:
         env: 
           STAGE: ${{ inputs.environment }}
         with:
-          role-to-assume: ${{ secrets.ROLE }}
+          role-to-assume: 'arn:aws:iam::038462779690:role/GitHub'
           role-session-name: OIDCSession
           audience: 'sts.amazonaws.com'
           aws-region: 'us-east-1'
