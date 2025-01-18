@@ -7,6 +7,13 @@ on:
         description: 'Choose env:'
         type: environment
         required: true
+      stack-name:
+        description: 'Choose stack:'
+        type: choice
+        options:
+          - talkToMe
+          - talkToMe-dev
+        required: true
         
 run-name: '[Deploy] ${{ github.ref_name }} to ${{ inputs.environment }}'
 

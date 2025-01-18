@@ -7,6 +7,10 @@ on:
         description: 'Deployment environment (e.g. dev or prod)'
         required: true
         type: string
+      stack-name:
+        description: 'AWS Stack Name'
+        required: true
+        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -44,16 +48,19 @@ jobs:
         run: |
           dotnet restore
           dotnet build --configuration Release
+        working-directory: TalkToMe
         
       #6. Setup tools  
       - name: Setup tooling
         run: dotnet tool install -g Amazon.Lambda.Tools
         shell: bash
+        working-directory: TalkToMe
 
       # 7. Deploy the SAM application
       - name: SAM Deploy
         run: |
           sam deploy \
-            --stack-name talkToMe-${{ inputs.environment }} \
-            --s3-bucket talktomebucket-${{ inputs.environment }} \
+            --stack-name ${{ inputs.stack-name }} \
+            --s3-bucket talktomebucket \
             --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND 
+        working-directory: TalkToMe
