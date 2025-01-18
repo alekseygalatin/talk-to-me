@@ -59,8 +59,8 @@ jobs:
       # 7. Deploy the SAM application
       - name: SAM Deploy
         run: |
+          cd TolkToMe
           sam deploy \
             --stack-name ${{ inputs.stack-name }} \
             --s3-bucket talktomebucket \
             --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND 
-        working-directory: TalkToMe
