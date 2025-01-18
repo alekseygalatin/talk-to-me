@@ -42,25 +42,25 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-
-      # 5. (Optional) Restore and build your .NET project
-      - name: Restore and build .NET project
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
-        working-directory: TalkToMe
         
       #6. Setup tools  
       - name: Setup tooling
         run: dotnet tool install -g Amazon.Lambda.Tools
         shell: bash
         working-directory: TalkToMe
+        
+      # 5. (Optional) Restore and build your .NET project
+      - name: Restore and build .NET project
+        run: |
+          dotnet restore
+          dotnet publish -c Release
+        working-directory: TalkToMe
 
       # 7. Deploy the SAM application
       - name: SAM Deploy
         run: |
-          cd TalkToMe
           sam deploy \
             --stack-name ${{ inputs.stack-name }} \
             --s3-bucket talktomebucket \
-            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND 
+            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
+        working-directory: TalkToMe
