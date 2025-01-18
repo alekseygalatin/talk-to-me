@@ -27,7 +27,7 @@ jobs:
 
       # 4. Configure AWS Credentials from GitHub secrets
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.3
+        uses: aws-actions/configure-aws-credentials@v4
         env: 
           STAGE: ${{ inputs.environment }}
         with:
