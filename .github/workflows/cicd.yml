@@ -59,7 +59,7 @@ jobs:
       # 7. Deploy the SAM application
       - name: SAM Deploy
         run: |
-          cd TolkToMe
+          cd TalkToMe
           sam deploy \
             --stack-name ${{ inputs.stack-name }} \
             --s3-bucket talktomebucket \
