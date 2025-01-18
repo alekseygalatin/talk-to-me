@@ -54,6 +54,6 @@ jobs:
       - name: SAM Deploy
         run: |
           sam deploy \
-            --stack-name ${{ vars.STACK_NAME }} \
+            --stack-name talkToMe-${{ inputs.environment }} \
             --s3-bucket talktomebucket-${{ inputs.environment }} \
             --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND 

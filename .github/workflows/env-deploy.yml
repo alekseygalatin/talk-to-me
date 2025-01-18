@@ -10,6 +10,14 @@ on:
         
 run-name: '[Deploy] ${{ github.ref_name }} to ${{ inputs.environment }}'
 
+permissions:
+  id-token: write
+  contents: write
+  issues: write
+  pull-requests: write
+  packages: write
+  actions: write
+  
 jobs:
   dev-deployment:
     name: Deploy to Dev
