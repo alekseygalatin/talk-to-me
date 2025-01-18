@@ -1,0 +1,61 @@
+name: Build and Deploy SAM Application
+
+on:
+  # Allows manual (workflow_dispatch) runs from the Actions tab
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "The environment to deploy (e.g., dev or prod)"
+        required: true
+        default: "dev"
+
+permissions: 
+  id-token: write
+  contents: write
+  issues: write
+  pull-requests: write
+  packages: write
+  actions: write
+  
+jobs:
+  build-and-deploy:
+    name: Deploy to ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out the repository code
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # 2. Set up .NET (if your project is .NET 6, for example)
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # 4. Configure AWS Credentials from GitHub secrets
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 5. (Optional) Restore and build your .NET project
+      - name: Restore and build .NET project
+        run: |
+          dotnet restore
+          dotnet build --configuration Release
+        
+      #6. Setup tools  
+      - name: Setup tooling
+        run: dotnet tool install -g Amazon.Lambda.Tools
+        shell: bash
+
+      # 7. Deploy the SAM application
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --stack-name ${{ vars.STACK_NAME }} \
+            --s3-bucket talktomebucket-${{ inputs.environment }} \
+            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND 
