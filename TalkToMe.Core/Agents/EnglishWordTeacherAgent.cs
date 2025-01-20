@@ -39,7 +39,7 @@ public class EnglishWordTeacherAgent : BaseWithMemoryAgent
         str.Append(string.Join(", ", list));
         str.Append(".");
         str.Append(
-            "Build dialogues with me where you naturally use these words and utilize the conversation history to ensure all words are covered. Ask questions that help me memorize them and encourage me to use the words in my own sentences. Focus on creating a logical and engaging conversation around the words, where each question or answer builds on the previous interaction. You don’t need to focus on one word at a time, but use the words as often as possible. The goal is for me to learn all the words through active interaction. Speak only English and keep each response to a maximum of two sentences to keep the dialogue dynamic.");
+            "Build dialogues with me where you naturally use provided words and utilize the conversation history to ensure all words are covered. Ask questions that help me memorize them and encourage me to use the words in my own sentences. Focus on creating a logical and engaging conversation around the words, where each question or answer builds on the previous interaction. You don’t need to focus on one word at a time, but use the words as often as possible. The goal is for me to learn all the words through active interaction. Speak only English and keep each response to a maximum of two sentences to keep the dialogue dynamic.");
         
         var memory = await base.BuildSystemPromt(message, sessionId);
         str.Append(memory);
