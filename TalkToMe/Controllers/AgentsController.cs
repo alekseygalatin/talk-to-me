@@ -44,8 +44,8 @@ public class AgentsController : ControllerBase
         _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory, conversationManager);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
         _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
-        _swedishAlexAgent = new SwedishAlexAgent(bedrockAgentService, conversationManager);
-        _swedishEmmaAgent = new SwedishEmmaAgent(bedrockAgentService, conversationManager, wordService);
+        _swedishAlexAgent = new SwedishAlexAgent(bedrockAgentService);
+        _swedishEmmaAgent = new SwedishEmmaAgent(bedrockAgentService, wordService);
             
         _englishConversationAgent = new EnglishConversationAgent(aiProviderFactory, conversationManager);
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory);
@@ -53,8 +53,8 @@ public class AgentsController : ControllerBase
         _englishRetailerAgent = new EnglishRetailerAgent(aiProviderFactory, conversationManager);
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, conversationManager);
         _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
-        _englishAlexAgent = new EnglishAlexAgent(bedrockAgentService, conversationManager);
-        _englishEmmaAgent = new EnglishEmmaAgent(bedrockAgentService, conversationManager, wordService);
+        _englishAlexAgent = new EnglishAlexAgent(bedrockAgentService);
+        _englishEmmaAgent = new EnglishEmmaAgent(bedrockAgentService, wordService);
     }
         
     [HttpPost("{locale}/{agent}/text/invoke")]
