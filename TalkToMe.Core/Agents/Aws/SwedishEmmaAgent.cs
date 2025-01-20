@@ -17,7 +17,7 @@ public class SwedishEmmaAgent : BaseAwsAgent
         return await base.Invoke(new CoreRequest
         {
             Prompt = text
-        }, sessionId, "DSXU3CSLY0", "VU35L5J5A3");
+        }, sessionId, "DSXU3CSLY0", "LQSILKO1TO");
     }
 
     public async Task<CoreResponse> InitialInvoke(string sessionId)
@@ -31,7 +31,7 @@ public class SwedishEmmaAgent : BaseAwsAgent
         return await base.Invoke(new CoreRequest
         {
             Prompt = str.ToString()
-        }, sessionId, "DSXU3CSLY0", "VU35L5J5A3");
+        }, sessionId, "DSXU3CSLY0", "LQSILKO1TO");
     }
 
     protected override string AgentId => "73802da4-582f-4e22-8668-f4dfc3c87218";
