@@ -17,7 +17,7 @@ public class EnglishEmmaAgent : BaseAwsAgent
         return await base.Invoke(new CoreRequest
         {
             Prompt = text
-        }, sessionId, "HXNKQ1UV8P", "J5YBQDNSPB");
+        }, sessionId, "HXNKQ1UV8P", "4KHX3HRUZ0");
     }
 
     public async Task<CoreResponse> InitialInvoke(string sessionId)
@@ -31,6 +31,6 @@ public class EnglishEmmaAgent : BaseAwsAgent
         return await base.Invoke(new CoreRequest
         {
             Prompt = str.ToString()
-        }, sessionId, "HXNKQ1UV8P", "J5YBQDNSPB");
+        }, sessionId, "HXNKQ1UV8P", "4KHX3HRUZ0");
     }
 }
