@@ -5,7 +5,7 @@ namespace TalkToMe.Core.Agents.Aws;
 
 public class EnglishAlexAgent : BaseAwsAgent
 {
-    public EnglishAlexAgent(IBedrockAgentService bedrockAgentService, IConversationManager conversationManager) : base(bedrockAgentService, conversationManager)
+    public EnglishAlexAgent(IBedrockAgentService bedrockAgentService) : base(bedrockAgentService)
     {
     }
 
@@ -16,6 +16,4 @@ public class EnglishAlexAgent : BaseAwsAgent
             Prompt = text
         }, sessionId, "63O8MUCFBG", "QOJMBGO5LW");
     }
-
-    protected override string AgentId => "5a981447-3092-41d4-b6e2-771bcfce3252";
 }

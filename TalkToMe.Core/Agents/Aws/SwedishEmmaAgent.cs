@@ -7,7 +7,7 @@ public class SwedishEmmaAgent : BaseAwsAgent
 {
     private readonly IWordService _wordService;
     
-    public SwedishEmmaAgent(IBedrockAgentService bedrockAgentService, IConversationManager conversationManager, IWordService wordService) : base(bedrockAgentService, conversationManager)
+    public SwedishEmmaAgent(IBedrockAgentService bedrockAgentService, IWordService wordService) : base(bedrockAgentService)
     {
         _wordService = wordService;
     }
@@ -33,6 +33,4 @@ public class SwedishEmmaAgent : BaseAwsAgent
             Prompt = str.ToString()
         }, sessionId, "DSXU3CSLY0", "LQSILKO1TO");
     }
-
-    protected override string AgentId => "73802da4-582f-4e22-8668-f4dfc3c87218";
 }
