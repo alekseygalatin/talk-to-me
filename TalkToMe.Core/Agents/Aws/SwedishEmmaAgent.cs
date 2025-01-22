@@ -24,7 +24,7 @@ public class SwedishEmmaAgent : BaseAwsAgent
     {
         var words = await _wordService.GetWords(sessionId, "sv-SE");
         var list = words.Select(x => x.Word);
-        var str = new StringBuilder("Jag lär mig svenska och vill att du ska hjälpa mig som en språkinlärningspartner för att träna följande ord: ");
+        var str = new StringBuilder("Ställ endast frågor till mig för att bygga en dialog och hjälpa mig att lära mig orden ett i taget. Använd din minneshantering för att hålla koll på vilka ord som redan har täckts och vilka som inte har det, och håll svaren till högst två meningar, utan att inkludera något som inte är relaterat till ordlärandet. Här är orden jag vill öva på: ");
         str.Append(string.Join(", ", list));
         str.Append(".");
         
