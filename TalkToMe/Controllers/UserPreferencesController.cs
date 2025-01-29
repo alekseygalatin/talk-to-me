@@ -17,23 +17,27 @@ namespace TalkToMe.Controllers
             _service = service;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetById(string userId)
+        [HttpGet]
+        public async Task<IActionResult> GetById()
         {
+            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
             var preferences = await _service.GetByIdAsync(userId);
             return Ok(preferences);
         }
 
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> Create(string userId, [FromBody] UserPreferenceRequestDto dto)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] UserPreferenceRequestDto dto)
         {
+            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
             await _service.CreateAsync(userId, dto);
             return CreatedAtAction(nameof(GetById), new { userId }, null);
         }
 
-        [HttpPut("{userId}")]
-        public async Task<IActionResult> Update(string userId, [FromBody] UserPreferenceRequestDto dto)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UserPreferenceRequestDto dto)
         {
+            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
+
             try
             {
                 await _service.UpdateAsync(userId, dto);
@@ -45,16 +49,20 @@ namespace TalkToMe.Controllers
             }
         }
 
-        [HttpDelete("{userId}")]
-        public async Task<IActionResult> Delete(string userId)
+        [HttpDelete]
+        public async Task<IActionResult> Delete()
         {
+            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
+
             await _service.DeleteAsync(userId);
             return NoContent();
         }
 
-        [HttpPut("set-current-language-to-learn/{userId}/{langaugeCode}")]
-        public async Task<IActionResult> SetCurrentLanguageToLearn(string userId, string langaugeCode)
+        [HttpPut("set-current-language-to-learn/{langaugeCode}")]
+        public async Task<IActionResult> SetCurrentLanguageToLearn(string langaugeCode)
         {
+            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
+
             try
             {
                 await _service.SetCurrentLanguageToLearn(userId, langaugeCode);
