@@ -58,14 +58,14 @@ namespace TalkToMe.Controllers
             return NoContent();
         }
 
-        [HttpPut("set-current-language-to-learn/{langaugeCode}")]
-        public async Task<IActionResult> SetCurrentLanguageToLearn(string langaugeCode)
+        [HttpPut("set-current-language-to-learn/{languageCode}")]
+        public async Task<IActionResult> SetCurrentLanguageToLearn(string languageCode)
         {
             var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
 
             try
             {
-                await _service.SetCurrentLanguageToLearn(userId, langaugeCode);
+                await _service.SetCurrentLanguageToLearn(userId, languageCode);
                 return NoContent();
             }
             catch (KeyNotFoundException)
