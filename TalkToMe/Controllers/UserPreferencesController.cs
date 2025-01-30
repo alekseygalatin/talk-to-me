@@ -3,68 +3,66 @@ using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.Interfaces;
 
-namespace TalkToMe.Controllers
+namespace TalkToMe.Controllers;
+
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class UserPreferencesController : ControllerBase
 {
-    [Authorize]
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UserPreferencesController : ControllerBase
+    private readonly IUserPreferenceService _service;
+
+    public UserPreferencesController(IUserPreferenceService service)
     {
-        private readonly IUserPreferenceService _service;
+        _service = service;
+    }
 
-        public UserPreferencesController(IUserPreferenceService service)
-        {
-            _service = service;
-        }
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetById(string userId)
+    {
+        var preferences = await _service.GetByIdAsync(userId);
+        return Ok(preferences);
+    }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetById(string userId)
-        {
-            var preferences = await _service.GetByIdAsync(userId);
-            return Ok(preferences);
-        }
+    [HttpPost("{userId}")]
+    public async Task<IActionResult> Create(string userId, [FromBody] UserPreferenceRequestDto dto)
+    {
+        await _service.CreateAsync(userId, dto);
+        return CreatedAtAction(nameof(GetById), new { userId }, null);
+    }
 
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> Create(string userId, [FromBody] UserPreferenceRequestDto dto)
+    [HttpPut("{userId}")]
+    public async Task<IActionResult> Update(string userId, [FromBody] UserPreferenceRequestDto dto)
+    {
+        try
         {
-            await _service.CreateAsync(userId, dto);
-            return CreatedAtAction(nameof(GetById), new { userId }, null);
-        }
-
-        [HttpPut("{userId}")]
-        public async Task<IActionResult> Update(string userId, [FromBody] UserPreferenceRequestDto dto)
-        {
-            try
-            {
-                await _service.UpdateAsync(userId, dto);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }
-
-        [HttpDelete("{userId}")]
-        public async Task<IActionResult> Delete(string userId)
-        {
-            await _service.DeleteAsync(userId);
+            await _service.UpdateAsync(userId, dto);
             return NoContent();
         }
-
-        [HttpPut("set-current-language-to-learn/{userId}/{langaugeCode}")]
-        public async Task<IActionResult> SetCurrentLanguageToLearn(string userId, string langaugeCode)
+        catch (KeyNotFoundException)
         {
-            try
-            {
-                await _service.SetCurrentLanguageToLearn(userId, langaugeCode);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            return NotFound();
         }
     }
 
+    [HttpDelete("{userId}")]
+    public async Task<IActionResult> Delete(string userId)
+    {
+        await _service.DeleteAsync(userId);
+        return NoContent();
+    }
+
+    [HttpPut("set-current-language-to-learn/{userId}/{langaugeCode}")]
+    public async Task<IActionResult> SetCurrentLanguageToLearn(string userId, string langaugeCode)
+    {
+        try
+        {
+            await _service.SetCurrentLanguageToLearn(userId, langaugeCode);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
 }

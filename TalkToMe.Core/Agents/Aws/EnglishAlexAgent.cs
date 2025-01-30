@@ -1,12 +1,14 @@
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
+using TalkToMe.Infrastructure.IRepository;
 
 namespace TalkToMe.Core.Agents.Aws;
 
 public class EnglishAlexAgent : BaseAwsAgent
 {
-    public EnglishAlexAgent(IBedrockAgentService bedrockAgentService) : base(bedrockAgentService)
-    {
+    public EnglishAlexAgent(IBedrockAgentService bedrockAgentService, IHistoryService historyService) : 
+        base(bedrockAgentService, historyService)
+    { 
     }
 
     public async Task<CoreResponse> Invoke(string text, string sessionId)
@@ -16,4 +18,6 @@ public class EnglishAlexAgent : BaseAwsAgent
             Prompt = text
         }, sessionId, "63O8MUCFBG", "QOJMBGO5LW");
     }
+
+    public override string AgentId => "7b542e6e-7e2a-424f-8e76-0fec63cb2568";
 }

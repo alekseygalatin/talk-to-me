@@ -1,44 +1,40 @@
-using MongoDB.Bson;
-using MongoDB.Driver;
+using TalkToMe.Core.Interfaces;
+using TalkToMe.Core.Models;
+using TalkToMe.Domain.Entities;
+using TalkToMe.Domain.Enums;
+using TalkToMe.Infrastructure.IRepository;
 
 namespace TalkToMe.Core.Services;
 
-public class HistoryService
+public class HistoryService : IHistoryService
 {
-    private readonly IMongoCollection<Document> _mongoCollection;
+    private readonly IChatHistoryRepository _chatHistoryRepository;
     
-    public HistoryService()
+    public HistoryService(IChatHistoryRepository chatHistoryRepository)
     {
-        const string connectionUri = "mongodb+srv://galatinaleksei:fiiqZQXCnc2Zv0LF@talktome.zjjg2.mongodb.net/?retryWrites=true&w=majority&appName=TalkToMe";
-        var settings = MongoClientSettings.FromConnectionString(connectionUri);
-        // Set the ServerApi field of the settings object to set the version of the Stable API on the client
-        settings.ServerApi = new ServerApi(ServerApiVersion.V1);
-        // Create a new client and connect to the server
-        var client = new MongoClient(settings);
-        var database = client.GetDatabase("talktome");
-        _mongoCollection = database.GetCollection<Document>("talktomecollection");
+        _chatHistoryRepository = chatHistoryRepository;
     }
 
-    public async Task<IEnumerable<Document>> GetHistory(string sessionId)
+    public async Task<IEnumerable<MessageModel>> GetHistory(string sessionId)
     {
-        var pipeline = new[]
+        var messages = await _chatHistoryRepository.GetChatHistoryAsync(sessionId);
+        return messages.Select(x => new MessageModel
         {
-            new BsonDocument
-            {
-                { "$match", new BsonDocument { { "guideId", sessionId } } }
-            },
-            new BsonDocument
-            {
-                { "$sort", new BsonDocument { { "timeStamp", 1 } } } // Sort by timeStamp descending
-            },
-            new BsonDocument
-            {
-                { "$limit", 20 } // Limit to 10 latest messages
-            }
-        };
-
-        var results = await _mongoCollection.Aggregate<Document>(pipeline).ToListAsync();
-
-        return results.ToList();
+            Timestamp = x.Timestamp,
+            Role = x.Role,
+            Message = x.Message
+        });
+    }
+    
+    public async Task SaveHistory(string sessionId, ChatRole role, string message)
+    {
+        await _chatHistoryRepository.CreateAsync(new ChatHistoryEntity
+        {
+            Id = sessionId,
+            Role = role,
+            Message = message,
+            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            Ttl = DateTimeOffset.UtcNow.AddDays(3).ToUnixTimeSeconds()
+        });
     }
 }

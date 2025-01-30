@@ -1,7 +1,5 @@
 using System.Text.Json;
-using Amazon;
 using Amazon.Lambda.APIGatewayEvents;
-using Amazon.Polly;
 using Amazon.TranscribeService.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,43 +16,35 @@ namespace TalkToMe.Controllers;
 [Route("api/[controller]")]
 public class AgentsController : ControllerBase
 {
-    private SwedishConversationAgent _swedishConversationAgent;
     private SwedishTranslationAgent _swedishTranslationAgent;
     private SwedishStoryTailorAgent _swedishStoryTailorAgent;
     private SwedishRetailerAgent _swedishRetailerAgent;
     private SwedishConversationHelperAgent _swedishConversationHelperAgent;
-    private SwedishWordTeacherAgent _swedishWordTeacherAgent;
     private SwedishAlexAgent _swedishAlexAgent;
     private SwedishEmmaAgent _swedishEmmaAgent;
     
-    private EnglishConversationAgent _englishConversationAgent;
     private EnglishTranslationAgent _englishTranslationAgent;
     private EnglishStoryTailorAgent _englishStoryTailorAgent;
     private EnglishRetailerAgent _englishRetailerAgent;
     private EnglishConversationHelperAgent _englishConversationHelperAgent;
-    private EnglishWordTeacherAgent _englishWordTeacherAgent;
     private EnglishAlexAgent _englishAlexAgent;
     private EnglishEmmaAgent _englishEmmaAgent;
         
-    public AgentsController(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager, IWordService wordService, IBedrockAgentService bedrockAgentService)
+    public AgentsController(IAIProviderFactory aiProviderFactory, IHistoryService historyService, IWordService wordService, IBedrockAgentService bedrockAgentService)
     {
-        _swedishConversationAgent = new SwedishConversationAgent(aiProviderFactory, conversationManager);
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
         _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory);
-        _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory, conversationManager);
-        _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
-        _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
-        _swedishAlexAgent = new SwedishAlexAgent(bedrockAgentService);
-        _swedishEmmaAgent = new SwedishEmmaAgent(bedrockAgentService, wordService);
-            
-        _englishConversationAgent = new EnglishConversationAgent(aiProviderFactory, conversationManager);
+        _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory);
+        _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory);
+        _swedishAlexAgent = new SwedishAlexAgent(bedrockAgentService, historyService);
+        _swedishEmmaAgent = new SwedishEmmaAgent(bedrockAgentService, wordService, historyService);
+        
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory);
         _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory);
-        _englishRetailerAgent = new EnglishRetailerAgent(aiProviderFactory, conversationManager);
-        _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, conversationManager);
-        _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
-        _englishAlexAgent = new EnglishAlexAgent(bedrockAgentService);
-        _englishEmmaAgent = new EnglishEmmaAgent(bedrockAgentService, wordService);
+        _englishRetailerAgent = new EnglishRetailerAgent(aiProviderFactory);
+        _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory);
+        _englishAlexAgent = new EnglishAlexAgent(bedrockAgentService, historyService);
+        _englishEmmaAgent = new EnglishEmmaAgent(bedrockAgentService, wordService, historyService);
     }
         
     [HttpPost("{locale}/{agent}/text/invoke")]
@@ -128,12 +118,12 @@ public class AgentsController : ControllerBase
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
-                var response = await _swedishConversationHelperAgent.Invoke(text, sub);
+                var response = await _swedishConversationHelperAgent.Invoke(text);
                 return this.CreateResponse(response.Response);
             }
             else
             {
-                var response = await _englishConversationHelperAgent.Invoke(text, sub);
+                var response = await _englishConversationHelperAgent.Invoke(text);
                 return this.CreateResponse(response.Response);
             }
         }
@@ -170,12 +160,12 @@ public class AgentsController : ControllerBase
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
-                var response = await _swedishRetailerAgent.Invoke(data.Promt, data.Text, sub);
+                var response = await _swedishRetailerAgent.Invoke(data.Promt, data.Text);
                 return this.CreateResponse(response.Response);
             }
             else
             {
-                var response = await _englishRetailerAgent.Invoke(data.Promt, data.Text, sub);
+                var response = await _englishRetailerAgent.Invoke(data.Promt, data.Text);
                 return this.CreateResponse(response.Response);
             }
         }

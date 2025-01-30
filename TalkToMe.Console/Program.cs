@@ -51,30 +51,28 @@ class Program
         using var scope = serviceProvider.CreateScope();
         
         var providerFactory = scope.ServiceProvider.GetRequiredService<IAIProviderFactory>();
-        var iConversationManager = scope.ServiceProvider.GetRequiredService<IConversationManager>();
 
         /*await SendEnglishPromts(lamaService);
         await SendEnglishPromts(chatGpt4oMiniService);*/
 
-        await SendSwedishPromts(providerFactory, iConversationManager);
         //await SendSwedishPromts(chatGpt4oMiniService);
     }
 
-    private static async Task SendSwedishPromts(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager) 
-    {
-        var swedishConversationAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
-        var request = await swedishConversationAgent.Invoke("Hej", "1234");
-        var request2 = await swedishConversationAgent.Invoke("jag heter Gordon", "1234");
-        var request3 = await swedishConversationAgent.Invoke("Min bror Oleg", "1234");
-        var request4 = await swedishConversationAgent.Invoke("Vad heter mig?", "1234");
-        
-        Console.WriteLine("Agent: " + nameof(SwedishConversationAgent));
-        Console.WriteLine("1: " + request.Response);
-        Console.WriteLine("2: "+ request2.Response);
-        Console.WriteLine("3: "+ request3.Response);
-        Console.WriteLine("4: "+ request4.Response);
-        Console.WriteLine("-----");
-    }
+    // private static async Task SendSwedishPromts(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager) 
+    // {
+    //     var swedishConversationAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
+    //     var request = await swedishConversationAgent.Invoke("Hej", "1234");
+    //     var request2 = await swedishConversationAgent.Invoke("jag heter Gordon", "1234");
+    //     var request3 = await swedishConversationAgent.Invoke("Min bror Oleg", "1234");
+    //     var request4 = await swedishConversationAgent.Invoke("Vad heter mig?", "1234");
+    //     
+    //     Console.WriteLine("Agent: " + nameof(SwedishConversationAgent));
+    //     Console.WriteLine("1: " + request.Response);
+    //     Console.WriteLine("2: "+ request2.Response);
+    //     Console.WriteLine("3: "+ request3.Response);
+    //     Console.WriteLine("4: "+ request4.Response);
+    //     Console.WriteLine("-----");
+    // }
 
     // private static async Task SendEnglishPromts(IAiModelService aiService)
     // {
