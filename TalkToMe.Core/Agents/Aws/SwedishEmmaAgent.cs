@@ -13,7 +13,7 @@ public class SwedishEmmaAgent : BaseAwsAgent
         _wordService = wordService;
     }
 
-    public async Task<CoreResponse> Invoke(string text, string sessionId)
+    public override async Task<CoreResponse> InvokeWithSession(string text, string sessionId)
     {
         return await base.Invoke(new CoreRequest
         {
@@ -21,7 +21,7 @@ public class SwedishEmmaAgent : BaseAwsAgent
         }, sessionId, "DSXU3CSLY0", "75Z4CXPDA9");
     }
 
-    public async Task<CoreResponse> InitialInvoke(string sessionId)
+    public override async Task<CoreResponse> InvokeWithSession(string sessionId)
     {
         var words = await _wordService.GetWords(sessionId, "sv-SE");
         var list = words.Select(x => x.Word);

@@ -16,7 +16,7 @@ public class EnglishTranslationAgent : BaseTranslationAgent
     //protected override string SystemPromt => "You are a English-to-Russian language translation agent. When given a English word or phrase. Provide an accurate Russian translation, a brief example sentence showing natural usage in English, and any relevant notes on nuances like article usage in English. Your respons always must contain only JSON in the format: {\"translation\":  \"russian translation\",  \"example_usage\": \"example english sentence\",  \"translation_notes\": \"notes on use\"}";
     protected override string SystemPromt => GetTranslationAgentPrompt("English", "Russian");
 
-    public async Task<CoreResponse> Invoke(string message)
+    public override async Task<CoreResponse> Invoke(string message)
     {
         var promt = await BuildSystemPromt();
         

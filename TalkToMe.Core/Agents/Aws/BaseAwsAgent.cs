@@ -4,7 +4,7 @@ using TalkToMe.Domain.Enums;
 
 namespace TalkToMe.Core.Agents.Aws;
 
-public abstract class BaseAwsAgent
+public abstract class BaseAwsAgent : IAgent
 {
     private IBedrockAgentService _bedrockAgentService;
     private IHistoryService _historyService;
@@ -30,5 +30,30 @@ public abstract class BaseAwsAgent
     private string GetKey(string sessionId)
     {
         return $"{sessionId}{AgentId}";
+    }
+
+    public Task<CoreResponse> Invoke()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<CoreResponse> Invoke(string promt)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<CoreResponse> Invoke(string promt, string message)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public virtual Task<CoreResponse> InvokeWithSession(string sessionId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual Task<CoreResponse> InvokeWithSession(string promt, string sessionId)
+    {
+        throw new NotImplementedException();
     }
 }

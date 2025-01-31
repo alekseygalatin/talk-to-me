@@ -10,7 +10,7 @@ public class SwedishAlexAgent : BaseAwsAgent
     {
     }
 
-    public async Task<CoreResponse> Invoke(string text, string sessionId)
+    public override async Task<CoreResponse> InvokeWithSession(string text, string sessionId)
     {
         return await base.Invoke(new CoreRequest
         {

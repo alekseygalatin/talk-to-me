@@ -75,14 +75,14 @@ var mapperConfig = new MapperConfiguration(mc =>
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAWSService<IAmazonDynamoDB>();
-builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped<ILanguageRepository, LanguageRepository>();
-builder.Services.AddScoped<IWordRepository, WordRepository>();
-builder.Services.AddScoped<IChatHistoryRepository, ChatHistoryRepository>();
-builder.Services.AddScoped<IUserPreferenceService, UserPreferenceService>();
-builder.Services.AddScoped<ILanguageService, LanguageService>();
-builder.Services.AddScoped<IWordService, WordService>();
-builder.Services.AddScoped<IHistoryService, HistoryService>();
+builder.Services.AddSingleton(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+builder.Services.AddSingleton<ILanguageRepository, LanguageRepository>();
+builder.Services.AddSingleton<IWordRepository, WordRepository>();
+builder.Services.AddSingleton<IChatHistoryRepository, ChatHistoryRepository>();
+builder.Services.AddSingleton<IUserPreferenceService, UserPreferenceService>();
+builder.Services.AddSingleton<ILanguageService, LanguageService>();
+builder.Services.AddSingleton<IWordService, WordService>();
+builder.Services.AddSingleton<IHistoryService, HistoryService>();
 builder.Services.AddSingleton<IBedrockAgentService, BedrockAgentService>();
 builder.Services.AddSingleton<DynamoDbTableManager>();
 

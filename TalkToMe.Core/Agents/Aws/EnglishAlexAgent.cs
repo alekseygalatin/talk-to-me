@@ -1,6 +1,5 @@
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
-using TalkToMe.Infrastructure.IRepository;
 
 namespace TalkToMe.Core.Agents.Aws;
 
@@ -11,7 +10,7 @@ public class EnglishAlexAgent : BaseAwsAgent
     { 
     }
 
-    public async Task<CoreResponse> Invoke(string text, string sessionId)
+    public async Task<CoreResponse> InvokeWithSession(string text, string sessionId)
     {
         return await base.Invoke(new CoreRequest
         {

@@ -11,10 +11,10 @@ public static class ServiceCollectionExtensions
         BedrockSettings settings)
     {
         services.AddSingleton(settings);
-        
+        services.AddSingleton<AwsAgentFactory>();
         services.AddSingleton<IBedrockClientFactory, BedrockClientFactory>();
-        services.AddScoped<IAIProviderFactory, AIProviderFactory>();
-        services.AddTransient<BedrockService>();
+        services.AddSingleton<IAIProviderFactory, AIProviderFactory>();
+        services.AddSingleton<BedrockService>();
 
         return services;
     }
