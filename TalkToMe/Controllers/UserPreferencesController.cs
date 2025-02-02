@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.Interfaces;
+using TalkToMe.Helpers;
 
 namespace TalkToMe.Controllers
 {
@@ -20,27 +21,24 @@ namespace TalkToMe.Controllers
         [HttpGet]
         public async Task<IActionResult> GetById()
         {
-            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-            var preferences = await _service.GetByIdAsync(userId);
+            var preferences = await _service.GetByIdAsync(UserHelper.GetUserId(User));
             return Ok(preferences);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UserPreferenceRequestDto dto)
         {
-            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-            await _service.CreateAsync(userId, dto);
+            var userId = UserHelper.GetUserId(User);
+            await _service.CreateAsync(UserHelper.GetUserId(User), dto);
             return CreatedAtAction(nameof(GetById), new { userId }, null);
         }
 
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UserPreferenceRequestDto dto)
         {
-            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-
             try
             {
-                await _service.UpdateAsync(userId, dto);
+                await _service.UpdateAsync(UserHelper.GetUserId(User), dto);
                 return NoContent();
             }
             catch (KeyNotFoundException)
@@ -52,20 +50,16 @@ namespace TalkToMe.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete()
         {
-            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-
-            await _service.DeleteAsync(userId);
+            await _service.DeleteAsync(UserHelper.GetUserId(User));
             return NoContent();
         }
 
         [HttpPut("set-current-language-to-learn/{languageCode}")]
         public async Task<IActionResult> SetCurrentLanguageToLearn(string languageCode)
         {
-            var userId = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-
             try
             {
-                await _service.SetCurrentLanguageToLearn(userId, languageCode);
+                await _service.SetCurrentLanguageToLearn(UserHelper.GetUserId(User), languageCode);
                 return NoContent();
             }
             catch (KeyNotFoundException)
