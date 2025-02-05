@@ -11,6 +11,10 @@ public abstract class BaseAwsAgent : IAgent
     
     public abstract string AgentId { get; }
     
+    protected string Promt { get; set; }
+    protected string Message { get; set; }
+    protected string Session { get; set; }
+    
     protected BaseAwsAgent(IBedrockAgentService bedrockAgentService, IHistoryService historyService)
     {
         _bedrockAgentService = bedrockAgentService;
@@ -32,28 +36,23 @@ public abstract class BaseAwsAgent : IAgent
         return $"{sessionId}{AgentId}";
     }
 
-    public Task<CoreResponse> Invoke()
+    public IAgent WithPromt(string promt)
     {
-        throw new NotImplementedException();
+        Promt = promt;
+        return this;
     }
 
-    public Task<CoreResponse> Invoke(string promt)
+    public IAgent WithMessage(string message)
     {
-        throw new NotImplementedException();
+        Message = message;
+        return this;
     }
 
-    public Task<CoreResponse> Invoke(string promt, string message)
+    public IAgent WithSession(string sessionId)
     {
-        throw new NotImplementedException();
-    }
-    
-    public virtual Task<CoreResponse> InvokeWithSession(string sessionId)
-    {
-        throw new NotImplementedException();
+        Session = sessionId;
+        return this;
     }
 
-    public virtual Task<CoreResponse> InvokeWithSession(string promt, string sessionId)
-    {
-        throw new NotImplementedException();
-    }
+    public abstract Task<CoreResponse> Invoke();
 }

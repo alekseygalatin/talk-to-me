@@ -19,18 +19,18 @@ public class SwedishStoryTailorAgent : BaseAgent
 
     public override async Task<CoreResponse> Invoke()
     {
-        var promt = await BuildSystemPromt();
+        if (string.IsNullOrWhiteSpace(Message))
+        {
+            var promt = await BuildSystemPromt();
         
-        var request = new CoreRequestBuilder()
-        .WithSystemInstruction(promt)
-        .WithPrompt("skriv")
-        .Build();
+            var request = new CoreRequestBuilder()
+                .WithSystemInstruction(promt)
+                .WithPrompt("skriv")
+                .Build();
 
-        return await base.Invoke(request);
-    }
-
-    public override async Task<CoreResponse> Invoke(string originalText, string retailing)
-    {
-        return await _swedishRetailer.Invoke(originalText, originalText);
+            return await base.Invoke(request);
+        }
+        
+        return await _swedishRetailer.WithPromt(Promt).WithMessage(Message).Invoke();
     }
 }

@@ -27,34 +27,29 @@ public class AgentsController : ControllerBase
     {
         if (agent == "conversationAgent")
         {
-            var instance = _agentFactory.GetAgent("alex", locale);
-            var response = await instance.InvokeWithSession(text, SessionId);
+            var instance = _agentFactory.GetAgent("alex", locale)
+                .WithMessage(text)
+                .WithSession(SessionId);
+            
+            var response = await instance.Invoke();
             return this.CreateResponse(response.Response);
         }
         else if (agent == "wordTeacherAgent")
         {
             var instance = _agentFactory.GetAgent("emma", locale);
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                var response = await instance.InvokeWithSession(SessionId);
-                return this.CreateResponse(response.Response);
-            }
-            else
-            {
-                var response = await instance.InvokeWithSession(text, SessionId);
-                return this.CreateResponse(response.Response);
-            }
+            var response = await instance.WithMessage(text).WithSession(SessionId).Invoke();
+            return this.CreateResponse(response.Response);
         }
         else if (agent == "translationAgent")
         {
             var instance = _agentFactory.GetAgent("translation", locale);
-            var response = await instance.Invoke(text);
+            var response = await instance.WithMessage(text).Invoke();
             return this.CreateResponse(response.Response);
         }
         else if (agent == "conversationHelperAgent")
         {
             var instance = _agentFactory.GetAgent("helper", locale);
-            var response = await instance.Invoke(text);
+            var response = await instance.WithMessage(text).Invoke();
             return this.CreateResponse(response.Response);
         }
         
@@ -80,7 +75,7 @@ public class AgentsController : ControllerBase
         if (agent == "retailerAgent")
         {
             var instance = _agentFactory.GetAgent("maria", locale);
-            var response = await instance.Invoke(data.Promt, data.Text);
+            var response = await instance.WithPromt(data.Promt).WithMessage(data.Text).Invoke();
             return this.CreateResponse(response.Response);
         }
         

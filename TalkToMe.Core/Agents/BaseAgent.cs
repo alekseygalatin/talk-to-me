@@ -7,8 +7,13 @@ namespace TalkToMe.Core.Agents;
 public abstract class BaseAgent : IAgent
 {
     private IAiModelService _model;
-    
+    private IAgent _agentImplementation;
+
     protected abstract string SystemPromt { get; }
+    
+    protected string Promt { get; set; }
+    protected string Message { get; set; }
+    protected string Session { get; set; }
 
     protected BaseAgent(IAIProviderFactory aiProviderFactory, AIProvider aiProvider, string model)
     {
@@ -26,28 +31,23 @@ public abstract class BaseAgent : IAgent
         return await Task.FromResult(SystemPromt);
     }
 
-    public virtual Task<CoreResponse> Invoke()
+    public IAgent WithPromt(string promt)
     {
-        throw new NotImplementedException();
+        Promt = promt;
+        return this;
     }
 
-    public virtual Task<CoreResponse> Invoke(string promt)
+    public IAgent WithMessage(string message)
     {
-        throw new NotImplementedException();
+        Message = message;
+        return this;
     }
 
-    public virtual Task<CoreResponse> Invoke(string promt, string message)
+    public IAgent WithSession(string sessionId)
     {
-        throw new NotImplementedException();
+        Session = sessionId;
+        return this;
     }
 
-    public Task<CoreResponse> InvokeWithSession(string sessionId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<CoreResponse> InvokeWithSession(string promt, string sessionId)
-    {
-        throw new NotImplementedException();
-    }
+    public abstract Task<CoreResponse> Invoke();
 }

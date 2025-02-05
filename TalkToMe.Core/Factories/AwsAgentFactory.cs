@@ -9,30 +9,33 @@ public class AwsAgentFactory
     private SwedishTranslationAgent _swedishTranslationAgent;
     private SwedishStoryTailorAgent _swedishStoryTailorAgent;
     private SwedishConversationHelperAgent _swedishConversationHelperAgent;
-    private SwedishAlexAgent _swedishAlexAgent;
-    private SwedishEmmaAgent _swedishEmmaAgent;
+    private ConversationSwedishAgent _conversationSwedishAgent;
+    private WordTeacherSwedishAgent _wordTeacherSwedishAgent;
     
     private EnglishTranslationAgent _englishTranslationAgent;
     private EnglishStoryTailorAgent _englishStoryTailorAgent;
     private EnglishConversationHelperAgent _englishConversationHelperAgent;
-    private EnglishAlexAgent _englishAlexAgent;
-    private EnglishEmmaAgent _englishEmmaAgent;
+    private ConversationEnglishAgent _conversationAgent;
+    private WordTeacherEnglishAgent _wordTeacherEnglishAgent;
 
     private Dictionary<string, Dictionary<string, IAgent>> _agents;
+
+    private string swedishLocale = "sv-se";
+    private string englishLocale = "en-us";
 
     public AwsAgentFactory(IAIProviderFactory aiProviderFactory, IHistoryService historyService, IWordService wordService, IBedrockAgentService bedrockAgentService)
     {
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
         _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory);
-        _swedishAlexAgent = new SwedishAlexAgent(bedrockAgentService, historyService);
-        _swedishEmmaAgent = new SwedishEmmaAgent(bedrockAgentService, wordService, historyService);
+        _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService);
+        _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService);
         
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory);
         _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory);
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory);
-        _englishAlexAgent = new EnglishAlexAgent(bedrockAgentService, historyService);
-        _englishEmmaAgent = new EnglishEmmaAgent(bedrockAgentService, wordService, historyService);
+        _conversationAgent = new ConversationEnglishAgent(bedrockAgentService, historyService);
+        _wordTeacherEnglishAgent = new WordTeacherEnglishAgent(bedrockAgentService, wordService, historyService);
 
         _agents = new Dictionary<string, Dictionary<string, IAgent>>
         {
@@ -40,40 +43,40 @@ public class AwsAgentFactory
                 "alex", 
                 new Dictionary<string, IAgent>
                 {
-                    {"sv-se", _swedishAlexAgent},
-                    {"en-us", _englishAlexAgent}
+                    {swedishLocale, _conversationSwedishAgent},
+                    {englishLocale, _conversationAgent}
                 }
             },
             {
                 "emma",
                 new Dictionary<string, IAgent>
                 {
-                    {"sv-se", _swedishEmmaAgent},
-                    {"en-us", _englishEmmaAgent}
+                    {swedishLocale, _wordTeacherSwedishAgent},
+                    {englishLocale, _wordTeacherEnglishAgent}
                 }
             },
             {
                 "maria",
                 new Dictionary<string, IAgent>
                 {
-                    {"sv-se", _swedishStoryTailorAgent},
-                    {"en-us", _englishStoryTailorAgent}
+                    {swedishLocale, _swedishStoryTailorAgent},
+                    {englishLocale, _englishStoryTailorAgent}
                 }
             },
             {
                 "translation",
                 new Dictionary<string, IAgent>
                 {
-                    {"sv-se", _swedishTranslationAgent},
-                    {"en-us", _englishTranslationAgent}
+                    {swedishLocale, _swedishTranslationAgent},
+                    {englishLocale, _englishTranslationAgent}
                 }
             },
             {
                 "helper",
                 new Dictionary<string, IAgent>
                 {
-                    {"sv-se", _swedishConversationHelperAgent},
-                    {"en-us", _englishConversationHelperAgent}
+                    {swedishLocale, _swedishConversationHelperAgent},
+                    {englishLocale, _englishConversationHelperAgent}
                 }
             }
         };

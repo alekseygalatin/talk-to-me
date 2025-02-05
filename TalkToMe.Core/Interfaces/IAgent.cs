@@ -4,9 +4,8 @@ namespace TalkToMe.Core.Interfaces;
 
 public interface IAgent
 {
+    IAgent WithPromt(string promt);
+    IAgent WithMessage(string message);
+    IAgent WithSession(string sessionId);
     Task<CoreResponse> Invoke();
-    Task<CoreResponse> Invoke(string promt);
-    Task<CoreResponse> Invoke(string promt, string message);
-    Task<CoreResponse> InvokeWithSession(string sessionId);
-    Task<CoreResponse> InvokeWithSession(string promt, string sessionId);
 }
