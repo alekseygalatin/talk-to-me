@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.Interfaces;
+using TalkToMe.Helpers;
 
 namespace TalkToMe.Controllers;
 
@@ -20,16 +21,14 @@ public class WordsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddWordToDictionary([FromBody] AddWordToDictionaryRequestDto request)
     {
-        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-        await _wordService.AddWordToDictionary(sub, request);
+        await _wordService.AddWordToDictionary(UserHelper.GetUserId(User), request);
         return NoContent();
     }
 
     [HttpGet("{language}")]
     public async Task<IActionResult> GetWords(string language)
     {
-        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-        var result = await _wordService.GetWords(sub, language);
+        var result = await _wordService.GetWords(UserHelper.GetUserId(User), language);
         return Ok(result);
     }
 }
