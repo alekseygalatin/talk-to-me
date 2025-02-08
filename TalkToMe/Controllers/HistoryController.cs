@@ -1,11 +1,11 @@
 using System.Globalization;
-using System.Security.Claims;
 using Amazon.TranscribeService.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.DTO.Response;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Domain.Enums;
+using TalkToMe.Helpers;
 
 namespace TalkToMe.Controllers;
 
@@ -21,7 +21,7 @@ public class HistoryController : ControllerBase
         _historyService = historyService;
     }
     
-    private string SessionId => HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    private string SessionId => UserHelper.GetUserId(User);
         
     [HttpGet("{locale}/{agent}")]
     public async Task<ActionResult> Invoke([FromRoute] string locale, [FromRoute] string agent)

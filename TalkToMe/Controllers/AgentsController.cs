@@ -1,10 +1,10 @@
-using System.Security.Claims;
 using System.Text.Json;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.TranscribeService.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.Factories;
+using TalkToMe.Helpers;
 using TalkToMe.Models;
 
 namespace TalkToMe.Controllers;
@@ -20,7 +20,7 @@ public class AgentsController : ControllerBase
         _agentFactory = agentFactory;
     }
 
-    private string SessionId => HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    private string SessionId => UserHelper.GetUserId(User);
         
     [HttpPost("{locale}/{agent}/text/invoke")]
     public async Task<APIGatewayHttpApiV2ProxyResponse> Invoke([FromRoute] string locale, [FromRoute] string agent, [FromBody] string text)

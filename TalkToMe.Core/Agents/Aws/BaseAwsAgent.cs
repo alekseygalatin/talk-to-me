@@ -23,11 +23,10 @@ public abstract class BaseAwsAgent : IAgent
 
     protected async Task<CoreResponse> Invoke(CoreRequest request, string sessionId, string agentId, string agentAliasId)
     {
-        var task1 = _historyService.SaveHistory(GetKey(sessionId), ChatRole.User, request.Prompt);
+        await _historyService.SaveHistory(GetKey(sessionId), ChatRole.User, request.Prompt);
         var response = await _bedrockAgentService.Invoke(request.Prompt, sessionId, agentId, agentAliasId);
-        var task2 = _historyService.SaveHistory(GetKey(sessionId), ChatRole.Assistant, response.Response);
-
-        await Task.WhenAll(task1, task2);
+        await _historyService.SaveHistory(GetKey(sessionId), ChatRole.Assistant, response.Response);
+        
         return response;
     }
     
