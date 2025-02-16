@@ -6,7 +6,9 @@ using Amazon.TranscribeService.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.Agents;
+using TalkToMe.Core.Agents.Aws;
 using TalkToMe.Core.Interfaces;
+using TalkToMe.Core.Models;
 using TalkToMe.Models;
 
 namespace TalkToMe.Controllers;
@@ -22,6 +24,8 @@ public class AgentsController : ControllerBase
     private SwedishRetailerAgent _swedishRetailerAgent;
     private SwedishConversationHelperAgent _swedishConversationHelperAgent;
     private SwedishWordTeacherAgent _swedishWordTeacherAgent;
+    private SwedishAlexAgent _swedishAlexAgent;
+    private SwedishEmmaAgent _swedishEmmaAgent;
     
     private EnglishConversationAgent _englishConversationAgent;
     private EnglishTranslationAgent _englishTranslationAgent;
@@ -29,10 +33,10 @@ public class AgentsController : ControllerBase
     private EnglishRetailerAgent _englishRetailerAgent;
     private EnglishConversationHelperAgent _englishConversationHelperAgent;
     private EnglishWordTeacherAgent _englishWordTeacherAgent;
-    
-    private readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast1;
+    private EnglishAlexAgent _englishAlexAgent;
+    private EnglishEmmaAgent _englishEmmaAgent;
         
-    public AgentsController(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager, IWordService wordService)
+    public AgentsController(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager, IWordService wordService, IBedrockAgentService bedrockAgentService)
     {
         _swedishConversationAgent = new SwedishConversationAgent(aiProviderFactory, conversationManager);
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
@@ -40,6 +44,8 @@ public class AgentsController : ControllerBase
         _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory, conversationManager);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
         _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
+        _swedishAlexAgent = new SwedishAlexAgent(bedrockAgentService);
+        _swedishEmmaAgent = new SwedishEmmaAgent(bedrockAgentService, wordService);
             
         _englishConversationAgent = new EnglishConversationAgent(aiProviderFactory, conversationManager);
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory);
@@ -47,6 +53,8 @@ public class AgentsController : ControllerBase
         _englishRetailerAgent = new EnglishRetailerAgent(aiProviderFactory, conversationManager);
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, conversationManager);
         _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
+        _englishAlexAgent = new EnglishAlexAgent(bedrockAgentService);
+        _englishEmmaAgent = new EnglishEmmaAgent(bedrockAgentService, wordService);
     }
         
     [HttpPost("{locale}/{agent}/text/invoke")]
@@ -60,7 +68,7 @@ public class AgentsController : ControllerBase
                 if (string.IsNullOrEmpty(text))
                     text = "Hej";
                 
-                var response = await _swedishConversationAgent.Invoke(text, sub);
+                var response = await _swedishAlexAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
             else
@@ -68,7 +76,7 @@ public class AgentsController : ControllerBase
                 if (string.IsNullOrEmpty(text))
                     text = "Hi";
                 
-                var response = await _englishConversationAgent.Invoke(text, sub);
+                var response = await _englishAlexAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
         }
@@ -76,18 +84,30 @@ public class AgentsController : ControllerBase
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
-                if (string.IsNullOrEmpty(text))
-                    text = "Hej";
+                CoreResponse response;
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    response = await _swedishEmmaAgent.InitialInvoke(sub);
+                }
+                else
+                {
+                    response = await _swedishEmmaAgent.Invoke(text, sub);
+                }
                 
-                var response = await _swedishWordTeacherAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
             else
             {
-                if (string.IsNullOrEmpty(text))
-                    text = "Hi";
+                CoreResponse response;
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    response = await _englishEmmaAgent.InitialInvoke(sub);
+                }
+                else
+                {
+                    response = await _englishEmmaAgent.Invoke(text, sub);
+                }
                 
-                var response = await _englishWordTeacherAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
         }

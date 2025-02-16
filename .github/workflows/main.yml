@@ -1,0 +1,32 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: write
+  
+jobs:
+#  dev-deployment:
+#    name: Deploy to Dev
+#    uses: ./.github/workflows/cicd.yml
+#    with:
+#      environment: 'dev'
+#      stack-name: 'talkToMe-dev'
+#    secrets:
+#      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  prod-deployment:
+    name: Deploy to Prod
+#    needs: dev-deployment
+    uses: ./.github/workflows/cicd.yml
+    with:
+      environment: 'prod'
+      stack-name: 'talkToMe'
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

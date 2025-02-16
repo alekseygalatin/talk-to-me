@@ -1,0 +1,66 @@
+name: cicd
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment (e.g. dev or prod)'
+        required: true
+        type: string
+      stack-name:
+        description: 'AWS Stack Name'
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  build-and-deploy:
+    name: Deploy to ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out the repository code
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # 4. Configure AWS Credentials from GitHub secrets
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        env: 
+          STAGE: ${{ inputs.environment }}
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'us-east-1'
+          
+      # 2. Set up .NET (if your project is .NET 6, for example)
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+        
+      #6. Setup tools  
+      - name: Setup tooling
+        run: dotnet tool install -g Amazon.Lambda.Tools
+        shell: bash
+        working-directory: TalkToMe
+        
+      # 5. (Optional) Restore and build your .NET project
+      - name: Restore and build .NET project
+        run: |
+          dotnet restore
+          dotnet publish -c Release
+        working-directory: TalkToMe
+
+      # 7. Deploy the SAM application
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --stack-name ${{ inputs.stack-name }} \
+            --s3-bucket talktomebucket \
+            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
+        working-directory: TalkToMe
