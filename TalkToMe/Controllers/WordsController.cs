@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Helpers;
-using TalkToMe.Core.Services;
 
 namespace TalkToMe.Controllers;
 
@@ -36,31 +35,14 @@ public class WordsController : ControllerBase
     [HttpDelete("{language}/{word}")]
     public async Task<IActionResult> DeleteWord(string language, string word)
     {
-        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-        await _wordService.DeleteWord(sub, language, word);
+        await _wordService.DeleteWord(UserHelper.GetUserId(User), language, word);
         return Ok();
     }
 
     [HttpPut("{language}/{word}/{includeIntoChat}")]
     public async Task<IActionResult> SetIncludeIntoChat(string language, string word, bool includeIntoChat)
     {
-        var result = await _wordService.GetWords(UserHelper.GetUserId(User), language);
-        return Ok(result);
-    }
-
-    [HttpDelete("{language}/{word}")]
-    public async Task<IActionResult> DeleteWord(string language, string word)
-    {
-        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-        await _wordService.DeleteWord(sub, language, word);
-        return Ok();
-    }
-
-    [HttpPut("{language}/{word}/{includeIntoChat}")]
-    public async Task<IActionResult> SetIncludeIntoChat(string language, string word, bool includeIntoChat)
-    {
-        var sub = this.HttpContext.User.Claims.First(x => x.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
-        await _wordService.SetIncludeIntoChat(sub, language, word, includeIntoChat);
+        await _wordService.SetIncludeIntoChat(UserHelper.GetUserId(User), language, word, includeIntoChat);
         return Ok();
     }
 }
