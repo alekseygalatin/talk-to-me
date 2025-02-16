@@ -25,7 +25,7 @@ public class WordService : IWordService
         return _mapper.Map<List<WordResponseDto>>(wordsList);
     }
 
-    public async Task AddWordToDictionary(string userId, AddWordToDictionaryRequestDto dto)
+    public async Task AddWordToDictionary(string userId, WordRequestDto dto)
     {
         if (string.IsNullOrEmpty(userId))
             throw new ArgumentNullException(nameof(userId));
@@ -38,5 +38,16 @@ public class WordService : IWordService
         word.IncludeIntoChat = true;
 
         await _repository.CreateAsync(word);
+    }
+
+    public async Task DeleteWord(string userId, string language, string word) 
+    {
+        var entity = new WordEntity { UserId = userId, LanguageWord = $"{language}#{word}" };
+        await _repository.DeleteAsync(entity);
+    }
+
+    public async Task SetIncludeIntoChat(string userId, string language, string word, bool includeIntoChat)
+    {
+        await _repository.UpdateIncludeIntoChatAsync(userId, $"{language}#{word}", includeIntoChat);
     }
 }

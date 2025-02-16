@@ -19,7 +19,7 @@ public class WordsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddWordToDictionary([FromBody] AddWordToDictionaryRequestDto request)
+    public async Task<IActionResult> AddWordToDictionary([FromBody] WordRequestDto request)
     {
         await _wordService.AddWordToDictionary(UserHelper.GetUserId(User), request);
         return NoContent();
@@ -30,5 +30,19 @@ public class WordsController : ControllerBase
     {
         var result = await _wordService.GetWords(UserHelper.GetUserId(User), language);
         return Ok(result);
+    }
+
+    [HttpDelete("{language}/{word}")]
+    public async Task<IActionResult> DeleteWord(string language, string word)
+    {
+        await _wordService.DeleteWord(UserHelper.GetUserId(User), language, word);
+        return Ok();
+    }
+
+    [HttpPut("{language}/{word}/{includeIntoChat}")]
+    public async Task<IActionResult> SetIncludeIntoChat(string language, string word, bool includeIntoChat)
+    {
+        await _wordService.SetIncludeIntoChat(UserHelper.GetUserId(User), language, word, includeIntoChat);
+        return Ok();
     }
 }

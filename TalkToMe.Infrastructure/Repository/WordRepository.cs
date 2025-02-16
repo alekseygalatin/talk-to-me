@@ -38,4 +38,23 @@ public class WordRepository : BaseRepository<WordEntity>, IWordRepository
 
         return (await query.GetRemainingAsync()).FirstOrDefault();
     }
+
+    public async Task DeleteAsync(WordEntity word)
+    {
+        await _context.DeleteAsync(word);
+    }
+
+    public async Task UpdateIncludeIntoChatAsync(string userId, string languageWord, bool includeIntoChat)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(languageWord))
+            throw new ArgumentException("UserId and LanguageWord cannot be null or empty.");
+
+        var wordEntity = await _context.LoadAsync<WordEntity>(userId, languageWord);
+        if (wordEntity == null)
+            throw new KeyNotFoundException("Word not found");
+
+        wordEntity.IncludeIntoChat = includeIntoChat;
+
+        await _context.SaveAsync(wordEntity);
+    }
 }
