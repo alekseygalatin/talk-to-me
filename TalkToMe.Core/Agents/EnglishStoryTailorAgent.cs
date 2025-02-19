@@ -8,22 +8,29 @@ namespace TalkToMe.Core.Agents;
 
 public class EnglishStoryTailorAgent : BaseAgent
 {
+    private EnglishRetailerAgent _englishRetailer;
     public EnglishStoryTailorAgent(IAIProviderFactory aiProviderFactory) :
         base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Claude_3_5_Haiku)
     {
+        _englishRetailer = new EnglishRetailerAgent(aiProviderFactory);
     }
     
     protected override string SystemPromt => "You are a friendly storyteller named Maria. Write a short story in very simple English. The story should be easy to read and suitable for someone learning English. Use short sentences, common words, and focus on an interesting or fun theme. The story should be about 150–200 words long. Avoid difficult words and complicated grammar. After the story, ask a simple and general question about the story so the reader can retell it in their own words.";
 
-    public async Task<CoreResponse> Invoke()
+    public override async Task<CoreResponse> Invoke()
     {
-        var promt = await BuildSystemPromt();
+        if (string.IsNullOrWhiteSpace(Message))
+        {
+            var promt = await BuildSystemPromt();
         
-        var request = new CoreRequestBuilder()
-        .WithSystemInstruction(promt)
-        .WithPrompt("write")
-        .Build();
+            var request = new CoreRequestBuilder()
+                .WithSystemInstruction(promt)
+                .WithPrompt("write")
+                .Build();
 
-        return await base.Invoke(request);
+            return await base.Invoke(request);
+        }
+
+        return await _englishRetailer.WithPromt(Promt).WithMessage(Message).Invoke();
     }
 }

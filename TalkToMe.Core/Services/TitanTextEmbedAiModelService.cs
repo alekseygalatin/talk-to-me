@@ -8,7 +8,6 @@ namespace TalkToMe.Core.Services;
 public class TitanTextEmbedAiModelService : IAiModelService, IDisposable
 {
     private readonly AmazonBedrockRuntimeClient _client;
-    private readonly IConversationManager _conversationManager;
     private bool _disposed;
     private readonly string _modelId;
 

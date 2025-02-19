@@ -4,11 +4,16 @@ using TalkToMe.Core.Models;
 
 namespace TalkToMe.Core.Agents;
 
-public abstract class BaseAgent
+public abstract class BaseAgent : IAgent
 {
     private IAiModelService _model;
-    
+    private IAgent _agentImplementation;
+
     protected abstract string SystemPromt { get; }
+    
+    protected string Promt { get; set; }
+    protected string Message { get; set; }
+    protected string Session { get; set; }
 
     protected BaseAgent(IAIProviderFactory aiProviderFactory, AIProvider aiProvider, string model)
     {
@@ -25,4 +30,24 @@ public abstract class BaseAgent
     {
         return await Task.FromResult(SystemPromt);
     }
+
+    public IAgent WithPromt(string promt)
+    {
+        Promt = promt;
+        return this;
+    }
+
+    public IAgent WithMessage(string message)
+    {
+        Message = message;
+        return this;
+    }
+
+    public IAgent WithSession(string sessionId)
+    {
+        Session = sessionId;
+        return this;
+    }
+
+    public abstract Task<CoreResponse> Invoke();
 }

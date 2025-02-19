@@ -5,8 +5,6 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TalkToMe", "TalkToMe\TalkToMe.csproj", "{393F1504-30DD-45C8-BD7B-51C9A78432FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TalkToMe.Console", "TalkToMe.Console\TalkToMe.Console.csproj", "{D184A24C-7669-4E01-ABBB-ED859ACE187B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TalkToMe.Core", "TalkToMe.Core\TalkToMe.Core.csproj", "{00787050-EC6F-45FD-9D4A-3D3999EE1507}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TalkToMe.Domain", "TalkToMe.Domain\TalkToMe.Domain.csproj", "{3FD6B56D-4662-46EA-8638-920B4A1AC4BC}"
@@ -23,10 +21,6 @@ Global
 		{393F1504-30DD-45C8-BD7B-51C9A78432FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{393F1504-30DD-45C8-BD7B-51C9A78432FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{393F1504-30DD-45C8-BD7B-51C9A78432FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D184A24C-7669-4E01-ABBB-ED859ACE187B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D184A24C-7669-4E01-ABBB-ED859ACE187B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D184A24C-7669-4E01-ABBB-ED859ACE187B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D184A24C-7669-4E01-ABBB-ED859ACE187B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{00787050-EC6F-45FD-9D4A-3D3999EE1507}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{00787050-EC6F-45FD-9D4A-3D3999EE1507}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00787050-EC6F-45FD-9D4A-3D3999EE1507}.Release|Any CPU.ActiveCfg = Release|Any CPU
