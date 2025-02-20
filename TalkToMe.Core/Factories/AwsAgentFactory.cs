@@ -23,19 +23,19 @@ public class AwsAgentFactory
     private string swedishLocale = "sv-se";
     private string englishLocale = "en-us";
 
-    public AwsAgentFactory(IAIProviderFactory aiProviderFactory, IHistoryService historyService, IWordService wordService, IBedrockAgentService bedrockAgentService)
+    public AwsAgentFactory(IAIProviderFactory aiProviderFactory, IHistoryService historyService, IWordService wordService, IBedrockAgentService bedrockAgentService, IQueryCounterService queryCounterService)
     {
-        _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
-        _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory);
-        _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory);
-        _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService);
-        _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService);
+        _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory, queryCounterService);
+        _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory, queryCounterService);
+        _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, queryCounterService);
+        _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService, queryCounterService);
+        _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
         
-        _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory);
-        _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory);
-        _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory);
-        _conversationAgent = new ConversationEnglishAgent(bedrockAgentService, historyService);
-        _wordTeacherEnglishAgent = new WordTeacherEnglishAgent(bedrockAgentService, wordService, historyService);
+        _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory, queryCounterService);
+        _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory, queryCounterService);
+        _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, queryCounterService);
+        _conversationAgent = new ConversationEnglishAgent(bedrockAgentService, historyService, queryCounterService);
+        _wordTeacherEnglishAgent = new WordTeacherEnglishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
 
         _agents = new Dictionary<string, Dictionary<string, IAgent>>
         {

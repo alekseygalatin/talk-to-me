@@ -8,8 +8,8 @@ namespace TalkToMe.Core.Agents;
 
 public class EnglishConversationHelperAgent : BaseAgent
 {
-    public EnglishConversationHelperAgent(IAIProviderFactory aiProviderFactory) :
-        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.AWS_Nova_Pro)
+    public EnglishConversationHelperAgent(IAIProviderFactory aiProviderFactory, IQueryCounterService queryCounterService) :
+        base(aiProviderFactory, queryCounterService, AIProvider.AmazonBedrock, BedrockAIModelNames.AWS_Nova_Pro)
     {
     }
     
@@ -24,6 +24,6 @@ public class EnglishConversationHelperAgent : BaseAgent
         .WithPrompt(Message)
         .Build();
 
-        return await Invoke(request);
+        return await Invoke(request, Session);
     }
 }

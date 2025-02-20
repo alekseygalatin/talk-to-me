@@ -1,3 +1,4 @@
+using TalkToMe.Core.Exceptions;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Infrastructure.IRepository;
 
@@ -18,6 +19,6 @@ public class QueryCounterService: IQueryCounterService
         var count = await _repository.IncrementCounterAsync(userId, 1);
 
         if (count >= QueriesLimit)
-            throw new Exception("");
+            throw new QueryLimitExceeded();
     }
 }

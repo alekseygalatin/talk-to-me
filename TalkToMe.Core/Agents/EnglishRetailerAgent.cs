@@ -8,8 +8,8 @@ namespace TalkToMe.Core.Agents;
 
 public class EnglishRetailerAgent : BaseAgent
 {
-    public EnglishRetailerAgent(IAIProviderFactory aiProviderFactory) :
-        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
+    public EnglishRetailerAgent(IAIProviderFactory aiProviderFactory, IQueryCounterService queryCounterService) :
+        base(aiProviderFactory, queryCounterService, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
     {
     }
 
@@ -27,6 +27,6 @@ public class EnglishRetailerAgent : BaseAgent
         .WithPrompt($"This is my retailing: {Message}.")
         .Build();
 
-        return await base.Invoke(request);
+        return await base.Invoke(request, Session);
     }
 }

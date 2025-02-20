@@ -5,8 +5,8 @@ namespace TalkToMe.Core.Agents.Aws;
 
 public class ConversationSwedishAgent : BaseAwsAgent
 {
-    public ConversationSwedishAgent(IBedrockAgentService bedrockAgentService, IHistoryService historyService) : 
-        base(bedrockAgentService, historyService)
+    public ConversationSwedishAgent(IBedrockAgentService bedrockAgentService, IHistoryService historyService, IQueryCounterService queryCounterService) : 
+        base(bedrockAgentService, historyService, queryCounterService)
     {
     }
     

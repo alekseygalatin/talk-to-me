@@ -8,6 +8,7 @@ public abstract class BaseAgent : IAgent
 {
     private IAiModelService _model;
     private IAgent _agentImplementation;
+    private IQueryCounterService _queryCounterService;
 
     protected abstract string SystemPromt { get; }
     
@@ -15,14 +16,17 @@ public abstract class BaseAgent : IAgent
     protected string Message { get; set; }
     protected string Session { get; set; }
 
-    protected BaseAgent(IAIProviderFactory aiProviderFactory, AIProvider aiProvider, string model)
+    protected BaseAgent(IAIProviderFactory aiProviderFactory, IQueryCounterService queryCounterService, AIProvider aiProvider, string model)
     {
+        _queryCounterService = queryCounterService;
         var provider = aiProviderFactory.GetProvider(aiProvider);
         _model = provider.GetModel(model);
     }
     
-    protected async Task<CoreResponse> Invoke(CoreRequest request)
+    protected async Task<CoreResponse> Invoke(CoreRequest request, string sessionId)
     {
+        await _queryCounterService.CheckLimitOrThrowError(sessionId);
+        
         return await _model.SendMessageAsync(request);
     }
 

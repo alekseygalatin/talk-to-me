@@ -27,10 +27,7 @@ public class AgentsController : ControllerBase
     {
         if (agent == "conversationAgent")
         {
-            var instance = _agentFactory.GetAgent("alex", locale)
-                .WithMessage(text)
-                .WithSession(SessionId);
-            
+            var instance = _agentFactory.GetAgent("alex", locale).WithMessage(text).WithSession(SessionId);
             var response = await instance.Invoke();
             return this.CreateResponse(response.Response);
         }
@@ -43,13 +40,13 @@ public class AgentsController : ControllerBase
         else if (agent == "translationAgent")
         {
             var instance = _agentFactory.GetAgent("translation", locale);
-            var response = await instance.WithMessage(text).Invoke();
+            var response = await instance.WithMessage(text).WithSession(SessionId).Invoke();
             return this.CreateResponse(response.Response);
         }
         else if (agent == "conversationHelperAgent")
         {
             var instance = _agentFactory.GetAgent("helper", locale);
-            var response = await instance.WithMessage(text).Invoke();
+            var response = await instance.WithMessage(text).WithSession(SessionId).Invoke();
             return this.CreateResponse(response.Response);
         }
         
@@ -61,7 +58,7 @@ public class AgentsController : ControllerBase
     {
         if (agent == "storyTailorAgent")
         {
-            var instance = _agentFactory.GetAgent("maria", locale);
+            var instance = _agentFactory.GetAgent("maria", locale).WithSession(SessionId);
             var response = await instance.Invoke();
             return this.CreateResponse(response.Response);
         }
@@ -75,7 +72,7 @@ public class AgentsController : ControllerBase
         if (agent == "retailerAgent")
         {
             var instance = _agentFactory.GetAgent("maria", locale);
-            var response = await instance.WithPromt(data.Promt).WithMessage(data.Text).Invoke();
+            var response = await instance.WithPromt(data.Promt).WithMessage(data.Text).WithSession(SessionId).Invoke();
             return this.CreateResponse(response.Response);
         }
         

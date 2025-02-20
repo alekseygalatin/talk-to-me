@@ -8,8 +8,8 @@ namespace TalkToMe.Core.Agents;
 
 public class EnglishTranslationAgent : BaseTranslationAgent
 {
-    public EnglishTranslationAgent(IAIProviderFactory aiProviderFactory) :
-        base(aiProviderFactory, AIProvider.AmazonBedrock, BedrockAIModelNames.Claude_3_5_Haiku)
+    public EnglishTranslationAgent(IAIProviderFactory aiProviderFactory, IQueryCounterService queryCounterService) :
+        base(aiProviderFactory, queryCounterService, AIProvider.AmazonBedrock, BedrockAIModelNames.Claude_3_5_Haiku)
     {
     }
     
@@ -24,6 +24,6 @@ public class EnglishTranslationAgent : BaseTranslationAgent
             .WithPrompt(Message)
             .Build();
 
-        return await base.Invoke(request);
+        return await base.Invoke(request, Session);
     }
 }
