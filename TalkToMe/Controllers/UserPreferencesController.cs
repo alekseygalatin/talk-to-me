@@ -55,7 +55,7 @@ namespace TalkToMe.Controllers
         }
 
         [HttpPut("current-language")]
-        public async Task<IActionResult> SetCurrentLanguageToLearn([FromBody] LanguageInfoDTO languageInfo)
+        public async Task<IActionResult> SetCurrentLanguageToLearn([FromBody] LanguageInfoDto languageInfo)
         {
             try
             {

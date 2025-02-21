@@ -39,10 +39,10 @@ public class WordsController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("{language}/{word}/{includeIntoChat}")]
-    public async Task<IActionResult> SetIncludeIntoChat(string language, string word, bool includeIntoChat)
+    [HttpPut("include-into-chat")]
+    public async Task<IActionResult> SetIncludeIntoChat([FromBody] IncludeIntoChatDto model)
     {
-        await _wordService.SetIncludeIntoChat(UserHelper.GetUserId(User), language, word, includeIntoChat);
+        await _wordService.SetIncludeIntoChat(UserHelper.GetUserId(User), model.LanguageCode, model.Word, model.IncludeIntoChat);
         return Ok();
     }
 }

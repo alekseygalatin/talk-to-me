@@ -1,6 +1,8 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
+using TalkToMe.Domain.Constants;
 using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.IRepository;
 
@@ -9,6 +11,7 @@ namespace TalkToMe.Infrastructure.Repository;
 public class WordRepository : BaseRepository<WordEntity>, IWordRepository
 {
     private readonly DynamoDBContext _context;
+    private readonly IAmazonDynamoDB _dynamoDb;
 
     public WordRepository(IAmazonDynamoDB dynamoDb): base(dynamoDb) 
     {
@@ -17,7 +20,27 @@ public class WordRepository : BaseRepository<WordEntity>, IWordRepository
             Conversion = DynamoDBEntryConversion.V2
         };
         _context = new DynamoDBContext(dynamoDb, config);
+        _dynamoDb = dynamoDb;
     }
+
+    public async Task<int> CountWordsByLanguageAsync(string userId, string language)
+    {
+        var request = new QueryRequest
+        {
+            TableName = TableNames.WordsTable,
+            KeyConditionExpression = "UserId = :userId AND begins_with(LanguageWord, :languageWord)",
+            ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+        {
+            { ":userId", new AttributeValue { S = userId } },
+            { ":languageWord", new AttributeValue { S = $"{language}#" } }
+        },
+            Select = "COUNT" // Only return count, no data
+        };
+
+        var response = await _dynamoDb.QueryAsync(request);
+        return response.Count;
+    }
+
 
     public async Task<List<WordEntity>> GetWordsByLanguageAsync(string userId, string language)
     {

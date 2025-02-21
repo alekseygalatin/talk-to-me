@@ -10,6 +10,7 @@ using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.Helpers;
 using TalkToMe.Infrastructure.IRepository;
 using TalkToMe.Infrastructure.Repository;
+using TalkToMe.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,8 @@ app.UseSwaggerUI();
 
     await next();
 });*/
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors();
 

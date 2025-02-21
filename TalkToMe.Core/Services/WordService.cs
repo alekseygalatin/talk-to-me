@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.DTO.Response;
+using TalkToMe.Core.Exceptions;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.IRepository;
@@ -27,11 +28,18 @@ public class WordService : IWordService
 
     public async Task AddWordToDictionary(string userId, WordRequestDto dto)
     {
+        int wordsLimit = 100;
+
         if (string.IsNullOrEmpty(userId))
             throw new ArgumentNullException(nameof(userId));
 
         if (dto is null)
             throw new ArgumentNullException(nameof(dto));
+
+        var wordsCount = await _repository.CountWordsByLanguageAsync(userId, dto.Language);
+
+        if (wordsCount >= wordsLimit)
+            throw new UserFriendlyException($"You have reached a limit of words ({wordsLimit})");
 
         var word = _mapper.Map<WordEntity>(dto);
         word.UserId = userId;
