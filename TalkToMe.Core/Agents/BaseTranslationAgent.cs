@@ -5,8 +5,8 @@ namespace TalkToMe.Core.Agents
 {
     public abstract class BaseTranslationAgent: BaseAgent
     {
-        protected BaseTranslationAgent(IAIProviderFactory aiProviderFactory, AIProvider aiProvider, string model):
-            base(aiProviderFactory, aiProvider, model)
+        protected BaseTranslationAgent(IAIProviderFactory aiProviderFactory, IQueryCounterService queryCounterService, AIProvider aiProvider, string model):
+            base(aiProviderFactory, queryCounterService, aiProvider, model)
         {
         }
 

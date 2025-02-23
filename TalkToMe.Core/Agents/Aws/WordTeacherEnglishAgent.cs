@@ -7,8 +7,8 @@ public class WordTeacherEnglishAgent : BaseAwsAgent
 {
     private readonly IWordService _wordService;
     
-    public WordTeacherEnglishAgent(IBedrockAgentService bedrockAgentService, IWordService wordService, IHistoryService historyService) :
-        base(bedrockAgentService, historyService)
+    public WordTeacherEnglishAgent(IBedrockAgentService bedrockAgentService, IWordService wordService, IHistoryService historyService, IQueryCounterService queryCounterService) :
+        base(bedrockAgentService, historyService, queryCounterService)
     {
         _wordService = wordService;
     }

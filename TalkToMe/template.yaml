@@ -25,6 +25,7 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: WordsTable
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: UserId
           AttributeType: S
@@ -35,9 +36,18 @@ Resources:
           KeyType: HASH
         - AttributeName: LanguageWord
           KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+        
+  QueryCountersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: QueryCountersTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: UserId
+          KeyType: HASH
         
   ChatHistoryTable:
     Type: AWS::DynamoDB::Table
