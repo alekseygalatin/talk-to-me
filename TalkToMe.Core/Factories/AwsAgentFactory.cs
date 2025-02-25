@@ -11,12 +11,14 @@ public class AwsAgentFactory
     private SwedishConversationHelperAgent _swedishConversationHelperAgent;
     private ConversationSwedishAgent _conversationSwedishAgent;
     private WordTeacherSwedishAgent _wordTeacherSwedishAgent;
+    private StoryRetailerSwedishAgent _retailerSwedish;
     
     private EnglishTranslationAgent _englishTranslationAgent;
     private EnglishStoryTailorAgent _englishStoryTailorAgent;
     private EnglishConversationHelperAgent _englishConversationHelperAgent;
     private ConversationEnglishAgent _conversationAgent;
     private WordTeacherEnglishAgent _wordTeacherEnglishAgent;
+    private StoryRetailerEnglishAgent _retailerEnglish;
 
     private Dictionary<string, Dictionary<string, IAgent>> _agents;
 
@@ -30,12 +32,14 @@ public class AwsAgentFactory
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, queryCounterService);
         _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService, queryCounterService);
         _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
+        _retailerSwedish = new StoryRetailerSwedishAgent(bedrockAgentService, historyService, queryCounterService);
         
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory, queryCounterService);
         _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory, queryCounterService);
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, queryCounterService);
         _conversationAgent = new ConversationEnglishAgent(bedrockAgentService, historyService, queryCounterService);
         _wordTeacherEnglishAgent = new WordTeacherEnglishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
+        _retailerEnglish = new StoryRetailerEnglishAgent(bedrockAgentService, historyService, queryCounterService);
 
         _agents = new Dictionary<string, Dictionary<string, IAgent>>
         {
@@ -61,6 +65,14 @@ public class AwsAgentFactory
                 {
                     {swedishLocale, _swedishStoryTailorAgent},
                     {englishLocale, _englishStoryTailorAgent}
+                }
+            },
+            {
+                "maria-chat",
+                new Dictionary<string, IAgent>
+                {
+                    {swedishLocale, _retailerSwedish},
+                    {englishLocale, _retailerEnglish}
                 }
             },
             {

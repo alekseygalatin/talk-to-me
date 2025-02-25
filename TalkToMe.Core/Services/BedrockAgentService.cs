@@ -46,4 +46,16 @@ public class BedrockAgentService : IBedrockAgentService
 
         throw new Exception("Agent failed");
     }
+
+    public async Task CleanMemory(string sessionId, string agentId, string agentAliasId)
+    {
+        await _client.DeleteAgentMemoryAsync(
+            new DeleteAgentMemoryRequest
+            {
+                AgentId = agentId,
+                AgentAliasId = agentAliasId,
+                SessionId = sessionId,
+                MemoryId = sessionId,
+            });
+    }
 }

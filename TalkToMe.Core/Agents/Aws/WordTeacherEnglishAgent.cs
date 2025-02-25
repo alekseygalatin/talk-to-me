@@ -13,8 +13,8 @@ public class WordTeacherEnglishAgent : BaseAwsAgent
         _wordService = wordService;
     }
     
-    private string AwsAgentId = "HXNKQ1UV8P";
-    private string AwsAliasId = "4KHX3HRUZ0";
+    protected override string AwsAgentId => "HXNKQ1UV8P";
+    protected override string AwsAliasId => "4KHX3HRUZ0";
     
     public override string AgentId => "4e4f7fdd-ad93-4189-92af-d711c92aa751";
     

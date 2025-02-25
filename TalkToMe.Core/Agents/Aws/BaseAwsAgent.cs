@@ -6,12 +6,14 @@ namespace TalkToMe.Core.Agents.Aws;
 
 public abstract class BaseAwsAgent : IAgent
 {
-    private IBedrockAgentService _bedrockAgentService;
-    private IHistoryService _historyService;
+    protected IBedrockAgentService _bedrockAgentService;
+    protected IHistoryService _historyService;
     private IQueryCounterService _queryCounterService;
     
     public abstract string AgentId { get; }
     
+    protected abstract string AwsAgentId { get; }
+    protected abstract string AwsAliasId { get; }
     protected string Promt { get; set; }
     protected string Message { get; set; }
     protected string Session { get; set; }
@@ -58,4 +60,10 @@ public abstract class BaseAwsAgent : IAgent
     }
 
     public abstract Task<CoreResponse> Invoke();
+
+    public async Task CleanMemory()
+    {
+        await _bedrockAgentService.CleanMemory(Session, AwsAgentId, AwsAliasId);
+        await _historyService.CleanAgentHistory(Session + AgentId);
+    }
 }
