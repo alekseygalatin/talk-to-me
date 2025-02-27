@@ -48,6 +48,9 @@ Resources:
       KeySchema:
         - AttributeName: UserId
           KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: Ttl
+        Enabled: true
         
   ChatHistoryTable:
     Type: AWS::DynamoDB::Table
