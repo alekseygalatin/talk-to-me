@@ -3,6 +3,7 @@ using Amazon.TranscribeService.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TalkToMe.Core.DTO.Response;
+using TalkToMe.Core.Factories;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Domain.Enums;
 using TalkToMe.Helpers;
@@ -15,10 +16,12 @@ namespace TalkToMe.Controllers;
 public class HistoryController : ControllerBase
 {
     private IHistoryService _historyService;
+    private AwsAgentFactory _agentFactory;
     
-    public HistoryController(IHistoryService historyService)
+    public HistoryController(IHistoryService historyService, AwsAgentFactory agentFactory)
     {
         _historyService = historyService;
+        _agentFactory = agentFactory;
     }
     
     private string SessionId => UserHelper.GetUserId(User);
@@ -77,5 +80,36 @@ public class HistoryController : ControllerBase
             }
         }
         throw new NotFoundException($"Agent: {agent} has not been found");
+    }
+
+    [HttpDelete("{locale}/{agent}")]
+    public async Task<ActionResult> CleanAgentMemory([FromRoute] string locale, [FromRoute] string agent)
+    {
+        if (agent == "conversationAgent")
+        {
+            var instance = _agentFactory
+                .GetAgent("alex", locale)
+                .WithSession(SessionId);
+            
+            await instance.CleanMemory();
+        }
+        else if (agent == "wordTeacherAgent")
+        {
+            var instance = _agentFactory
+                .GetAgent("emma", locale)
+                .WithSession(SessionId);
+            
+            await instance.CleanMemory();
+        }
+        else if (agent == "retailerAgent")
+        {
+            var instance = _agentFactory
+                .GetAgent("maria-chat", locale)
+                .WithSession(SessionId);
+
+            await instance.CleanMemory();
+        }
+
+        return NoContent();
     }
 }

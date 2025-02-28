@@ -10,8 +10,8 @@ public class ConversationEnglishAgent : BaseAwsAgent
     { 
     }
     
-    private string AwsAgentId = "63O8MUCFBG";
-    private string AwsAliasId = "QOJMBGO5LW";
+    protected override string AwsAgentId => "63O8MUCFBG";
+    protected override string AwsAliasId => "QOJMBGO5LW";
 
     public override string AgentId => "7b542e6e-7e2a-424f-8e76-0fec63cb2568";
     

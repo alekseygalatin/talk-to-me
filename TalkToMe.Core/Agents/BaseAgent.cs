@@ -54,4 +54,9 @@ public abstract class BaseAgent : IAgent
     }
 
     public abstract Task<CoreResponse> Invoke();
+
+    public virtual Task CleanMemory()
+    {
+        throw new NotImplementedException();
+    }
 }

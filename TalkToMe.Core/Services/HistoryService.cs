@@ -9,7 +9,6 @@ namespace TalkToMe.Core.Services;
 public class HistoryService : IHistoryService
 {
     private readonly IChatHistoryRepository _chatHistoryRepository;
-    
     public HistoryService(IChatHistoryRepository chatHistoryRepository)
     {
         _chatHistoryRepository = chatHistoryRepository;
@@ -36,5 +35,10 @@ public class HistoryService : IHistoryService
             Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
             Ttl = DateTimeOffset.UtcNow.AddDays(3).ToUnixTimeSeconds()
         });
+    }
+    
+    public async Task CleanAgentHistory(string sessionId)
+    {
+        await _chatHistoryRepository.DeleteAsync(sessionId);
     }
 }

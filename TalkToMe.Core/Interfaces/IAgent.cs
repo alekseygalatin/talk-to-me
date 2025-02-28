@@ -8,4 +8,5 @@ public interface IAgent
     IAgent WithMessage(string message);
     IAgent WithSession(string sessionId);
     Task<CoreResponse> Invoke();
+    Task CleanMemory();
 }

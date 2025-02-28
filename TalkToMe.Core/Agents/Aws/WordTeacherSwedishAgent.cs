@@ -15,8 +15,8 @@ public class WordTeacherSwedishAgent : BaseAwsAgent
     
     public override string AgentId => "f9b126e3-4340-4009-8b72-29a4ec321e7c";
     
-    private string AwsAgentId = "DSXU3CSLY0";
-    private string AwsAliasId = "MQPM7HUVK9";
+    protected override string AwsAgentId => "DSXU3CSLY0";
+    protected override string AwsAliasId => "MQPM7HUVK9";
     
     public override async Task<CoreResponse> Invoke()
     {

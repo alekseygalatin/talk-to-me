@@ -71,9 +71,18 @@ public class AgentsController : ControllerBase
     {
         if (agent == "retailerAgent")
         {
-            var instance = _agentFactory.GetAgent("maria", locale);
-            var response = await instance.WithPromt(data.Promt).WithMessage(data.Text).WithSession(SessionId).Invoke();
-            return this.CreateResponse(response.Response);
+            if (!string.IsNullOrWhiteSpace(data.Promt))
+            {
+                var instance = _agentFactory.GetAgent("maria-chat", locale);
+                var response = await instance.WithPromt(data.Promt).WithMessage(data.Text).WithSession(SessionId).Invoke();
+                return this.CreateResponse(response.Response);
+            }
+            else
+            {
+                var instance = _agentFactory.GetAgent("maria", locale);
+                var response = await instance.WithSession(SessionId).Invoke();
+                return this.CreateResponse(response.Response);
+            }
         }
         
         throw new NotFoundException($"Agent: {agent} has not been found");
