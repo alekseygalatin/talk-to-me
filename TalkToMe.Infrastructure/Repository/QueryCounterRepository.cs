@@ -13,8 +13,8 @@ public class QueryCounterRepository: IQueryCounterRepository
     {
         _dynamoDb = dynamoDb;
     }
-
-    public async Task<int> IncrementCounterAsync(string userId, int incrementBy)
+    
+    public async Task<int> IncrementCounterAsync(string userId, int incrementBy, int ttlDays)
     {
         var request = new UpdateItemRequest
         {
@@ -23,11 +23,16 @@ public class QueryCounterRepository: IQueryCounterRepository
             {
                 { "UserId", new AttributeValue { S = userId } }
             },
-            UpdateExpression = "SET CounterValue = if_not_exists(CounterValue, :zero) + :incr",
+            UpdateExpression = "SET CounterValue = if_not_exists(CounterValue, :zero) + :incr, #ttl = if_not_exists(#ttl, :ttl)",
+            ExpressionAttributeNames = new Dictionary<string, string>
+            {
+                { "#ttl", "Ttl" }
+            },
             ExpressionAttributeValues = new Dictionary<string, AttributeValue>
             {
                 { ":incr", new AttributeValue { N = incrementBy.ToString() } },
-                { ":zero", new AttributeValue { N = "0" } }
+                { ":zero", new AttributeValue { N = "0" } },
+                { ":ttl", new AttributeValue { N = DateTimeOffset.UtcNow.AddDays(ttlDays).ToUnixTimeSeconds().ToString() } }
             },
             ReturnValues = "UPDATED_NEW"
         };
