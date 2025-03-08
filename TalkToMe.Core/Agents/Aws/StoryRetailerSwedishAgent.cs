@@ -1,19 +1,27 @@
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
+using TalkToMe.Core.Options;
 
 namespace TalkToMe.Core.Agents.Aws;
 
 public class StoryRetailerSwedishAgent : BaseAwsAgent
 {
-    public StoryRetailerSwedishAgent(IBedrockAgentService bedrockAgentService, IHistoryService historyService, IQueryCounterService queryCounterService) : 
+    private AwsAgentOptions _awsAgentOptions;
+    
+    public StoryRetailerSwedishAgent(
+        IBedrockAgentService bedrockAgentService, 
+        IHistoryService historyService, 
+        IQueryCounterService queryCounterService, 
+        AwsAgentOptions awsAgentOptions) : 
         base(bedrockAgentService, historyService, queryCounterService)
     {
+        _awsAgentOptions = awsAgentOptions;
     }
     
     public override string AgentId => "6e83c910-d4c2-491f-94ce-cd8f2c468c43";
     
-    protected override string AwsAgentId => "FCIVVXTBB6";
-    protected override string AwsAliasId => "VBXGWDYEDD";
+    protected override string AwsAgentId => _awsAgentOptions.MariaSeId;
+    protected override string AwsAliasId => _awsAgentOptions.MariaAliasSeId;
     
     public override async Task<CoreResponse> Invoke()
     {

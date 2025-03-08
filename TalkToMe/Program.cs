@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using TalkToMe.Configuration;
 using TalkToMe.Core.Configuration;
 using TalkToMe.Core.Interfaces;
+using TalkToMe.Core.Options;
 using TalkToMe.Core.Services;
 using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.Helpers;
@@ -87,6 +88,7 @@ builder.Services.AddSingleton<IWordService, WordService>();
 builder.Services.AddSingleton<IHistoryService, HistoryService>();
 builder.Services.AddSingleton<IBedrockAgentService, BedrockAgentService>();
 builder.Services.AddSingleton<DynamoDbTableManager>();
+builder.Services.AddSingleton<AwsAgentOptions>();
 
 var app = builder.Build();
 

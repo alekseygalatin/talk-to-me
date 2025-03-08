@@ -1,22 +1,30 @@
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
+using TalkToMe.Core.Options;
 
 namespace TalkToMe.Core.Agents.Aws;
 
 public class WordTeacherSwedishAgent : BaseAwsAgent
 {
     private readonly IWordService _wordService;
+    private AwsAgentOptions _awsAgentOptions;
     
-    public WordTeacherSwedishAgent(IBedrockAgentService bedrockAgentService, IWordService wordService, IHistoryService historyService, IQueryCounterService queryCounterService) : 
+    public WordTeacherSwedishAgent(
+        IBedrockAgentService bedrockAgentService, 
+        IWordService wordService, 
+        IHistoryService historyService,
+        IQueryCounterService queryCounterService,
+        AwsAgentOptions awsAgentOptions) : 
         base(bedrockAgentService, historyService, queryCounterService)
     {
         _wordService = wordService;
+        _awsAgentOptions = awsAgentOptions;
     }
     
     public override string AgentId => "f9b126e3-4340-4009-8b72-29a4ec321e7c";
     
-    protected override string AwsAgentId => "DSXU3CSLY0";
-    protected override string AwsAliasId => "MQPM7HUVK9";
+    protected override string AwsAgentId => _awsAgentOptions.EmmaSeId;
+    protected override string AwsAliasId => _awsAgentOptions.EmmaAliasSeId;
     
     public override async Task<CoreResponse> Invoke()
     {

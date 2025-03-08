@@ -31,6 +31,10 @@ public class BedrockService : IAIProvider
             {
                 BedrockAIModelNames.Claude_3_5_Haiku,
                 new ClaudeHaikuModelService(clientFactory, BedrockAIModelNames.Claude_3_5_Haiku)
+            },
+            {
+                BedrockAIModelNames.Claude_3_5_Sonnet,
+                new ClaudeHaikuModelService(clientFactory, BedrockAIModelNames.Claude_3_5_Sonnet)
             }
         };
     }
