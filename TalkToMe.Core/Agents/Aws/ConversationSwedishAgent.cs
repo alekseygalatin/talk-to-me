@@ -18,8 +18,8 @@ public class ConversationSwedishAgent : BaseAwsAgent
         _awsAgentOptions = awsAgentOptions;
     }
     
-    protected override string AwsAgentId => _awsAgentOptions.AlexSeId;
-    protected override string AwsAliasId => _awsAgentOptions.AlexAliasSeId;
+    protected override string AwsAgentId => _awsAgentOptions.ConversationAgentSeId;
+    protected override string AwsAliasId => _awsAgentOptions.ConversationAgentAliasSeId;
     
     public override string AgentId => "6a47a518-cc4b-4b40-b7a5-94113d8c1b16";
     

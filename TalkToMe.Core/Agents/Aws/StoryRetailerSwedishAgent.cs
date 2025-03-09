@@ -20,8 +20,8 @@ public class StoryRetailerSwedishAgent : BaseAwsAgent
     
     public override string AgentId => "6e83c910-d4c2-491f-94ce-cd8f2c468c43";
     
-    protected override string AwsAgentId => _awsAgentOptions.MariaSeId;
-    protected override string AwsAliasId => _awsAgentOptions.MariaAliasSeId;
+    protected override string AwsAgentId => _awsAgentOptions.StoryRetailerAgentSeId;
+    protected override string AwsAliasId => _awsAgentOptions.StoryRetailerAgentAliasSeId;
     
     public override async Task<CoreResponse> Invoke()
     {
