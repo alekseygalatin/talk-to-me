@@ -52,6 +52,16 @@ public class WordRepository : BaseRepository<WordEntity>, IWordRepository
         return await query.GetRemainingAsync();
     }
 
+    public async Task<List<WordEntity>> GetRandomWordsAsync(string userId, string language, int count)
+    {
+        var words = await GetWordsByLanguageAsync(userId, language);
+        var shuffledWords = words.Where(x => x.IncludeIntoChat).OrderBy(_ => Guid.NewGuid());
+        if (words.Count <= count)
+            return shuffledWords.ToList();
+
+        return shuffledWords.Take(count).ToList();
+    }
+
     public async Task<WordEntity?> GetWordAsync(string userId, string language, string word)
     {
         var query = _context.QueryAsync<WordEntity>(

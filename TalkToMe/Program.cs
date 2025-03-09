@@ -84,26 +84,13 @@ builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<IWordService, WordService>();
 builder.Services.AddSingleton<IBedrockAgentService, BedrockAgentService>();
 builder.Services.AddSingleton<DynamoDbTableManager>();
+builder.Services.AddSingleton<IVocabularyChatSessionStore, InMemoryVocabularyChatSessionStore>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
-
-/*app.Use(async (context, next) =>
-{
-    if (context.Request.Method == HttpMethods.Options)
-    {
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
-        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        context.Response.StatusCode = StatusCodes.Status204NoContent;
-        return;
-    }
-
-    await next();
-});*/
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

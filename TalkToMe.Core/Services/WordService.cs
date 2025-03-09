@@ -26,6 +26,12 @@ public class WordService : IWordService
         return _mapper.Map<List<WordResponseDto>>(wordsList);
     }
 
+    public async Task<List<WordResponseDto>> GetRandomWords(string userId, string langauge, int count)
+    {
+        var wordsList = await _repository.GetRandomWordsAsync(userId, langauge, count);
+        return _mapper.Map<List<WordResponseDto>>(wordsList);
+    }
+
     public async Task AddWordToDictionary(string userId, WordRequestDto dto)
     {
         int wordsLimit = 100;

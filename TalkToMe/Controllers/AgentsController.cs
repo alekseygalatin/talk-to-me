@@ -36,14 +36,14 @@ public class AgentsController : ControllerBase
     private EnglishAlexAgent _englishAlexAgent;
     private EnglishEmmaAgent _englishEmmaAgent;
         
-    public AgentsController(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager, IWordService wordService, IBedrockAgentService bedrockAgentService)
+    public AgentsController(IAIProviderFactory aiProviderFactory, IConversationManager conversationManager, IWordService wordService, IBedrockAgentService bedrockAgentService, IVocabularyChatSessionStore vocabularyChatSessionStore)
     {
         _swedishConversationAgent = new SwedishConversationAgent(aiProviderFactory, conversationManager);
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory);
         _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory);
         _swedishRetailerAgent = new SwedishRetailerAgent(aiProviderFactory, conversationManager);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, conversationManager);
-        _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
+        _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, vocabularyChatSessionStore);
         _swedishAlexAgent = new SwedishAlexAgent(bedrockAgentService);
         _swedishEmmaAgent = new SwedishEmmaAgent(bedrockAgentService, wordService);
             
@@ -52,7 +52,7 @@ public class AgentsController : ControllerBase
         _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory);
         _englishRetailerAgent = new EnglishRetailerAgent(aiProviderFactory, conversationManager);
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, conversationManager);
-        _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, conversationManager, wordService);
+        _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, vocabularyChatSessionStore);
         _englishAlexAgent = new EnglishAlexAgent(bedrockAgentService);
         _englishEmmaAgent = new EnglishEmmaAgent(bedrockAgentService, wordService);
     }
@@ -84,30 +84,12 @@ public class AgentsController : ControllerBase
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
-                CoreResponse response;
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    response = await _swedishEmmaAgent.InitialInvoke(sub);
-                }
-                else
-                {
-                    response = await _swedishEmmaAgent.Invoke(text, sub);
-                }
-                
+                var response = await _swedishWordTeacherAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
             else
             {
-                CoreResponse response;
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    response = await _englishEmmaAgent.InitialInvoke(sub);
-                }
-                else
-                {
-                    response = await _englishEmmaAgent.Invoke(text, sub);
-                }
-                
+                var response = await _englishWordTeacherAgent.Invoke(text, sub);
                 return this.CreateResponse(response.Response);
             }
         }
