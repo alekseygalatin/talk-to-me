@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TalkToMe.Core.Configuration;
 using TalkToMe.Core.Enums;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Services;
