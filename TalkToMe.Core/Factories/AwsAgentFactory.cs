@@ -11,6 +11,7 @@ public class AwsAgentFactory
     private SwedishConversationHelperAgent _swedishConversationHelperAgent;
     private ConversationSwedishAgent _conversationSwedishAgent;
     private WordTeacherSwedishAgent _wordTeacherSwedishAgent;
+    private SwedishWordTeacherAgent _swedishWordTeacherAgent;
     private StoryRetailerSwedishAgent _retailerSwedish;
     
     private EnglishTranslationAgent _englishTranslationAgent;
@@ -18,6 +19,7 @@ public class AwsAgentFactory
     private EnglishConversationHelperAgent _englishConversationHelperAgent;
     private ConversationEnglishAgent _conversationAgent;
     private WordTeacherEnglishAgent _wordTeacherEnglishAgent;
+    private EnglishWordTeacherAgent _englishWordTeacherAgent;
     private StoryRetailerEnglishAgent _retailerEnglish;
 
     private Dictionary<string, Dictionary<string, IAgent>> _agents;
@@ -25,13 +27,19 @@ public class AwsAgentFactory
     private string swedishLocale = "sv-se";
     private string englishLocale = "en-us";
 
-    public AwsAgentFactory(IAIProviderFactory aiProviderFactory, IHistoryService historyService, IWordService wordService, IBedrockAgentService bedrockAgentService, IQueryCounterService queryCounterService)
+    public AwsAgentFactory(IAIProviderFactory aiProviderFactory, 
+        IHistoryService historyService, 
+        IWordService wordService, 
+        IBedrockAgentService bedrockAgentService, 
+        IQueryCounterService queryCounterService,
+        IVocabularyChatSessionStore _vocabularyChatSessionStore)
     {
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory, queryCounterService);
         _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory, queryCounterService);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, queryCounterService);
         _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService, queryCounterService);
         _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
+        _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, queryCounterService, _vocabularyChatSessionStore); /**/
         _retailerSwedish = new StoryRetailerSwedishAgent(bedrockAgentService, historyService, queryCounterService);
         
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory, queryCounterService);
@@ -39,6 +47,7 @@ public class AwsAgentFactory
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, queryCounterService);
         _conversationAgent = new ConversationEnglishAgent(bedrockAgentService, historyService, queryCounterService);
         _wordTeacherEnglishAgent = new WordTeacherEnglishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
+        _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, queryCounterService, _vocabularyChatSessionStore); /**/
         _retailerEnglish = new StoryRetailerEnglishAgent(bedrockAgentService, historyService, queryCounterService);
 
         _agents = new Dictionary<string, Dictionary<string, IAgent>>
@@ -55,8 +64,8 @@ public class AwsAgentFactory
                 "emma",
                 new Dictionary<string, IAgent>
                 {
-                    {swedishLocale, _wordTeacherSwedishAgent},
-                    {englishLocale, _wordTeacherEnglishAgent}
+                    {swedishLocale, _swedishWordTeacherAgent},
+                    {englishLocale, _englishWordTeacherAgent}
                 }
             },
             {

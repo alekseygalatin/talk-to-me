@@ -6,8 +6,10 @@ namespace TalkToMe.Core.Agents;
 
 public class EnglishWordTeacherAgent : BaseWordTeacherAgent
 {
-    public EnglishWordTeacherAgent(IAIProviderFactory aiProviderFactory, IVocabularyChatSessionStore sessionStore)
-        : base(aiProviderFactory, sessionStore, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
+    public EnglishWordTeacherAgent(IAIProviderFactory aiProviderFactory,
+        IQueryCounterService queryCounterService,
+        IVocabularyChatSessionStore sessionStore)
+        : base(aiProviderFactory, queryCounterService, sessionStore, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
     {
     }
 

@@ -11,9 +11,11 @@ namespace TalkToMe.Core.Agents
         private readonly IVocabularyChatSessionStore _sessionStore;
         private VocabularyChatSession? _currentSession;
 
-        public BaseWordTeacherAgent(IAIProviderFactory aiProviderFactory, IVocabularyChatSessionStore sessionStore, 
+        public BaseWordTeacherAgent(IAIProviderFactory aiProviderFactory, 
+            IQueryCounterService queryCounterService, 
+            IVocabularyChatSessionStore sessionStore, 
             AIProvider aiProvider, string model) : 
-            base(aiProviderFactory, aiProvider, model)
+            base(aiProviderFactory, queryCounterService, aiProvider, model)
         {
             _sessionStore = sessionStore;
         }
@@ -21,30 +23,29 @@ namespace TalkToMe.Core.Agents
         protected abstract string Language { get; }
         protected abstract string LanguageCode { get; }
 
-        public async Task<CoreResponse> Invoke(string text, string userId)
+        public async override Task<CoreResponse> Invoke()
         {
-            _currentSession = GetSession(userId);
-            var response = await GetAgentResponseAsync(text);
-
+            _currentSession = GetSession();
+            var response = await GetAgentResponseAsync();
             UpdateSessionState(response);
 
             return new CoreResponse { Response = JsonConvert.SerializeObject(response) };
         }
 
-        private VocabularyChatSession GetSession(string userId)
-            => _sessionStore.CurrentSession(userId, LanguageCode)
+        private VocabularyChatSession GetSession()
+            => _sessionStore.CurrentSession(Session, LanguageCode)
                 ?? throw new InvalidOperationException("Session not found for user.");
 
-        private async Task<VocabularyChatResult> GetAgentResponseAsync(string text)
+        private async Task<VocabularyChatResult> GetAgentResponseAsync()
         {
             var prompt = await BuildSystemPromt();
 
             var request = new CoreRequestBuilder()
                 .WithSystemInstruction(prompt)
-                .WithPrompt(string.IsNullOrEmpty(text) ? "Follow the instructions" : text)
+                .WithPrompt(string.IsNullOrEmpty(Message) ? "Follow the instructions" : Message)
                 .Build();
 
-            var agentResponse = await base.Invoke(request);
+            var agentResponse = await base.Invoke(request, Session);
 
             var response = JsonConvert.DeserializeObject<VocabularyChatResult>(agentResponse.Response)
                            ?? new VocabularyChatResult
@@ -62,24 +63,24 @@ namespace TalkToMe.Core.Agents
         {
             get
             {
-                if (_currentSession is null)
-                    throw new InvalidOperationException("Session is not available before invocation.");
-
-                return GetWordTeacherPrompt(_currentSession.Status, _currentSession.CurrentWord, Language);
+                return GetWordTeacherPrompt();
             }
         }
 
-        protected string GetWordTeacherPrompt(VocabularyChatSessionStatus sessionStatus, string currentWord, string langauge)
+        protected string GetWordTeacherPrompt()
         {
-            return sessionStatus == VocabularyChatSessionStatus.Introduction ?
-                GetIntroductionPromt(currentWord, langauge) :
-                GetEvaluationPromt(currentWord, langauge);
+            if (_currentSession is null)
+                throw new InvalidOperationException("Session is not available before invocation.");
+
+            return _currentSession.Status == VocabularyChatSessionStatus.Introduction ?
+                GetIntroductionPromt() :
+                GetEvaluationPromt();
         }
 
-        private string GetIntroductionPromt(string currentWord, string language)
+        private string GetIntroductionPromt()
         {
-            var str = new StringBuilder($"You are an AI {language} language tutor helping users practice vocabulary through natural conversations.");
-            str.AppendLine($"The word for practice is: {currentWord}.");
+            var str = new StringBuilder($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
+            str.AppendLine($"The word for practice is: {_currentSession?.CurrentWord}.");
             str.AppendLine("Follow this structured process: ");
             str.AppendLine("- Don't say any opening words.");
             str.AppendLine("- Introduce the word naturally in a sentence. Use it in a meaningful way so the user understands how it’s used in context.");
@@ -98,10 +99,10 @@ namespace TalkToMe.Core.Agents
             return str.ToString();
         }
 
-        private string GetEvaluationPromt(string currentWord, string language)
+        private string GetEvaluationPromt()
         {
-            var str = new StringBuilder($"You are an AI {language} language tutor helping users practice vocabulary through natural conversations.");
-            str.AppendLine($"The word for practice is: {currentWord}.");
+            var str = new StringBuilder($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
+            str.AppendLine($"The word for practice is: {_currentSession?.CurrentWord}.");
             str.AppendLine("Evaluate the user’s response using this word: ");
             str.AppendLine("- If correct, praise them");
             str.AppendLine("- If incorrect, gently correct their sentence and explain the mistake. Ask them to try again");
