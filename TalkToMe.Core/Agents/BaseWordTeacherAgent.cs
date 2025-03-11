@@ -100,7 +100,6 @@ namespace TalkToMe.Core.Agents
             str.AppendLine("\"response\":\"Return the text of your response\",");
             str.AppendLine("\"success\":true // Return true if correct, false otherwise");
             str.AppendLine("}");
-            str.AppendLine();
             str.AppendLine($"</notes>");
 
             return str.ToString();

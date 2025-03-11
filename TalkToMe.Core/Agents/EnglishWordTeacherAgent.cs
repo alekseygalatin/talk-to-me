@@ -9,7 +9,7 @@ public class EnglishWordTeacherAgent : BaseWordTeacherAgent
     public EnglishWordTeacherAgent(IAIProviderFactory aiProviderFactory,
         IQueryCounterService queryCounterService,
         IVocabularyChatSessionStore sessionStore)
-        : base(aiProviderFactory, queryCounterService, sessionStore, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
+        : base(aiProviderFactory, queryCounterService, sessionStore, AIProvider.AmazonBedrock, BedrockAIModelNames.Claude_3_5_Haiku)
     {
     }
 
