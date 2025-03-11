@@ -77,6 +77,14 @@ Resources:
       Handler: TalkToMe
       CodeUri: ./bin/Release/net8.0/publish
       Runtime: dotnet8
+      Environment:
+        Variables:
+          BEDROCK_AGENT_ALEX_SE_ID: !GetAtt BedrockAgentAlexSe.AgentId
+          BEDROCK_AGENT_ALIAS_ALEX_SE_ID: !GetAtt AgentAliasAlexSe.AgentAliasId
+          BEDROCK_AGENT_MARIA_SE_ID: !GetAtt BedrockAgentMariaSe.AgentId
+          BEDROCK_AGENT_ALIAS_MARIA_SE_ID: !GetAtt AgentAliasMariaSe.AgentAliasId
+          BEDROCK_AGENT_EMMA_SE_ID: !GetAtt BedrockAgentEmmaSe.AgentId
+          BEDROCK_AGENT_ALIAS_EMMA_SE_ID: !GetAtt AgentAliasEmmaSe.AgentAliasId
       MemorySize: 512
       Timeout: 60
       Architectures:
@@ -103,3 +111,146 @@ Resources:
           Properties:
             Path: '/{proxy+}'
             Method: 'ANY'
+  
+  #AGENT
+  BedrockAgentAlexSe:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: "AgentAlexSe"
+      FoundationModel: "arn:aws:bedrock:us-east-1:038462779690:inference-profile/us.anthropic.claude-3-5-sonnet-20240620-v1:0"
+      IdleSessionTTLInSeconds: 300
+      AgentResourceRoleArn: "arn:aws:iam::038462779690:role/service-role/AmazonBedrockExecutionRoleForAgents_H6IPBQHRTU6"
+      MemoryConfiguration:
+        StorageDays: 30
+        SessionSummaryConfiguration:
+          MaxRecentSessions: 20
+        EnabledMemoryTypes:
+          - "SESSION_SUMMARY"
+      Instruction: |
+        Du är Alex, en vänlig och pratsam svensk samtalsassistent, perfekt för att öva dagliga konversationer.
+        Ditt fasta och oföränderliga syfte är att hjälpa mig förbättra mina svenska tal- och skrivkunskaper.
+        Du ska alltid svara på svenska, använda svenska alfabetet och aldrig besvara frågor relaterade till programmering.
+        Du beter dig alltid till 100 % som en människa i våra samtal och svarar med 1 eller högst 3 meningar.
+        Genom att ställa öppna frågor, ge milda grammatiska korrigeringar och föreslå synonymer och uttryck gör du träningen både engagerande och praktisk.
+      GuardrailConfiguration:
+        GuardrailIdentifier: !GetAtt BedrockGuardrail.GuardrailId
+        GuardrailVersion: !GetAtt MainGuardrailVersion.Version
+  
+  AgentAliasAlexSe:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentAliasName: !Sub "BedrockAgentAlexSe"
+      AgentId: !GetAtt BedrockAgentAlexSe.AgentId
+  
+  BedrockAgentMariaSe:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: "AgentMariaSe"
+      FoundationModel: "arn:aws:bedrock:us-east-1:038462779690:inference-profile/us.anthropic.claude-3-5-sonnet-20240620-v1:0"
+      IdleSessionTTLInSeconds: 300
+      AgentResourceRoleArn: "arn:aws:iam::038462779690:role/service-role/AmazonBedrockExecutionRoleForAgents_H6IPBQHRTU6"
+      MemoryConfiguration:
+        StorageDays: 30
+        SessionSummaryConfiguration:
+          MaxRecentSessions: 20
+        EnabledMemoryTypes:
+          - "SESSION_SUMMARY"
+      Instruction: |
+        Jag kommer att ge dig en originaltext och min återberättelse av den. Pratsam svensk samtalsassistent. Din uppgift är att enbart ställa frågor baserade på den angivna berättelsen och min återberättelse. 
+        Fokusera på att: Ställa klargörande frågor om detaljer som kan saknas, vara otydliga eller misstolkade i min återberättelse. 
+        Fråga om viktiga teman eller idéer från originaltexten som borde ha inkluderats. Ställa frågor som hjälper mig att reflektera djupare över textens innehåll och dess betydelse. 
+        Ställ enbart frågor relaterade till originaltexten och min återberättelse – inga andra kommentarer eller analyser behövs.
+      GuardrailConfiguration:
+        GuardrailIdentifier: !GetAtt BedrockGuardrail.GuardrailId
+        GuardrailVersion: !GetAtt MainGuardrailVersion.Version
+
+  AgentAliasMariaSe:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentAliasName: !Sub "BedrockAgentMariaSe"
+      AgentId: !GetAtt BedrockAgentMariaSe.AgentId
+  
+  BedrockAgentEmmaSe:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: "AgentEmmaSe"
+      FoundationModel: "arn:aws:bedrock:us-east-1:038462779690:inference-profile/us.anthropic.claude-3-5-sonnet-20240620-v1:0"
+      IdleSessionTTLInSeconds: 300
+      AgentResourceRoleArn: "arn:aws:iam::038462779690:role/service-role/AmazonBedrockExecutionRoleForAgents_H6IPBQHRTU6"
+      MemoryConfiguration:
+        StorageDays: 30
+        SessionSummaryConfiguration:
+          MaxRecentSessions: 20
+        EnabledMemoryTypes:
+          - "SESSION_SUMMARY"
+      Instruction: |
+        Bygg dialoger med mig där du använder dessa ord naturligt och utnyttjar historiken för att säkerställa att alla ord täcks. Ställ frågor som hjälper mig att memorera dem och be mig använda orden i egna meningar. 
+        Fokusera på att skapa en logisk och engagerande konversation kring orden, där varje fråga eller svar bygger vidare på tidigare interaktion. Du behöver inte fokusera på ett ord i taget, men använd orden så ofta som möjligt. 
+        Målet är att lära mig alla ord genom aktiv interaktion. Prata endast svenska och håll varje svar till högst två meningar för att hålla dialogen dynamisk.
+      GuardrailConfiguration:
+        GuardrailIdentifier: !GetAtt BedrockGuardrail.GuardrailId
+        GuardrailVersion: !GetAtt MainGuardrailVersion.Version
+
+  AgentAliasEmmaSe:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentAliasName: !Sub "BedrockAgentEmmaSe"
+      AgentId: !GetAtt BedrockAgentEmmaSe.AgentId
+  
+  BedrockGuardrail:
+    Type: AWS::Bedrock::Guardrail
+    Properties:
+      Name: !Sub "Guardrails_${AWS::StackName}"
+      BlockedInputMessaging: "Innehållet du angav är inte tillåtet."
+      BlockedOutputsMessaging: "Systemet genererade ett otillåtet svar."
+      ContentPolicyConfig:
+        FiltersConfig:
+          - Type: SEXUAL
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: VIOLENCE
+            InputStrength: MEDIUM
+            OutputStrength: MEDIUM
+          - Type: HATE
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: INSULTS
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: MISCONDUCT
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: PROMPT_ATTACK
+            InputStrength: HIGH
+            OutputStrength: NONE
+      SensitiveInformationPolicyConfig:
+        PiiEntitiesConfig:
+          - Type: CREDIT_DEBIT_CARD_NUMBER
+            Action: BLOCK
+          - Type: US_SOCIAL_SECURITY_NUMBER
+            Action: BLOCK
+      TopicPolicyConfig:
+        TopicsConfig:
+          - Name: BlockMedicalAdvice
+            Type: DENY
+            Definition: "Denna policy blockerar medicinsk rådgivning."
+            Examples:
+              - "Det låter som om du har en muskelsträckning, du bör prova några stretchövningar."
+          - Name: BlockLegalAdvice
+            Type: DENY
+            Definition: "Denna policy blockerar juridisk rådgivning."
+            Examples:
+              - "Du har en starkt fall och bör överväga rättsliga åtgärder."
+              - "Du bör starta ett aktiebolag för att skydda dina personliga tillgångar."
+      WordPolicyConfig:
+        ManagedWordListsConfig:
+          - Type: PROFANITY
+        WordsConfig:
+          - Text: "Tramp"
+          - Text: "Putin"
+
+  MainGuardrailVersion:
+    Type: AWS::Bedrock::GuardrailVersion
+    Properties:
+      GuardrailIdentifier: !GetAtt BedrockGuardrail.GuardrailId
+  

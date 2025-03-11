@@ -9,7 +9,7 @@ namespace TalkToMe.Core.Agents;
 public class SwedishStoryTailorAgent : BaseAgent
 {
     public SwedishStoryTailorAgent(IAIProviderFactory aiProviderFactory, IQueryCounterService queryCounterService) :
-        base(aiProviderFactory, queryCounterService, AIProvider.AmazonBedrock, BedrockAIModelNames.Lama3_3_70b_v1)
+        base(aiProviderFactory, queryCounterService, AIProvider.AmazonBedrock, BedrockAIModelNames.Claude_3_5_Sonnet)
     {
     }
     

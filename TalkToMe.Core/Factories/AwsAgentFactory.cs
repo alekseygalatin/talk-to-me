@@ -1,6 +1,7 @@
 using TalkToMe.Core.Agents;
 using TalkToMe.Core.Agents.Aws;
 using TalkToMe.Core.Interfaces;
+using TalkToMe.Core.Options;
 
 namespace TalkToMe.Core.Factories;
 
@@ -27,20 +28,26 @@ public class AwsAgentFactory
     private string swedishLocale = "sv-se";
     private string englishLocale = "en-us";
 
-    public AwsAgentFactory(IAIProviderFactory aiProviderFactory, 
+    public AwsAgentFactory(
+        IAIProviderFactory aiProviderFactory, 
+        
         IHistoryService historyService, 
+        
         IWordService wordService, 
+        
         IBedrockAgentService bedrockAgentService, 
+        
         IQueryCounterService queryCounterService,
+        AwsAgentOptions awsAgentOptions,
         IVocabularyChatSessionStore _vocabularyChatSessionStore)
     {
         _swedishTranslationAgent = new SwedishTranslationAgent(aiProviderFactory, queryCounterService);
         _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory, queryCounterService);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, queryCounterService);
-        _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService, queryCounterService);
-        _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
+        _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService, queryCounterService, awsAgentOptions);
+        _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService, queryCounterService, awsAgentOptions);
         _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, queryCounterService, _vocabularyChatSessionStore); /**/
-        _retailerSwedish = new StoryRetailerSwedishAgent(bedrockAgentService, historyService, queryCounterService);
+        _retailerSwedish = new StoryRetailerSwedishAgent(bedrockAgentService, historyService, queryCounterService, awsAgentOptions);
         
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory, queryCounterService);
         _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory, queryCounterService);
