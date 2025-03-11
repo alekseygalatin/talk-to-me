@@ -30,13 +30,9 @@ public class AwsAgentFactory
 
     public AwsAgentFactory(
         IAIProviderFactory aiProviderFactory, 
-        
         IHistoryService historyService, 
-        
         IWordService wordService, 
-        
         IBedrockAgentService bedrockAgentService, 
-        
         IQueryCounterService queryCounterService,
         AwsAgentOptions awsAgentOptions,
         IVocabularyChatSessionStore _vocabularyChatSessionStore)

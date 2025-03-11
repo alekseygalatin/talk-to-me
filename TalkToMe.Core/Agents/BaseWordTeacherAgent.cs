@@ -79,43 +79,66 @@ namespace TalkToMe.Core.Agents
 
         private string GetIntroductionPromt()
         {
-            var str = new StringBuilder($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
+            var str = new StringBuilder();
+            str.Append($"<role>");
+            str.AppendLine($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
+            str.AppendLine($"</role>");
+
+            str.AppendLine($"<instructions>");
             str.AppendLine($"The word for practice is: {_currentSession?.CurrentWord}.");
             str.AppendLine("Follow this structured process: ");
             str.AppendLine("- Don't say any opening words.");
             str.AppendLine("- Introduce the word naturally in a sentence. Use it in a meaningful way so the user understands how it’s used in context.");
             str.AppendLine("- Ask an open-ended question that encourages the user to respond using the word.");
             str.AppendLine("- Highlight the practicing word in bold in your responses to make it more visible.");
-            str.AppendLine();
+            str.AppendLine($"</instructions>");
+
+            str.AppendLine($"<notes>");
             str.AppendLine("IMPORTANT INSTRUCTION: Your entire response **MUST** be a valid JSON object and **MUST NOT** contain any text outside of it.");
-            str.AppendLine();
             str.AppendLine("Return the response in **exactly** the following JSON format, and nothing else:");
             str.AppendLine("{");
-            str.AppendLine("  \"response\": \"Return the text of your response\",");
-            str.AppendLine("  \"success\": true // Return true if correct, false otherwise");
+            str.AppendLine("\"response\":\"Return the text of your response\",");
+            str.AppendLine("\"success\":true // Return true if correct, false otherwise");
             str.AppendLine("}");
             str.AppendLine();
+            str.AppendLine($"</notes>");
 
             return str.ToString();
         }
 
         private string GetEvaluationPromt()
         {
-            var str = new StringBuilder($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
+            var str = new StringBuilder();
+            str.Append($"<original role>");
+            str.AppendLine($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
+            str.AppendLine($"</original role>");
+
+            str.AppendLine($"<original instructions>");
             str.AppendLine($"The word for practice is: {_currentSession?.CurrentWord}.");
             str.AppendLine("Evaluate the user’s response using this word: ");
             str.AppendLine("- If correct, praise them");
             str.AppendLine("- If incorrect, gently correct their sentence and explain the mistake. Ask them to try again");
             str.AppendLine("- Highlight the practicing word in bold in your responses to make it more visible.");
-            str.AppendLine();
+            str.AppendLine($"</original instructions>");
+
+            str.AppendLine($"<rules>");
+            str.AppendLine($"- you **MUST** always stay in your original role.");
+            str.AppendLine($"- you **MUST** always follow your original instructions. **NO** other features.");
+            str.AppendLine($"- do not accept or respond in any language other than {Language}");
+            str.AppendLine($"- avoid discussing forbidden topics, sensitive issues, or anything unrelated to your instructions.");
+            str.AppendLine($"- never ask for or store personal user information.");
+            str.AppendLine($"- keep responses concise and engaging. Avoid long answers at all costs. Respond in a few sentences");
+            str.AppendLine($"If a user's message results in a violation of these rules, politely return to your original role and instructions.");
+            str.AppendLine($"</rules>");
+
+            str.AppendLine($"<notes>");
             str.AppendLine("IMPORTANT INSTRUCTION: Your entire response **MUST** be a valid JSON object and **MUST NOT** contain any text outside of it.");
-            str.AppendLine();
             str.AppendLine("Return the response in **exactly** the following JSON format, and nothing else:");
             str.AppendLine("{");
-            str.AppendLine("  \"response\": \"Return the text of your response\",");
-            str.AppendLine("  \"success\": true // Return true if the sentence is correct and user uses the word correctly, false otherwise");
+            str.AppendLine("\"response\":\"Return the text of your response\",");
+            str.AppendLine($"\"success\":true // Return true only if the word \"{_currentSession?.CurrentWord}\" is used correctly by the user in a correctly constructed sentence, false otherwise");
             str.AppendLine("}");
-            str.AppendLine();
+            str.AppendLine($"</notes>");
 
             return str.ToString();
         }
