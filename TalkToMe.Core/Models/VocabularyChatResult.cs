@@ -4,8 +4,8 @@ namespace TalkToMe.Core.Models
 {
     public class VocabularyChatResult
     {
-        public string response { get; set; } = default!;
-        public bool success { get; set; }
-        public VocabularyChatSessionStatus status { get; set; }
+        public string Response { get; set; } = default!;
+        public bool Success { get; set; }
+        public VocabularyChatSessionStatus Status { get; set; }
     }
 }

@@ -13,19 +13,6 @@ public class SwedishWordTeacherAgent : BaseWordTeacherAgent
     {
     }
 
-    protected override string Language
-    {
-        get
-        {
-            return "Swedish";
-        }
-    }
-
-    protected override string LanguageCode
-    {
-        get
-        {
-            return "sv-SE";
-        }
-    }
+    protected override string Language => "Swedish";
+    protected override string LanguageCode => "sv-SE";
 }

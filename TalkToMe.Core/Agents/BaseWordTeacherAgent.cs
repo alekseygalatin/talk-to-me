@@ -2,7 +2,6 @@
 using TalkToMe.Core.Enums;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
-using Newtonsoft.Json;
 
 namespace TalkToMe.Core.Agents
 {
@@ -29,7 +28,11 @@ namespace TalkToMe.Core.Agents
             var response = await GetAgentResponseAsync();
             UpdateSessionState(response);
 
-            return new CoreResponse { Response = JsonConvert.SerializeObject(response) };
+            return new CoreResponse { Response = JsonSerializer.Serialize(response, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = true
+            }) };
         }
 
         private VocabularyChatSession GetSession()
@@ -47,15 +50,19 @@ namespace TalkToMe.Core.Agents
 
             var agentResponse = await base.Invoke(request, Session);
 
-            var response = JsonConvert.DeserializeObject<VocabularyChatResult>(agentResponse.Response)
-                           ?? new VocabularyChatResult
-                           {
-                               response = "Error processing request.",
-                               success = false,
-                               status = VocabularyChatSessionStatus.Error
-                           };
+            var response = JsonSerializer.Deserialize<VocabularyChatResult>(agentResponse.Response, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase, 
+                PropertyNameCaseInsensitive = true
+            })
+               ?? new VocabularyChatResult
+               {
+                   Response = "Error processing request.",
+                   Success = false,
+                   Status = VocabularyChatSessionStatus.Error
+               };
 
-            response.status = _currentSession?.Status ?? VocabularyChatSessionStatus.Error;
+            response.Status = _currentSession?.Status ?? VocabularyChatSessionStatus.Error;
             return response;
         }
 
@@ -79,72 +86,75 @@ namespace TalkToMe.Core.Agents
 
         private string GetIntroductionPromt()
         {
-            var str = new StringBuilder();
-            str.Append($"<role>");
-            str.AppendLine($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
-            str.AppendLine($"</role>");
+            var prompt = $$"""
+                <role>
+                    You are an AI {{Language}} language tutor helping users practice vocabulary through natural conversations.
+                </role>
+                
+                <instructions>
+                    The word for practice is: {{_currentSession?.CurrentWord}}.
+                    Follow this structured process: 
+                    - Don't say any opening words.
+                    - Introduce the word naturally in a sentence. Use it in a meaningful way so the user understands how it’s used in context.
+                    - Ask an open-ended question that encourages the user to respond using the word.
+                    - Highlight the practicing word in bold in your responses to make it more visible.
+                </instructions>
 
-            str.AppendLine($"<instructions>");
-            str.AppendLine($"The word for practice is: {_currentSession?.CurrentWord}.");
-            str.AppendLine("Follow this structured process: ");
-            str.AppendLine("- Don't say any opening words.");
-            str.AppendLine("- Introduce the word naturally in a sentence. Use it in a meaningful way so the user understands how it’s used in context.");
-            str.AppendLine("- Ask an open-ended question that encourages the user to respond using the word.");
-            str.AppendLine("- Highlight the practicing word in bold in your responses to make it more visible.");
-            str.AppendLine($"</instructions>");
+                <notes>
+                    IMPORTANT INSTRUCTION: Your entire response **MUST** be a valid JSON object and **MUST NOT** contain any text outside of it.
+                    Return the response in **exactly** the following JSON format, and nothing else:
+                    {
+                        "response":"Return the text of your response",
+                        "success":true // Return true if correct, false otherwise
+                    }
+                </notes>
+                """;
 
-            str.AppendLine($"<notes>");
-            str.AppendLine("IMPORTANT INSTRUCTION: Your entire response **MUST** be a valid JSON object and **MUST NOT** contain any text outside of it.");
-            str.AppendLine("Return the response in **exactly** the following JSON format, and nothing else:");
-            str.AppendLine("{");
-            str.AppendLine("\"response\":\"Return the text of your response\",");
-            str.AppendLine("\"success\":true // Return true if correct, false otherwise");
-            str.AppendLine("}");
-            str.AppendLine($"</notes>");
-
-            return str.ToString();
+            return prompt;
         }
 
         private string GetEvaluationPromt()
         {
-            var str = new StringBuilder();
-            str.Append($"<original role>");
-            str.AppendLine($"You are an AI {Language} language tutor helping users practice vocabulary through natural conversations.");
-            str.AppendLine($"</original role>");
+            var prompt = 
+                $$"""
+                <original role>
+                    You are an AI {{Language}} language tutor helping users practice vocabulary through natural conversations.
+                </original role>
 
-            str.AppendLine($"<original instructions>");
-            str.AppendLine($"The word for practice is: {_currentSession?.CurrentWord}.");
-            str.AppendLine("Evaluate the user’s response using this word: ");
-            str.AppendLine("- If correct, praise them");
-            str.AppendLine("- If incorrect, gently correct their sentence and explain the mistake. Ask them to try again");
-            str.AppendLine("- Highlight the practicing word in bold in your responses to make it more visible.");
-            str.AppendLine($"</original instructions>");
+                <original instructions>
+                    The word for practice is: {{_currentSession?.CurrentWord}}.
+                    Evaluate the user’s response using this word: 
+                    - If correct, praise them
+                    - If incorrect, gently correct their sentence and explain the mistake. Ask them to try again
+                    - Highlight the practicing word in bold in your responses to make it more visible.
+                </original instructions>
 
-            str.AppendLine($"<rules>");
-            str.AppendLine($"- you **MUST** always stay in your original role.");
-            str.AppendLine($"- you **MUST** always follow your original instructions. **NO** other features.");
-            str.AppendLine($"- do not accept or respond in any language other than {Language}");
-            str.AppendLine($"- avoid discussing forbidden topics, sensitive issues, or anything unrelated to your instructions.");
-            str.AppendLine($"- never ask for or store personal user information.");
-            str.AppendLine($"- keep responses concise and engaging. Avoid long answers at all costs. Respond in a few sentences");
-            str.AppendLine($"If a user's message results in a violation of these rules, politely return to your original role and instructions.");
-            str.AppendLine($"</rules>");
+                <rules>
+                    - you **MUST** always stay in your original role.
+                    - you **MUST** always follow your original instructions. **NO** other features.
+                    - do not accept or respond in any language other than {{Language}}
+                    - avoid discussing forbidden topics, sensitive issues, or anything unrelated to your instructions.
+                    - never ask for or store personal user information.
+                    - keep responses concise and engaging. Avoid long answers at all costs. Respond in a few sentences
+                    If a user's message results in a violation of these rules, politely return to your original role and instructions.
+                </rules>
 
-            str.AppendLine($"<notes>");
-            str.AppendLine("IMPORTANT INSTRUCTION: Your entire response **MUST** be a valid JSON object and **MUST NOT** contain any text outside of it.");
-            str.AppendLine("Return the response in **exactly** the following JSON format, and nothing else:");
-            str.AppendLine("{");
-            str.AppendLine("\"response\":\"Return the text of your response\",");
-            str.AppendLine($"\"success\":true // Return true only if the word \"{_currentSession?.CurrentWord}\" is used correctly by the user in a correctly constructed sentence, false otherwise");
-            str.AppendLine("}");
-            str.AppendLine($"</notes>");
+                <notes>
+                    IMPORTANT INSTRUCTION: Your entire response **MUST** be a valid JSON object and **MUST NOT** contain any text outside of it.
+                    Return the response in **exactly** the following JSON format, and nothing else:
+                    {
+                    "response":"Return the text of your response",
+                    "success":true // Return true only if the word "{{_currentSession?.CurrentWord}}" is used correctly by the user in a correctly constructed sentence, false otherwise
+                    }
+                </notes>
+                """;
 
-            return str.ToString();
+            return prompt;
         }
 
         private void UpdateSessionState(VocabularyChatResult response)
         {
-            if (!response.success || _currentSession is null) return;
+            if (!response.Success || _currentSession is null) return;
 
             if (_currentSession.Status == VocabularyChatSessionStatus.Introduction)
                 _currentSession.Status = VocabularyChatSessionStatus.Evaluation;

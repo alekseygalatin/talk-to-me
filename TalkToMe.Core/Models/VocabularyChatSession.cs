@@ -18,11 +18,6 @@ namespace TalkToMe.Core.Models
 
         public string CurrentWord => (currentWordIndex < Words.Count) ? Words[currentWordIndex] : string.Empty;
 
-        public void MoveToNextWord() 
-        {
-            if (currentWordIndex >= Words.Count-1)
-                currentWordIndex = 0;
-            else currentWordIndex++;
-        }
+        public void MoveToNextWord() => currentWordIndex = (currentWordIndex + 1) % Words.Count;
     }
 }

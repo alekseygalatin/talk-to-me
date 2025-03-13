@@ -18,7 +18,7 @@ namespace TalkToMe.Controllers
             _vocabularyChatSessionStore = vocabularyChatSessionStore;
         }
 
-        [HttpPost("start")]
+        [HttpPost]
         public async Task<IActionResult> StartSession([FromBody] LanguageInfoDto request)
         {
             var words = await _vocabularyChatSessionStore.CreateSession(UserHelper.GetUserId(User), request.LanguageCode, 10);
@@ -27,11 +27,11 @@ namespace TalkToMe.Controllers
         }
 
 
-        [HttpPost("end")]
-        public IActionResult EndSession([FromBody] LanguageInfoDto request)
+        [HttpDelete("{languageCode}")]
+        public IActionResult EndSession(string languageCode)
         {
-            _vocabularyChatSessionStore.RemoveSession(UserHelper.GetUserId(User), request.LanguageCode);
-            return Ok("Session ended");
+            _vocabularyChatSessionStore.RemoveSession(UserHelper.GetUserId(User), languageCode);
+            return NoContent();
         }
 
     }

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
 
@@ -8,26 +7,22 @@ namespace TalkToMe.Core.Services
     public class InMemoryVocabularyChatSessionStore : IVocabularyChatSessionStore
     {
         private readonly ConcurrentDictionary<string, VocabularyChatSession> _sessions = new();
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IWordService _wordService;
 
-        public InMemoryVocabularyChatSessionStore(IServiceProvider serviceProvider)
+        public InMemoryVocabularyChatSessionStore(IWordService wordService)
         {
-            _serviceProvider = serviceProvider;
+            _wordService = wordService;
         }
 
         public async Task<List<string>> CreateSession(string userId, string language, int count)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var wordService = scope.ServiceProvider.GetRequiredService<IWordService>();
-            var words = await wordService.GetRandomWords(userId, language, count);
-            var wordsList = words.Select(x => x.Word).ToList();
-
-            var session = new VocabularyChatSession(wordsList);
+            var words = await _wordService.GetRandomWords(userId, language, count);
+            var session = new VocabularyChatSession(words);
             var sessionKey = GetSessionKey(userId, language);
 
             _sessions.TryAdd(sessionKey, session);
 
-            return wordsList;
+            return words;
         }
 
         public VocabularyChatSession CurrentSession(string userId, string language)

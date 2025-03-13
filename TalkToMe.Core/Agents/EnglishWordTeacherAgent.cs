@@ -13,19 +13,7 @@ public class EnglishWordTeacherAgent : BaseWordTeacherAgent
     {
     }
 
-    protected override string Language
-    {
-        get
-        {
-            return "English";
-        }
-    }
-
-    protected override string LanguageCode
-    {
-        get
-        {
-            return "en-US";
-        }
-    }
+    protected override string Language => "English";
+    protected override string LanguageCode => "en-US";
+    
 }

@@ -26,10 +26,10 @@ public class WordService : IWordService
         return _mapper.Map<List<WordResponseDto>>(wordsList);
     }
 
-    public async Task<List<WordResponseDto>> GetRandomWords(string userId, string langauge, int count)
+    public async Task<List<string>> GetRandomWords(string userId, string langauge, int count)
     {
         var wordsList = await _repository.GetRandomWordsAsync(userId, langauge, count);
-        return _mapper.Map<List<WordResponseDto>>(wordsList);
+        return wordsList;
     }
 
     public async Task AddWordToDictionary(string userId, WordRequestDto dto)

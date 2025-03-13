@@ -52,14 +52,29 @@ public class WordRepository : BaseRepository<WordEntity>, IWordRepository
         return await query.GetRemainingAsync();
     }
 
-    public async Task<List<WordEntity>> GetRandomWordsAsync(string userId, string language, int count)
+    public async Task<List<string>> GetRandomWordsAsync(string userId, string language, int count)
     {
-        var words = await GetWordsByLanguageAsync(userId, language);
-        var shuffledWords = words.Where(x => x.IncludeIntoChat).OrderBy(_ => Guid.NewGuid());
-        if (words.Count <= count)
-            return shuffledWords.ToList();
+        var scanRequest = new ScanRequest
+        {
+            TableName = TableNames.WordsTable,
+            FilterExpression = "UserId = :userId AND begins_with(LanguageWord, :languageWord) AND IncludeIntoChat = :includeIntoChat",
+            ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+        {
+            { ":userId", new AttributeValue { S = userId } },
+            { ":languageWord", new AttributeValue { S = $"{language}#" } },
+            { ":includeIntoChat", new AttributeValue { BOOL = true } }
+        },
+            ProjectionExpression = "LanguageWord", // Select only LanguageWord field
+            Limit = count * 5 // Fetch extra records for better randomness
+        };
 
-        return shuffledWords.Take(count).ToList();
+        var response = await _dynamoDb.ScanAsync(scanRequest);
+
+        return response.Items
+            .Select(item => item["LanguageWord"].S.Split('#')[1]) // Extract word after language#
+            .OrderBy(_ => Guid.NewGuid()) // Shuffle
+            .Take(count) // Select required count
+            .ToList();
     }
 
     public async Task<WordEntity?> GetWordAsync(string userId, string language, string word)
@@ -82,12 +97,21 @@ public class WordRepository : BaseRepository<WordEntity>, IWordRepository
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(languageWord))
             throw new ArgumentException("UserId and LanguageWord cannot be null or empty.");
 
-        var wordEntity = await _context.LoadAsync<WordEntity>(userId, languageWord);
-        if (wordEntity == null)
-            throw new KeyNotFoundException("Word not found");
+        var updateRequest = new UpdateItemRequest
+        {
+            TableName = TableNames.WordsTable,
+            Key = new Dictionary<string, AttributeValue>
+            {
+                { "UserId", new AttributeValue { S = userId } },
+                { "LanguageWord", new AttributeValue { S = languageWord } }
+            },
+            UpdateExpression = "SET IncludeIntoChat = :includeIntoChat",
+            ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+            {
+                { ":includeIntoChat", new AttributeValue { BOOL = includeIntoChat } }
+            }
+        };
 
-        wordEntity.IncludeIntoChat = includeIntoChat;
-
-        await _context.SaveAsync(wordEntity);
+        await _dynamoDb.UpdateItemAsync(updateRequest);
     }
 }

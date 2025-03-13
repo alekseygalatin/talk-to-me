@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using TalkToMe.Core.Exceptions;
+﻿using TalkToMe.Core.Exceptions;
 
 namespace TalkToMe.Middlewares
 {
@@ -22,15 +21,16 @@ namespace TalkToMe.Middlewares
             {
                 context.Response.StatusCode = ex.StatusCode;
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(new { message = ex.Message }));
+
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
             }
-            catch (Exception ex) // Handle unexpected errors
+            catch (Exception) // Handle unexpected errors
             {
                 context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(new { message = "An unexpected error occurred." }));
+
+                await context.Response.WriteAsJsonAsync(new { message = "An unexpected error occurred." });
             }
         }
     }
-
 }
