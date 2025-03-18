@@ -36,6 +36,15 @@ namespace TalkToMe.Core.Services
             throw new KeyNotFoundException($"Session not found for user {userId} and language {language}");
         }
 
+        public List<string> GetWords(string userId, string language)
+        {
+            var sessionKey = GetSessionKey(userId, language);
+            if (_sessions.TryGetValue(sessionKey, out var session))
+                return session.Words;
+
+            return new List<string>();
+        }
+
         public void RemoveSession(string userId, string language)
         {
             _sessions.TryRemove(GetSessionKey(userId, language), out _);

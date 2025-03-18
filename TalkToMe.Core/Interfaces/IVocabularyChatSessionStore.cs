@@ -6,6 +6,7 @@ namespace TalkToMe.Core.Interfaces
     {
         Task<List<string>> CreateSession(string userId, string language, int count);
         VocabularyChatSession CurrentSession(string userId, string language);
+        List<string> GetWords(string userId, string language);
         void RemoveSession(string userId, string language);
 
     }

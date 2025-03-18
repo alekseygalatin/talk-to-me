@@ -26,6 +26,13 @@ namespace TalkToMe.Controllers
             return Ok(words);
         }
 
+        [HttpGet("{languageCode}/words")]
+        public List<string> GetWords(string languageCode)
+        {
+            var words = _vocabularyChatSessionStore.GetWords(UserHelper.GetUserId(User), languageCode);
+
+            return words;
+        }
 
         [HttpDelete("{languageCode}")]
         public IActionResult EndSession(string languageCode)
