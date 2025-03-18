@@ -11,6 +11,7 @@ using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.Helpers;
 using TalkToMe.Infrastructure.IRepository;
 using TalkToMe.Infrastructure.Repository;
+using TalkToMe.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +89,7 @@ builder.Services.AddSingleton<IWordService, WordService>();
 builder.Services.AddSingleton<IHistoryService, HistoryService>();
 builder.Services.AddSingleton<IBedrockAgentService, BedrockAgentService>();
 builder.Services.AddSingleton<DynamoDbTableManager>();
+builder.Services.AddSingleton<IVocabularyChatSessionStore, InMemoryVocabularyChatSessionStore>();
 builder.Services.AddSingleton<AwsAgentOptions>();
 
 var app = builder.Build();
@@ -96,19 +98,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-/*app.Use(async (context, next) =>
-{
-    if (context.Request.Method == HttpMethods.Options)
-    {
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
-        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        context.Response.StatusCode = StatusCodes.Status204NoContent;
-        return;
-    }
-
-    await next();
-});*/
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors();
 
