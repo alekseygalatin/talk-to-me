@@ -7,8 +7,6 @@ using TalkToMe.Core.Configuration;
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Options;
 using TalkToMe.Core.Services;
-using TalkToMe.Domain.Entities;
-using TalkToMe.Infrastructure.Helpers;
 using TalkToMe.Infrastructure.IRepository;
 using TalkToMe.Infrastructure.Repository;
 using TalkToMe.Middlewares;
@@ -88,7 +86,6 @@ builder.Services.AddSingleton<IQueryCounterService, QueryCounterService>();
 builder.Services.AddSingleton<IWordService, WordService>();
 builder.Services.AddSingleton<IHistoryService, HistoryService>();
 builder.Services.AddSingleton<IBedrockAgentService, BedrockAgentService>();
-builder.Services.AddSingleton<DynamoDbTableManager>();
 builder.Services.AddSingleton<IVocabularyChatSessionStore, InMemoryVocabularyChatSessionStore>();
 builder.Services.AddSingleton<AwsAgentOptions>();
 
@@ -108,12 +105,5 @@ app.UseAuthorization();
 app.UseAuthorization();
 
 app.MapControllers();
-
-using (var scope = app.Services.CreateScope())
-{
-    var tableManager = scope.ServiceProvider.GetRequiredService<DynamoDbTableManager>();
-    // Seed langauges if not exist
-    await tableManager.SeedLanguageDataAsync();
-}
 
 app.Run();
