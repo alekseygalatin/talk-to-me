@@ -21,28 +21,16 @@ Resources:
       SupportedIdentityProviders:
         - COGNITO
   
-  Languages:
+  LanguagesTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Languages
+      TableName: LanguagesTable
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: Code
           AttributeType: S
       KeySchema:
         - AttributeName: Code
-          KeyType: HASH
-
-  UserPreferences:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: UserPreferences
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: UserId
-          AttributeType: S
-      KeySchema:
-        - AttributeName: UserId
           KeyType: HASH
 
   WordsTable:
