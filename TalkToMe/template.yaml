@@ -33,6 +33,18 @@ Resources:
         - AttributeName: Code
           KeyType: HASH
 
+  UserPreferencesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UserPreferencesTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: UserId
+          KeyType: HASH
+
   WordsTable:
     Type: AWS::DynamoDB::Table
     Properties:
