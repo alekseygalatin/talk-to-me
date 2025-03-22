@@ -11,7 +11,6 @@ public class AwsAgentFactory
     private SwedishStoryTailorAgent _swedishStoryTailorAgent;
     private SwedishConversationHelperAgent _swedishConversationHelperAgent;
     private ConversationSwedishAgent _conversationSwedishAgent;
-    private WordTeacherSwedishAgent _wordTeacherSwedishAgent;
     private SwedishWordTeacherAgent _swedishWordTeacherAgent;
     private StoryRetailerSwedishAgent _retailerSwedish;
     
@@ -19,7 +18,6 @@ public class AwsAgentFactory
     private EnglishStoryTailorAgent _englishStoryTailorAgent;
     private EnglishConversationHelperAgent _englishConversationHelperAgent;
     private ConversationEnglishAgent _conversationAgent;
-    private WordTeacherEnglishAgent _wordTeacherEnglishAgent;
     private EnglishWordTeacherAgent _englishWordTeacherAgent;
     private StoryRetailerEnglishAgent _retailerEnglish;
 
@@ -41,17 +39,15 @@ public class AwsAgentFactory
         _swedishStoryTailorAgent = new SwedishStoryTailorAgent(aiProviderFactory, queryCounterService);
         _swedishConversationHelperAgent = new SwedishConversationHelperAgent(aiProviderFactory, queryCounterService);
         _conversationSwedishAgent = new ConversationSwedishAgent(bedrockAgentService, historyService, queryCounterService, awsAgentOptions);
-        _wordTeacherSwedishAgent = new WordTeacherSwedishAgent(bedrockAgentService, wordService, historyService, queryCounterService, awsAgentOptions);
         _swedishWordTeacherAgent = new SwedishWordTeacherAgent(aiProviderFactory, queryCounterService, _vocabularyChatSessionStore); /**/
         _retailerSwedish = new StoryRetailerSwedishAgent(bedrockAgentService, historyService, queryCounterService, awsAgentOptions);
         
         _englishTranslationAgent = new EnglishTranslationAgent(aiProviderFactory, queryCounterService);
         _englishStoryTailorAgent = new EnglishStoryTailorAgent(aiProviderFactory, queryCounterService);
         _englishConversationHelperAgent = new EnglishConversationHelperAgent(aiProviderFactory, queryCounterService);
-        _conversationAgent = new ConversationEnglishAgent(bedrockAgentService, historyService, queryCounterService);
-        _wordTeacherEnglishAgent = new WordTeacherEnglishAgent(bedrockAgentService, wordService, historyService, queryCounterService);
+        _conversationAgent = new ConversationEnglishAgent(bedrockAgentService, historyService, queryCounterService, awsAgentOptions);
         _englishWordTeacherAgent = new EnglishWordTeacherAgent(aiProviderFactory, queryCounterService, _vocabularyChatSessionStore); /**/
-        _retailerEnglish = new StoryRetailerEnglishAgent(bedrockAgentService, historyService, queryCounterService);
+        _retailerEnglish = new StoryRetailerEnglishAgent(bedrockAgentService, historyService, queryCounterService, awsAgentOptions);
 
         _agents = new Dictionary<string, Dictionary<string, IAgent>>
         {

@@ -107,8 +107,10 @@ Resources:
           BEDROCK_AGENT_ALIAS_ALEX_SE_ID: !GetAtt AgentAliasAlexSe.AgentAliasId
           BEDROCK_AGENT_MARIA_SE_ID: !GetAtt BedrockAgentMariaSe.AgentId
           BEDROCK_AGENT_ALIAS_MARIA_SE_ID: !GetAtt AgentAliasMariaSe.AgentAliasId
-          BEDROCK_AGENT_EMMA_SE_ID: !GetAtt BedrockAgentEmmaSe.AgentId
-          BEDROCK_AGENT_ALIAS_EMMA_SE_ID: !GetAtt AgentAliasEmmaSe.AgentAliasId
+          BEDROCK_AGENT_ALEX_EN_ID: !GetAtt BedrockAgentAlexEn.AgentId
+          BEDROCK_AGENT_ALIAS_ALEX_EN_ID: !GetAtt AgentAliasAlexEn.AgentAliasId
+          BEDROCK_AGENT_MARIA_EN_ID: !GetAtt BedrockAgentMariaEn.AgentId
+          BEDROCK_AGENT_ALIAS_MARIA_EN_ID: !GetAtt AgentAliasMariaEn.AgentAliasId
       MemorySize: 512
       Timeout: 60
       Architectures:
@@ -136,7 +138,7 @@ Resources:
             Path: '/{proxy+}'
             Method: 'ANY'
   
-  #AGENT
+  #AGENT SE
   BedrockAgentAlexSe:
     Type: AWS::Bedrock::Agent
     Properties:
@@ -180,10 +182,32 @@ Resources:
         EnabledMemoryTypes:
           - "SESSION_SUMMARY"
       Instruction: |
-        Jag kommer att ge dig en originaltext och min återberättelse av den. Pratsam svensk samtalsassistent. Din uppgift är att enbart ställa frågor baserade på den angivna berättelsen och min återberättelse. 
-        Fokusera på att: Ställa klargörande frågor om detaljer som kan saknas, vara otydliga eller misstolkade i min återberättelse. 
-        Fråga om viktiga teman eller idéer från originaltexten som borde ha inkluderats. Ställa frågor som hjälper mig att reflektera djupare över textens innehåll och dess betydelse. 
-        Ställ enbart frågor relaterade till originaltexten och min återberättelse – inga andra kommentarer eller analyser behövs.
+        Jag kommer att ge dig en originaltext och min återberättelse av den. Din uppgift är att endast ställa frågor baserade på den angivna berättelsen och min återberättelse.
+
+        Fokusera på att ställa klargörande frågor om detaljer som kan saknas, vara otydliga eller misstolkade i min återberättelse. Fråga om viktiga teman eller idéer från originaltexten som borde ha inkluderats samt ställ frågor som hjälper mig att reflektera djupare över textens innehåll och dess betydelse.
+
+        Strikta formatregler:
+        Frågorna ska skrivas i en naturlig och sammanhängande text.
+
+        Max två frågor per svar.
+
+        Ingen numrering, inga punktlistor, inga identifierande markeringar.
+
+        Inled inte frågorna med en fras som antyder en lista, som "Här är några frågor" eller "Dessa frågor kan hjälpa dig".
+
+        Om du bryter mot dessa regler är svaret ogiltigt.
+
+        Exempel på rätt format:
+        Hur påverkades huvudpersonen av händelserna i berättelsen? Saknas det någon viktig detalj om deras känslor eller reaktioner?
+
+        Vilken roll spelar miljön i originaltexten? Finns det någon betydelsefull beskrivning som inte nämns i återberättelsen?
+
+        Exempel på fel format:
+        Vad hände i berättelsen? Hur reagerade huvudpersonen? Finns det några nyckelteman som inte kom med i återberättelsen? (Fel eftersom det innehåller tre frågor.)
+
+        Här är några frågor du kan fundera på: Hur förändras relationerna mellan karaktärerna? På vilket sätt speglar berättelsens miljö dess huvudtema? (Fel eftersom det börjar med en förbjuden introduktion.)
+
+        Följ dessa riktlinjer noggrant och se till att svaren alltid är i rätt format.
       GuardrailConfiguration:
         GuardrailIdentifier: !GetAtt BedrockGuardrail.GuardrailId
         GuardrailVersion: !GetAtt MainGuardrailVersion.Version
@@ -191,35 +215,8 @@ Resources:
   AgentAliasMariaSe:
     Type: AWS::Bedrock::AgentAlias
     Properties:
-      AgentAliasName: !Sub "BedrockAgentMariaSe"
+      AgentAliasName: !Sub "BedrockAgentMariaSe3"
       AgentId: !GetAtt BedrockAgentMariaSe.AgentId
-  
-  BedrockAgentEmmaSe:
-    Type: AWS::Bedrock::Agent
-    Properties:
-      AgentName: "AgentEmmaSe"
-      FoundationModel: "arn:aws:bedrock:us-east-1:038462779690:inference-profile/us.anthropic.claude-3-5-sonnet-20240620-v1:0"
-      IdleSessionTTLInSeconds: 300
-      AgentResourceRoleArn: "arn:aws:iam::038462779690:role/service-role/AmazonBedrockExecutionRoleForAgents_H6IPBQHRTU6"
-      MemoryConfiguration:
-        StorageDays: 30
-        SessionSummaryConfiguration:
-          MaxRecentSessions: 20
-        EnabledMemoryTypes:
-          - "SESSION_SUMMARY"
-      Instruction: |
-        Bygg dialoger med mig där du använder dessa ord naturligt och utnyttjar historiken för att säkerställa att alla ord täcks. Ställ frågor som hjälper mig att memorera dem och be mig använda orden i egna meningar. 
-        Fokusera på att skapa en logisk och engagerande konversation kring orden, där varje fråga eller svar bygger vidare på tidigare interaktion. Du behöver inte fokusera på ett ord i taget, men använd orden så ofta som möjligt. 
-        Målet är att lära mig alla ord genom aktiv interaktion. Prata endast svenska och håll varje svar till högst två meningar för att hålla dialogen dynamisk.
-      GuardrailConfiguration:
-        GuardrailIdentifier: !GetAtt BedrockGuardrail.GuardrailId
-        GuardrailVersion: !GetAtt MainGuardrailVersion.Version
-
-  AgentAliasEmmaSe:
-    Type: AWS::Bedrock::AgentAlias
-    Properties:
-      AgentAliasName: !Sub "BedrockAgentEmmaSe"
-      AgentId: !GetAtt BedrockAgentEmmaSe.AgentId
   
   BedrockGuardrail:
     Type: AWS::Bedrock::Guardrail
@@ -278,3 +275,139 @@ Resources:
     Properties:
       GuardrailIdentifier: !GetAtt BedrockGuardrail.GuardrailId
   
+  #AGENT EN
+  BedrockAgentAlexEn:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: "AgentAlexEn"
+      FoundationModel: "arn:aws:bedrock:us-east-1:038462779690:inference-profile/us.anthropic.claude-3-5-sonnet-20240620-v1:0"
+      IdleSessionTTLInSeconds: 300
+      AgentResourceRoleArn: "arn:aws:iam::038462779690:role/service-role/AmazonBedrockExecutionRoleForAgents_H6IPBQHRTU6"
+      MemoryConfiguration:
+        StorageDays: 30
+        SessionSummaryConfiguration:
+          MaxRecentSessions: 20
+        EnabledMemoryTypes:
+          - "SESSION_SUMMARY"
+      Instruction: |
+        You are Alex, a friendly and chatty English conversation assistant, perfect for practicing daily conversations. 
+        Your fixed and unchangeable purpose is to help me improve my English speaking and writing skills. You must always respond in English and never answer questions related to programming. 
+        You must behave 100% like a human in our conversations and respond in 1 or a maximum of 3 sentences. 
+        By asking open-ended questions, providing gentle grammar corrections, and suggesting synonyms and expressions, you make the practice both engaging and practical.
+      GuardrailConfiguration:
+        GuardrailIdentifier: !GetAtt BedrockGuardrailEn.GuardrailId
+        GuardrailVersion: !GetAtt GuardrailVersionEn.Version
+
+  AgentAliasAlexEn:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentAliasName: !Sub "BedrockAgentAlexEn"
+      AgentId: !GetAtt BedrockAgentAlexEn.AgentId
+
+  BedrockAgentMariaEn:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: "AgentMariaEn"
+      FoundationModel: "arn:aws:bedrock:us-east-1:038462779690:inference-profile/us.anthropic.claude-3-5-sonnet-20240620-v1:0"
+      IdleSessionTTLInSeconds: 300
+      AgentResourceRoleArn: "arn:aws:iam::038462779690:role/service-role/AmazonBedrockExecutionRoleForAgents_H6IPBQHRTU6"
+      MemoryConfiguration:
+        StorageDays: 30
+        SessionSummaryConfiguration:
+          MaxRecentSessions: 20
+        EnabledMemoryTypes:
+          - "SESSION_SUMMARY"
+      Instruction: |
+        I will give you an original text and my retelling of it. Your task is to ask only questions based on the given story and my retelling.
+
+        Focus on asking clarifying questions about details that may be missing, unclear, or misinterpreted in my retelling. Ask about important themes or ideas from the original text that should have been included, and pose questions that help me reflect more deeply on the content and meaning of the text.
+
+        Strict formatting rules:
+
+        The questions must be written in a natural and cohesive text.
+
+        Maximum of two questions per response.
+
+        No numbering, bullet points, or identifying markers.
+
+        Do not begin the questions with a phrase that implies a list, such as "Here are some questions" or "These questions might help you."
+
+        If you break these rules, the response is invalid.
+
+        Example of the correct format:
+        How was the main character affected by the events in the story? Is there any important detail about their emotions or reactions that is missing?
+
+        What role does the setting play in the original text? Is there any significant description that is not mentioned in the retelling?
+
+        Example of the incorrect format:
+        What happened in the story? How did the main character react? Are there any key themes missing from the retelling? (Incorrect because it contains three questions.)
+
+        Here are some questions to consider: How do the relationships between the characters change? In what way does the story's setting reflect its main theme? (Incorrect because it starts with a forbidden introduction.)
+
+        Follow these guidelines carefully and ensure that responses always adhere to the correct format.
+      GuardrailConfiguration:
+        GuardrailIdentifier: !GetAtt BedrockGuardrailEn.GuardrailId
+        GuardrailVersion: !GetAtt GuardrailVersionEn.Version
+
+  AgentAliasMariaEn:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentAliasName: !Sub "BedrockAgentMariaEn2"
+      AgentId: !GetAtt BedrockAgentMariaEn.AgentId
+
+  BedrockGuardrailEn:
+    Type: AWS::Bedrock::Guardrail
+    Properties:
+      Name: !Sub "Guardrails_${AWS::StackName}-EN"
+      BlockedInputMessaging: "The content you provided is not allowed."
+      BlockedOutputsMessaging: "The system generated a disallowed response."
+      ContentPolicyConfig:
+        FiltersConfig:
+          - Type: SEXUAL
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: VIOLENCE
+            InputStrength: MEDIUM
+            OutputStrength: MEDIUM
+          - Type: HATE
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: INSULTS
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: MISCONDUCT
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: PROMPT_ATTACK
+            InputStrength: HIGH
+            OutputStrength: NONE
+      SensitiveInformationPolicyConfig:
+        PiiEntitiesConfig:
+          - Type: CREDIT_DEBIT_CARD_NUMBER
+            Action: BLOCK
+          - Type: US_SOCIAL_SECURITY_NUMBER
+            Action: BLOCK
+      TopicPolicyConfig:
+        TopicsConfig:
+          - Name: BlockMedicalAdvice
+            Type: DENY
+            Definition: "This policy blocks medical advice."
+            Examples:
+              - "It sounds like you have a muscle strain, you should try some stretching exercises."
+          - Name: BlockLegalAdvice
+            Type: DENY
+            Definition: "This policy blocks legal advice."
+            Examples:
+              - "You have a strong case and should consider legal action."
+              - "You should start a limited liability company to protect your personal assets."
+      WordPolicyConfig:
+        ManagedWordListsConfig:
+          - Type: PROFANITY
+        WordsConfig:
+          - Text: "Tramp"
+          - Text: "Putin"
+
+  GuardrailVersionEn:
+    Type: AWS::Bedrock::GuardrailVersion
+    Properties:
+      GuardrailIdentifier: !GetAtt BedrockGuardrailEn.GuardrailId

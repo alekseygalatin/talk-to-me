@@ -60,6 +60,10 @@ public class AgentsController : ControllerBase
         {
             var instance = _agentFactory.GetAgent("maria", locale).WithSession(SessionId);
             var response = await instance.Invoke();
+            
+            var mariaChat = _agentFactory.GetAgent("maria-chat", locale);
+            await mariaChat.WithMessage($"Här är originaltexten vi ska arbeta med: {response.Response}.").WithSession(SessionId).Invoke();
+            
             return this.CreateResponse(response.Response);
         }
 
@@ -71,18 +75,10 @@ public class AgentsController : ControllerBase
     {
         if (agent == "retailerAgent")
         {
-            if (!string.IsNullOrWhiteSpace(data.Promt))
-            {
-                var instance = _agentFactory.GetAgent("maria-chat", locale);
-                var response = await instance.WithPromt(data.Promt).WithMessage(data.Text).WithSession(SessionId).Invoke();
-                return this.CreateResponse(response.Response);
-            }
-            else
-            {
-                var instance = _agentFactory.GetAgent("maria", locale);
-                var response = await instance.WithSession(SessionId).Invoke();
-                return this.CreateResponse(response.Response);
-            }
+            var instance = _agentFactory.GetAgent("maria-chat", locale);
+            var response = await instance.WithMessage($"Här är min återberättelse: {data.Text}.").WithSession(SessionId).Invoke();
+                
+            return this.CreateResponse(response.Response);
         }
         
         throw new NotFoundException($"Agent: {agent} has not been found");

@@ -54,11 +54,11 @@ public class HistoryController : ControllerBase
                 return Ok(result);
             }
         } 
-        else if (agent == "wordTeacherAgent")
+        else if (agent == "retailerAgent")
         {
             if (locale.Equals("sv-se", StringComparison.OrdinalIgnoreCase))
             {
-                var history = await _historyService.GetHistory(SessionId + "f9b126e3-4340-4009-8b72-29a4ec321e7c");
+                var history = await _historyService.GetHistory(SessionId + "6e83c910-d4c2-491f-94ce-cd8f2c468c43");
                 var result = history.Select(x => new HistoryMessageDto
                 {
                     Message = x.Message,
@@ -69,7 +69,7 @@ public class HistoryController : ControllerBase
             }
             else
             {
-                var history = await _historyService.GetHistory(SessionId + "4e4f7fdd-ad93-4189-92af-d711c92aa751");
+                var history = await _historyService.GetHistory(SessionId + "a7568025-1326-493b-9c2d-070255881e08");
                 var result = history.Select(x => new HistoryMessageDto
                 {
                     Message = x.Message,
@@ -89,14 +89,6 @@ public class HistoryController : ControllerBase
         {
             var instance = _agentFactory
                 .GetAgent("alex", locale)
-                .WithSession(SessionId);
-            
-            await instance.CleanMemory();
-        }
-        else if (agent == "wordTeacherAgent")
-        {
-            var instance = _agentFactory
-                .GetAgent("emma", locale)
                 .WithSession(SessionId);
             
             await instance.CleanMemory();

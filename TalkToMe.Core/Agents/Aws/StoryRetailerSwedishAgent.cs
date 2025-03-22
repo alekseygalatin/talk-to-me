@@ -25,13 +25,9 @@ public class StoryRetailerSwedishAgent : BaseAwsAgent
     
     public override async Task<CoreResponse> Invoke()
     {
-        var promt = new StringBuilder();
-        promt.Append($"Här är originaltexten: {Promt}. ");
-        promt.Append($"Här är min återberättelse: {Message}.");
-        
         return await base.Invoke(new CoreRequest
         {
-            Prompt = promt.ToString()
+            Prompt = Message
             
         }, Session, AwsAgentId, AwsAliasId);
     }
