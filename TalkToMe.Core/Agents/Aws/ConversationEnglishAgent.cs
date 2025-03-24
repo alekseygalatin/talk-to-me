@@ -1,17 +1,25 @@
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
+using TalkToMe.Core.Options;
 
 namespace TalkToMe.Core.Agents.Aws;
 
 public class ConversationEnglishAgent : BaseAwsAgent
 {
-    public ConversationEnglishAgent(IBedrockAgentService bedrockAgentService, IHistoryService historyService, IQueryCounterService queryCounterService) : 
-        base(bedrockAgentService, historyService, queryCounterService)
-    { 
-    }
+    private AwsAgentOptions _awsAgentOptions;
     
-    protected override string AwsAgentId => "63O8MUCFBG";
-    protected override string AwsAliasId => "QOJMBGO5LW";
+    public ConversationEnglishAgent(
+        IBedrockAgentService bedrockAgentService, 
+        IHistoryService historyService, 
+        IQueryCounterService queryCounterService,
+        AwsAgentOptions awsAgentOptions) : 
+        base(bedrockAgentService, historyService, queryCounterService)
+    {
+        _awsAgentOptions = awsAgentOptions;
+    }
+
+    protected override string AwsAgentId => _awsAgentOptions.ConversationAgentEnId;
+    protected override string AwsAliasId => _awsAgentOptions.ConversationAgentAliasEnId;
 
     public override string AgentId => "7b542e6e-7e2a-424f-8e76-0fec63cb2568";
     
