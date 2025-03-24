@@ -25,14 +25,9 @@ public class StoryRetailerEnglishAgent : BaseAwsAgent
     
     public override async Task<CoreResponse> Invoke()
     {
-        var promt = new StringBuilder();
-        promt.Append($"This is original text: {Promt}. ");
-        promt.Append($"This is my retailing: {Message}.");
-        
         return await base.Invoke(new CoreRequest
         {
-            Prompt = promt.ToString()
-            
+            Prompt = string.IsNullOrEmpty(Message) ? $"This is original text: {Promt}. " : $"This is my retailing: {Message}."
         }, Session, AwsAgentId, AwsAliasId);
     }
 }

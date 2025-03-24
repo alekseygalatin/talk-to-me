@@ -62,7 +62,7 @@ public class AgentsController : ControllerBase
             var response = await instance.Invoke();
             
             var mariaChat = _agentFactory.GetAgent("maria-chat", locale);
-            await mariaChat.WithMessage($"Här är originaltexten vi ska arbeta med: {response.Response}.").WithSession(SessionId).Invoke();
+            await mariaChat.WithPromt(response.Response).WithSession(SessionId).Invoke();
             
             return this.CreateResponse(response.Response);
         }
@@ -76,7 +76,7 @@ public class AgentsController : ControllerBase
         if (agent == "retailerAgent")
         {
             var instance = _agentFactory.GetAgent("maria-chat", locale);
-            var response = await instance.WithMessage($"Här är min återberättelse: {data.Text}.").WithSession(SessionId).Invoke();
+            var response = await instance.WithMessage(data.Text).WithSession(SessionId).Invoke();
                 
             return this.CreateResponse(response.Response);
         }

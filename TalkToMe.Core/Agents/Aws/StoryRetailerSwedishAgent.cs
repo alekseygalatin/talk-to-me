@@ -27,8 +27,7 @@ public class StoryRetailerSwedishAgent : BaseAwsAgent
     {
         return await base.Invoke(new CoreRequest
         {
-            Prompt = Message
-            
+            Prompt = string.IsNullOrEmpty(Message) ? $"Här är originaltexten vi ska arbeta med: {Promt}" : $"Här är min återberättelse: {Message}"
         }, Session, AwsAgentId, AwsAliasId);
     }
 }
