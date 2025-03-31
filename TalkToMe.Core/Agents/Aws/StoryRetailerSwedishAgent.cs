@@ -1,6 +1,7 @@
 using TalkToMe.Core.Interfaces;
 using TalkToMe.Core.Models;
 using TalkToMe.Core.Options;
+using TalkToMe.Domain.Enums;
 
 namespace TalkToMe.Core.Agents.Aws;
 
@@ -25,9 +26,19 @@ public class StoryRetailerSwedishAgent : BaseAwsAgent
     
     public override async Task<CoreResponse> Invoke()
     {
+        if (string.IsNullOrEmpty(Message))
+        {
+            await AddHistory(Session, Promt, ChatRole.Assistant);
+            
+            return await base.Invoke(new CoreRequest
+            {
+                Prompt = $"Här är originaltexten vi ska arbeta med: {Promt}"
+            }, Session, AwsAgentId, AwsAliasId, skipHistory: true);
+        }
+        
         return await base.Invoke(new CoreRequest
         {
-            Prompt = string.IsNullOrEmpty(Message) ? $"Här är originaltexten vi ska arbeta med: {Promt}" : $"Här är min återberättelse: {Message}"
+            Prompt = $"Här är min återberättelse: {Message}"
         }, Session, AwsAgentId, AwsAliasId);
     }
 }
