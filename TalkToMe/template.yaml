@@ -94,7 +94,37 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: Ttl
         Enabled: true
-      
+  
+  FeedbacksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FeedbacksTable
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+        - AttributeName: UserId
+          AttributeType: S
+        - AttributeName: CreatedAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: UserFeedbackIndex
+          KeySchema:
+            - AttributeName: UserId
+              KeyType: HASH
+            - AttributeName: CreatedAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: INCLUDE
+            NonKeyAttributes:
+              - Content
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
