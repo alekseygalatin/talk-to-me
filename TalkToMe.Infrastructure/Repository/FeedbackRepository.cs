@@ -19,18 +19,20 @@ namespace TalkToMe.Infrastructure.Repository
             var request = new QueryRequest
             {
                 TableName = TableNames.FeedbacksTable,
-                IndexName = "UserFeedbackIndex", 
-                KeyConditionExpression = "GSI_PK = :userId",
+                KeyConditionExpression = "UserId = :userId",
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>
                 {
                     { ":userId", new AttributeValue { S = userId } }
                 },
-                ProjectionExpression = "CreatedAt", 
                 ScanIndexForward = false,
-                Limit = 1 
+                Limit = 1
             };
 
             var response = await _dynamoDb.QueryAsync(request);
+
+            if (response.Items.Count == 0)
+                return null;
+
             var latestFeedbackDateStr = response.Items.FirstOrDefault()?["CreatedAt"].S;
 
             if (DateTime.TryParse(latestFeedbackDateStr, out DateTime latestFeedbackDate)) 
