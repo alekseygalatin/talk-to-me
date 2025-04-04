@@ -4,6 +4,6 @@ namespace TalkToMe.Infrastructure.IRepository
 {
     public interface IFeedbackRepository : IBaseRepository<Feedback>
     {
-        Task<DateTime?> GetLastFeedbackDate(string userId);
+        Task<long?> GetLastFeedbackDate(string userId);
     }
 }
