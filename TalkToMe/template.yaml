@@ -94,7 +94,23 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: Ttl
         Enabled: true
-      
+  
+  FeedbacksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FeedbacksTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S
+        - AttributeName: CreatedAt
+          AttributeType: N 
+      KeySchema:
+        - AttributeName: UserId
+          KeyType: HASH
+        - AttributeName: CreatedAt
+          KeyType: RANGE
+
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
