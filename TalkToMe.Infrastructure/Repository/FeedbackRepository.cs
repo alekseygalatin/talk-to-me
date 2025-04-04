@@ -14,7 +14,7 @@ namespace TalkToMe.Infrastructure.Repository
             _dynamoDb = dynamoDb;
         }
 
-        public async Task<DateTime?> GetLastFeedbackDate(string userId)
+        public async Task<long?> GetLastFeedbackDate(string userId)
         {
             var request = new QueryRequest
             {
@@ -30,15 +30,10 @@ namespace TalkToMe.Infrastructure.Repository
 
             var response = await _dynamoDb.QueryAsync(request);
 
-            if (response.Items.Count == 0)
-                return null;
+            var latestFeedbackTimeStampStr = response.Items.FirstOrDefault()?["CreatedAt"].N;
 
-            var latestFeedbackDateStr = response.Items.FirstOrDefault()?["CreatedAt"].S;
-
-            if (DateTime.TryParse(latestFeedbackDateStr, out DateTime latestFeedbackDate)) 
-            {
-                return latestFeedbackDate;
-            }
+            if (long.TryParse(latestFeedbackTimeStampStr, out long latestFeedbackTimeStamp)) 
+                return latestFeedbackTimeStamp;
 
             return null;
         }

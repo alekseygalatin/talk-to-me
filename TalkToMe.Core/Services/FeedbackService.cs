@@ -31,10 +31,12 @@ namespace TalkToMe.Core.Services
             if (feedback.Content.Length > maxLength)
                 throw new UserFriendlyException($"Feedback content maximum length is {maxLength}");
 
-            var lastFeedbackDate = await _repository.GetLastFeedbackDate(feedback.UserId);
-            if (lastFeedbackDate != null) 
+            var lastFeedbackTimestamp = await _repository.GetLastFeedbackDate(feedback.UserId);
+
+            if (lastFeedbackTimestamp.HasValue) 
             {
-                if ((DateTime.UtcNow - lastFeedbackDate.Value).TotalMinutes < 60)
+                var currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                if (currentTimestamp - lastFeedbackTimestamp.Value < 3600)
                     throw new UserFriendlyException("You can submit feedback only once per hour");
             }
 
