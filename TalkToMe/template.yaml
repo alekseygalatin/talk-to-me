@@ -120,7 +120,7 @@ Resources:
         - AttributeName: UserId
           AttributeType: S
         - AttributeName: CreatedAt
-          AttributeType: S
+          AttributeType: N
       KeySchema:
         - AttributeName: UserId
           KeyType: HASH
