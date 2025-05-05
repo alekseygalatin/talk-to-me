@@ -1,8 +1,7 @@
-﻿using AutoMapper;
+﻿using TalkToMe.Core.DTO.Extensions;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.DTO.Response;
 using TalkToMe.Core.Interfaces;
-using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.IRepository;
 
 namespace TalkToMe.Core.Services
@@ -10,18 +9,16 @@ namespace TalkToMe.Core.Services
     public class LanguageService : ILanguageService
     {
         private readonly ILanguageRepository _repository;
-        private readonly IMapper _mapper;
 
-        public LanguageService(ILanguageRepository repository, IMapper mapper)
+        public LanguageService(ILanguageRepository repository)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
         public async Task<List<LanguageResponseDto>> GetAllLanguagesAsync(bool onlyActive = true)
         {
             var languages = await _repository.GetAllLanguagesAsync();
-            return _mapper.Map<List<LanguageResponseDto>>(languages);
+            return languages.ToResponseList();
         }
 
         public async Task<LanguageResponseDto> GetByIdAsync(string code)
@@ -32,7 +29,7 @@ namespace TalkToMe.Core.Services
             var language = await _repository.GetByIdAsync(code);
             if (language == null) return null;
 
-            return _mapper.Map<LanguageResponseDto>(language);
+            return language.ToResponseDto();
         }
 
         public async Task CreateAsync(LanguageRequestDto dto)
@@ -40,7 +37,7 @@ namespace TalkToMe.Core.Services
             if (dto is null)
                 throw new ArgumentNullException(nameof(dto));
 
-            var language = _mapper.Map<Language>(dto);
+            var language = dto.ToEntity();
 
             await _repository.CreateAsync(language);
         }

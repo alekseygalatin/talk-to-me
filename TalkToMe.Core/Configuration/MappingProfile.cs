@@ -8,10 +8,6 @@ namespace TalkToMe.Core.Configuration
     {
         public MappingProfile()
         {
-            CreateMap<UserPreference, UserPreferenceResponseDto>();
-            CreateMap<UserPreferenceRequestDto, UserPreference>();
-            CreateMap<LanguageRequestDto, Language>();
-            CreateMap<Language, LanguageResponseDto>();
             CreateMap<WordRequestDto, WordEntity>();
             CreateMap<WordEntity, WordResponseDto>();
             CreateMap<FeedbackRequestDto, Feedback>();
