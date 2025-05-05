@@ -10,7 +10,7 @@ namespace TalkToMe.Domain.Entities
         public string UserId { get; set; } = default!;
         
         [DynamoDBRangeKey]
-        public DateTime CreatedAt { get; set; }
+        public long CreatedAt { get; set; }
 
         [DynamoDBProperty]
         public string Comment { get; set; } = default!;
