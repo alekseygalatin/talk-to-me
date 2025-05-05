@@ -8,12 +8,14 @@ namespace TalkToMe.Domain.Entities
     {
         [DynamoDBHashKey]
         public string UserId { get; set; } = default!;
+        
+        [DynamoDBRangeKey]
+        public DateTime CreatedAt { get; set; }
 
         [DynamoDBProperty]
         public string Comment { get; set; } = default!;
 
-        [DynamoDBProperty]
-        public DateTime CreatedAt { get; set; }
+        
     }
 
 }

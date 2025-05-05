@@ -119,9 +119,13 @@ Resources:
       AttributeDefinitions:
         - AttributeName: UserId
           AttributeType: S
+        - AttributeName: CreatedAt
+          AttributeType: S
       KeySchema:
         - AttributeName: UserId
           KeyType: HASH
+        - AttributeName: CreatedAt
+          KeyType: RANGE
 
   ApiFunction:
     Type: AWS::Serverless::Function
