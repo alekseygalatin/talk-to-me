@@ -114,7 +114,6 @@ Resources:
   SubscriptionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: SubscriptionsTable
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: UserId
