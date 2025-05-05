@@ -8,5 +8,6 @@
         public const string ChatHistory = "ChatHistoryTable";
         public const string QueryCountersTable = "QueryCountersTable";
         public const string FeedbacksTable = "FeedbacksTable";
+        public const string SubscriptionsTable = "SubscriptionsTable";
     }
 }
