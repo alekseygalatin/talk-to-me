@@ -114,18 +114,13 @@ Resources:
   SubscriptionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: SubscriptionsTable
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: UserId
           AttributeType: S
-        - AttributeName: CreatedAt
-          AttributeType: N
       KeySchema:
         - AttributeName: UserId
           KeyType: HASH
-        - AttributeName: CreatedAt
-          KeyType: RANGE
 
   ApiFunction:
     Type: AWS::Serverless::Function
