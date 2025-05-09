@@ -9,7 +9,7 @@ namespace TalkToMe.Domain.Entities
         [DynamoDBHashKey]
         public string UserId { get; set; } = default!;
         
-        [DynamoDBRangeKey]
+        [DynamoDBProperty]
         public long CreatedAt { get; set; }
 
         [DynamoDBProperty]

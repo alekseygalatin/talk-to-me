@@ -45,11 +45,10 @@ namespace TalkToMe.Infrastructure.Repository
 
         public async Task DeleteAsync(string key)
         {
-            var search = _context.QueryAsync<T>(key);
-            var items = await search.GetRemainingAsync();
-            foreach (var item in items)
+            var entity = await _context.LoadAsync<T>(key);
+            if (entity != null)
             {
-                await _context.DeleteAsync(item);
+                await _context.DeleteAsync(entity);
             }
         }
     }
