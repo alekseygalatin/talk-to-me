@@ -86,6 +86,7 @@ builder.Services.AddSingleton<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddSingleton<IQueryCounterService, QueryCounterService>();
 builder.Services.AddSingleton<IWordService, WordService>();
 builder.Services.AddSingleton<IFeedbackService, FeedbackService>();
+builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
 builder.Services.AddSingleton<IHistoryService, HistoryService>();
 builder.Services.AddSingleton<IBedrockAgentService, BedrockAgentService>();
 builder.Services.AddSingleton<IVocabularyChatSessionStore, InMemoryVocabularyChatSessionStore>();
