@@ -1,8 +1,7 @@
-﻿using AutoMapper;
+﻿using TalkToMe.Core.DTO.Extensions;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.Exceptions;
 using TalkToMe.Core.Interfaces;
-using TalkToMe.Domain.Entities;
 using TalkToMe.Infrastructure.IRepository;
 
 namespace TalkToMe.Core.Services
@@ -10,13 +9,10 @@ namespace TalkToMe.Core.Services
     public class FeedbackService: IFeedbackService
     {
         private readonly IFeedbackRepository _repository;
-        private readonly IMapper _mapper;
 
-        public FeedbackService(IFeedbackRepository repository,
-            IMapper mapper)
+        public FeedbackService(IFeedbackRepository repository)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
         public async Task SaveFeedbackAsync(FeedbackRequestDto feedback)
@@ -31,16 +27,20 @@ namespace TalkToMe.Core.Services
             if (feedback.Content.Length > maxLength)
                 throw new UserFriendlyException($"Feedback content maximum length is {maxLength}");
 
-            var lastFeedbackTimestamp = await _repository.GetLastFeedbackDate(feedback.UserId);
+            var lastFeedback = await _repository.GetLastFeedbackDate(feedback.UserId);
 
-            if (lastFeedbackTimestamp.HasValue) 
+            if (lastFeedback.HasValue)
             {
-                var currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                if (currentTimestamp - lastFeedbackTimestamp.Value < 3600)
-                    throw new UserFriendlyException("You can submit feedback only once per hour");
+                var elapsed = DateTimeOffset.UtcNow - DateTimeOffset.FromUnixTimeSeconds(lastFeedback.Value);
+
+                if (elapsed.TotalSeconds < 3600)
+                {
+                    var minutesRemaining = Math.Ceiling((3600 - elapsed.TotalSeconds) / 60);
+                    throw new UserFriendlyException($"You can submit feedback again in {minutesRemaining} minutes.");
+                }
             }
 
-            await _repository.CreateAsync(_mapper.Map<Feedback>(feedback));
+            await _repository.CreateAsync(feedback.ToEntity());
         }
 
     }
