@@ -51,5 +51,14 @@ namespace TalkToMe.Infrastructure.Repository
                 await _context.DeleteAsync(entity);
             }
         }
+        
+        public async Task DeleteManyAsync(string key)
+        {
+            var items = await GetManyByIdAsync(key);
+            foreach (var item in items)
+            {
+                await _context.DeleteAsync(item);
+            }
+        }
     }
 }

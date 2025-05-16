@@ -39,6 +39,6 @@ public class HistoryService : IHistoryService
     
     public async Task CleanAgentHistory(string sessionId)
     {
-        await _chatHistoryRepository.DeleteAsync(sessionId);
+        await _chatHistoryRepository.DeleteManyAsync(sessionId);
     }
 }
