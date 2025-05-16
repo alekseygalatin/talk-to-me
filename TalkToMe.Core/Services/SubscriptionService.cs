@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using TalkToMe.Core.DTO.Extensions;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.Exceptions;
 using TalkToMe.Core.Interfaces;
@@ -10,13 +10,10 @@ namespace TalkToMe.Core.Services
     public class SubscriptionService : ISubscriptionService
     {
         private readonly IBaseRepository<Subscription> _repository;
-        private readonly IMapper _mapper;
 
-        public SubscriptionService(IBaseRepository<Subscription> repository,
-            IMapper mapper)
+        public SubscriptionService(IBaseRepository<Subscription> repository)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
         public async Task RequestSubscription(SubscriptionRequestDto subscription)
@@ -31,7 +28,7 @@ namespace TalkToMe.Core.Services
             if (subscription.Comment.Length > maxLength)
                 throw new UserFriendlyException($"Subscription comment maximum length is {maxLength}");
 
-            await _repository.CreateAsync(_mapper.Map<Subscription>(subscription));
+            await _repository.CreateAsync(subscription.ToEntity());
         }
 
         public async Task<bool> SubscriptionRequested(string userId) 

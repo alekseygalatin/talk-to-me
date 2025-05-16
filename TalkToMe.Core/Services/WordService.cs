@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using TalkToMe.Core.DTO.Extensions;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.DTO.Response;
 using TalkToMe.Core.Exceptions;
@@ -11,19 +11,16 @@ namespace TalkToMe.Core.Services;
 public class WordService : IWordService
 {
     private readonly IWordRepository _repository;
-    private readonly IMapper _mapper;
 
-    public WordService(IWordRepository repository,
-        IMapper mapper)
+    public WordService(IWordRepository repository)
     {
         _repository = repository;
-        _mapper = mapper;
     }
 
     public async Task<List<WordResponseDto>> GetWords(string userId, string langauge)
     {
         var wordsList = await _repository.GetWordsByLanguageAsync(userId, langauge);
-        return _mapper.Map<List<WordResponseDto>>(wordsList);
+        return wordsList.ToResponseList();
     }
 
     public async Task<List<string>> GetRandomWords(string userId, string langauge, int count)
@@ -47,8 +44,7 @@ public class WordService : IWordService
         if (wordsCount >= wordsLimit)
             throw new UserFriendlyException($"You have reached a limit of words ({wordsLimit})");
 
-        var word = _mapper.Map<WordEntity>(dto);
-        word.UserId = userId;
+        var word = dto.ToEntity(userId);
         word.IncludeIntoChat = true;
 
         await _repository.CreateAsync(word);

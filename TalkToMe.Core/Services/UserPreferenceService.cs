@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using TalkToMe.Core.DTO.Extensions;
 using TalkToMe.Core.DTO.Request;
 using TalkToMe.Core.DTO.Response;
 using TalkToMe.Core.Interfaces;
@@ -10,12 +10,10 @@ namespace TalkToMe.Core.Services
     public class UserPreferenceService : IUserPreferenceService
     {
         private readonly IBaseRepository<UserPreference> _repository;
-        private readonly IMapper _mapper;
 
-        public UserPreferenceService(IBaseRepository<UserPreference> repository, IMapper mapper)
+        public UserPreferenceService(IBaseRepository<UserPreference> repository)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
         public async Task<UserPreferenceResponseDto> GetByIdAsync(string userId)
@@ -26,7 +24,7 @@ namespace TalkToMe.Core.Services
             var preferences = await _repository.GetByIdAsync(userId);
             if (preferences == null) return null;
 
-            return _mapper.Map<UserPreferenceResponseDto>(preferences);
+            return preferences.ToResponseDto();
         }
 
         public async Task CreateAsync(string userId, UserPreferenceRequestDto dto)
@@ -37,8 +35,7 @@ namespace TalkToMe.Core.Services
             if (dto is null)
                 throw new ArgumentNullException(nameof(dto));
 
-            var userPreferecnce = _mapper.Map<UserPreference>(dto);
-            userPreferecnce.UserId = userId;
+            var userPreferecnce = dto.ToEntity(userId);
 
             await _repository.CreateAsync(userPreferecnce);
         }

@@ -1,5 +1,4 @@
 using Amazon.DynamoDBv2;
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.OpenApi.Models;
 using TalkToMe.Configuration;
@@ -67,13 +66,6 @@ builder.Services.AddBedrockServices(new BedrockSettings
     DefaultModelId = "us.meta.llama3-1-8b-instruct-v1:0"
 });
 
-var mapperConfig = new MapperConfiguration(mc =>
-{
-    mc.AddProfile(new MappingProfile());
-});
-
-var mapper = mapperConfig.CreateMapper();
-builder.Services.AddSingleton(mapper);
 builder.Services.AddAWSService<IAmazonDynamoDB>();
 builder.Services.AddSingleton(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddSingleton<ILanguageRepository, LanguageRepository>();
