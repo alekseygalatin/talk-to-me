@@ -122,7 +122,28 @@ Resources:
       KeySchema:
         - AttributeName: UserId
           KeyType: HASH
+  
+  GenerateCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: 'api.talknlearn.com'
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: 'api.talknlearn.com'
+          HostedZoneId: 'Z05101631G3V0BC00Q366'
 
+  HttpApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: "talkandlearn-rest-api"
+      StageName: 'Prod'
+      Description: "REST API for HTTP-invoked."
+      Domain:
+        DomainName: 'api.talknlearn.com'
+        CertificateArn: !Ref GenerateCertificate
+        Route53:
+          HostedZoneId: 'Z05101631G3V0BC00Q366'
+          
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -165,6 +186,7 @@ Resources:
           Properties:
             Path: '/{proxy+}'
             Method: 'ANY'
+            RestApiId: !Ref HttpApi
   
   #AGENT SE
   BedrockAgentAlexSe:
