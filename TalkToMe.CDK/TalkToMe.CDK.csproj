@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Amazon.CDK.Lib" Version="2.208.0" />
+      <PackageReference Include="AWSSDK.Bedrock" Version="4.0.8.1" />
+      <PackageReference Include="AWSSDK.BedrockAgent" Version="4.0.4.1" />
+      <PackageReference Include="AWSSDK.BedrockAgentRuntime" Version="4.0.4.10" />
+      <PackageReference Include="Constructs" Version="10.4.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Resources\Instructions\comprehension-analyzer-english.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instructions\comprehension-analyzer-swedish.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instructions\supervisor.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instructions\text-generator-english.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instructions\text-generator-swedish.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
